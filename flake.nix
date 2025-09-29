@@ -94,6 +94,7 @@
       svr1chng = mkNixOSConfig ./machines/svr1chng/configuration.nix;
       svr2chng = mkNixOSConfig ./machines/svr2chng/configuration.nix;
       svr3chng = mkNixOSConfig ./machines/svr3chng/configuration.nix;
+      svr1shaikh = mkNixOSConfig ./machines/svr1shaikh/configuration.nix;
       iso1chng = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {inherit inputs outputs vars;};

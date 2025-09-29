@@ -34,14 +34,22 @@ if [ "$(uname)" == "Darwin" ]; then
   echo -e "\033[1mnix run nix-darwin -- switch --flake github:eh8/chenglab#mac1chng\033[0m\n"
   echo -e "Remember to add the new host public key to sops-nix!"
 elif [ "$(uname)" == "Linux" ]; then
-  # Define disk
-  DISK="/dev/nvme0n1"
-  DISK_BOOT_PARTITION="/dev/nvme0n1p1"
-  DISK_NIX_PARTITION="/dev/nvme0n1p2"
+  # Define disks
+  OS_DISK="/dev/nvme0n1"
+  OS_BOOT_PARTITION="/dev/nvme0n1p1"
+  OS_NIX_PARTITION="/dev/nvme0n1p2"
+  
+  # Data drives for RAID array
+  DATA_DRIVES=("/dev/sda" "/dev/sdc" "/dev/sdd" "/dev/sde")
+  RAID_DEVICE="/dev/md0"
+  LUKS_DEVICE="cryptdata"
+  VG_NAME="storage"
+  LV_NAME="data"
 
   # Display warning and wait for confirmation to proceed
   echo "Linux detected"
   echo -e "\n\033[1;31m**Warning:** This script is irreversible and will prepare system for NixOS installation.\033[0m"
+  echo -e "\033[1;33m**Setup:** OS on NVMe, Data RAID on 4x 2.5TB SSDs with RAID→LUKS→LVM→ext4\033[0m"
   read -n 1 -s -r -p "Press any key to continue or Ctrl+C to abort..."
 
   # Clear screen before showing disk layout
@@ -56,28 +64,65 @@ elif [ "$(uname)" == "Linux" ]; then
   echo -e "\n\033[1mUndoing any previous changes...\033[0m"
   set +e
   umount -R /mnt
-  cryptsetup close cryptroot
+  umount -R /mnt/data
+  cryptsetup close $LUKS_DEVICE
+  vgchange -a n $VG_NAME
+  mdadm --stop $RAID_DEVICE
   set -e
   echo -e "\033[32mPrevious changes undone.\033[0m"
 
-  # Partitioning disk
-  echo -e "\n\033[1mPartitioning disk...\033[0m"
-  parted $DISK -- mklabel gpt
-  parted $DISK -- mkpart ESP fat32 1MiB 512MiB
-  parted $DISK -- set 1 boot on
-  parted $DISK -- mkpart Nix 512MiB 100%
-  echo -e "\033[32mDisk partitioned successfully.\033[0m"
+  # Partitioning OS disk (NVMe)
+  echo -e "\n\033[1mPartitioning OS disk (NVMe)...\033[0m"
+  parted $OS_DISK -- mklabel gpt
+  parted $OS_DISK -- mkpart ESP fat32 1MiB 512MiB
+  parted $OS_DISK -- set 1 boot on
+  parted $OS_DISK -- mkpart Nix 512MiB 100%
+  echo -e "\033[32mOS disk partitioned successfully.\033[0m"
+
+  # Partitioning data drives for RAID
+  echo -e "\n\033[1mPartitioning data drives for RAID...\033[0m"
+  for drive in "${DATA_DRIVES[@]}"; do
+    echo "Partitioning $drive..."
+    parted $drive -- mklabel gpt
+    parted $drive -- mkpart primary 1MiB 100%
+    parted $drive -- set 1 raid on
+  done
+  echo -e "\033[32mData drives partitioned successfully.\033[0m"
+
+  # Creating RAID array
+  echo -e "\n\033[1mCreating RAID 5 array...\033[0m"
+  mdadm --create $RAID_DEVICE --level=5 --raid-devices=4 "${DATA_DRIVES[@]}1"
+  echo -e "\033[32mRAID array created successfully.\033[0m"
 
   # Setting up encryption
   echo -e "\n\033[1mSetting up encryption...\033[0m"
-  cryptsetup -q -v luksFormat $DISK_NIX_PARTITION
-  cryptsetup -q -v open $DISK_NIX_PARTITION cryptroot
-  echo -e "\033[32mEncryption setup completed.\033[0m"
+  # OS encryption
+  cryptsetup -q -v luksFormat $OS_NIX_PARTITION
+  cryptsetup -q -v open $OS_NIX_PARTITION cryptroot
+  echo -e "\033[32mOS encryption setup completed.\033[0m"
+  
+  # Data encryption (RAID → LUKS)
+  echo -e "\n\033[1mSetting up data encryption...\033[0m"
+  cryptsetup -q -v luksFormat $RAID_DEVICE
+  cryptsetup -q -v open $RAID_DEVICE $LUKS_DEVICE
+  echo -e "\033[32mData encryption setup completed.\033[0m"
+
+  # Setting up LVM for data
+  echo -e "\n\033[1mSetting up LVM for data...\033[0m"
+  pvcreate /dev/mapper/$LUKS_DEVICE
+  vgcreate $VG_NAME /dev/mapper/$LUKS_DEVICE
+  lvcreate -l 100%FREE -n $LV_NAME $VG_NAME
+  echo -e "\033[32mLVM setup completed.\033[0m"
 
   # Creating filesystems
   echo -e "\n\033[1mCreating filesystems...\033[0m"
-  mkfs.fat -F32 -n boot $DISK_BOOT_PARTITION
+  # OS filesystems
+  mkfs.fat -F32 -n boot $OS_BOOT_PARTITION
   mkfs.ext4 -F -L nix -m 0 /dev/mapper/cryptroot
+  
+  # Data filesystem (RAID → LUKS → LVM → ext4)
+  mkfs.ext4 -F -L data -m 0 /dev/mapper/$VG_NAME-$LV_NAME
+  
   # Let mkfs catch its breath
   sleep 2
   echo -e "\033[32mFilesystems created successfully.\033[0m"
@@ -85,9 +130,10 @@ elif [ "$(uname)" == "Linux" ]; then
   # Mounting filesystems
   echo -e "\n\033[1mMounting filesystems...\033[0m"
   mount -t tmpfs none /mnt
-  mkdir -pv /mnt/{boot,nix,etc/ssh,var/{lib,log}}
+  mkdir -pv /mnt/{boot,nix,data,etc/ssh,var/{lib,log}}
   mount /dev/disk/by-label/boot /mnt/boot
   mount /dev/disk/by-label/nix /mnt/nix
+  mount /dev/disk/by-label/data /mnt/data
   mkdir -pv /mnt/nix/{secret/initrd,persist/{etc/ssh,var/{lib,log}}}
   chmod 0700 /mnt/nix/secret
   mount -o bind /mnt/nix/persist/var/log /mnt/var/log
