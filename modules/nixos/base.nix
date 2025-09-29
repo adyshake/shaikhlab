@@ -80,7 +80,7 @@
 
   programs.zsh.enable = true;
   security.sudo.wheelNeedsPassword = false;
-  time.timeZone = "America/New_York";
+  time.timeZone = "America/Los_Angeles";
   zramSwap.enable = true;
 
   environment.persistence."/nix/persist" = {

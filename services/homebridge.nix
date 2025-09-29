@@ -59,9 +59,9 @@
 
   services.nginx = {
     virtualHosts = {
-      "home.chengeric.com" = {
+      "home.adnanshaikh.com" = {
         forceSSL = true;
-        useACMEHost = "chengeric.com";
+        useACMEHost = "adnanshaikh.com";
         locations."/" = {
           recommendedProxySettings = true;
           proxyPass = "http://127.0.0.1:8581";

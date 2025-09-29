@@ -34,7 +34,7 @@
   programs.zsh.enable = true;
   security.sudo.wheelNeedsPassword = false;
   services.vscode-server.enable = true;
-  time.timeZone = "America/New_York";
+  time.timeZone = "America/Los_Angeles";
   zramSwap.enable = true;
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion

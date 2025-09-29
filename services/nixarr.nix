@@ -83,45 +83,45 @@
 
   services.nginx = {
     virtualHosts = {
-      "watch.chengeric.com" = {
+      "watch.adnanshaikh.com" = {
         forceSSL = true;
-        useACMEHost = "chengeric.com";
+        useACMEHost = "adnanshaikh.com";
         locations."/" = {
           recommendedProxySettings = true;
           proxyPass = "http://127.0.0.1:8096";
         };
       };
 
-      "prowlarr.chengeric.com" = {
+      "prowlarr.adnanshaikh.com" = {
         forceSSL = true;
-        useACMEHost = "chengeric.com";
+        useACMEHost = "adnanshaikh.com";
         locations."/" = {
           recommendedProxySettings = true;
           proxyPass = "http://127.0.0.1:9696";
         };
       };
 
-      "radarr.chengeric.com" = {
+      "radarr.adnanshaikh.com" = {
         forceSSL = true;
-        useACMEHost = "chengeric.com";
+        useACMEHost = "adnanshaikh.com";
         locations."/" = {
           recommendedProxySettings = true;
           proxyPass = "http://127.0.0.1:7878";
         };
       };
 
-      "sonarr.chengeric.com" = {
+      "sonarr.adnanshaikh.com" = {
         forceSSL = true;
-        useACMEHost = "chengeric.com";
+        useACMEHost = "adnanshaikh.com";
         locations."/" = {
           recommendedProxySettings = true;
           proxyPass = "http://127.0.0.1:8989";
         };
       };
 
-      "transmission.chengeric.com" = {
+      "transmission.adnanshaikh.com" = {
         forceSSL = true;
-        useACMEHost = "chengeric.com";
+        useACMEHost = "adnanshaikh.com";
         locations."/" = {
           proxyPass = "http://127.0.0.1:9091";
         };
