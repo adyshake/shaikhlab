@@ -18,6 +18,32 @@
       # - dm_mod, dm_crypt: Device mapper and LUKS encryption
       availableKernelModules = ["nvme" "xhci_pci" "ahci" "usb_storage" "sd_mod" "raid456" "md_mod" "dm_mod" "dm_crypt"];
       
+      # Pre-device hook to ensure RAID array is assembled before LUKS unlock
+      # This ensures /dev/md0 is available when cryptdata tries to open it
+      # Runs early in boot, before device mapper and LUKS unlock
+      preDeviceCommands = ''
+        # Wait for RAID devices to appear
+        for i in {1..30}; do
+          if [ -b /dev/sdb1 ] && [ -b /dev/sdc1 ] && [ -b /dev/sdd1 ] && [ -b /dev/sde1 ]; then
+            break
+          fi
+          sleep 1
+        done
+        
+        # Assemble RAID array if not already assembled
+        if [ ! -b /dev/md0 ]; then
+          mdadm --assemble --scan || mdadm --assemble /dev/md0 /dev/sdb1 /dev/sdc1 /dev/sdd1 /dev/sde1 || true
+        fi
+        
+        # Wait for /dev/md0 to appear
+        for i in {1..10}; do
+          if [ -b /dev/md0 ]; then
+            break
+          fi
+          sleep 1
+        done
+      '';
+      
       luks = {
         # Reuse passphrases to avoid multiple password prompts during boot
         reusePassphrases = true;
