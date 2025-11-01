@@ -77,7 +77,8 @@
     # Replace with the output from step 9.
     mdadmConf = ''
       // NOTE: Dump the output from `mdadm --detail --scan --verbose` here.
-      ARRAY /dev/md0 level=raid1 num-devices=2 metadata=1.2 name=nixos:0 UUID=... devices=/dev/sda2,/dev/sdb2
+      ARRAY /dev/md0 level=raid5 num-devices=4 metadata=1.2 spares=1 UUID=45043155:dd96c83a:ee776fee:f003b4f3
+   devices=/dev/sda1,/dev/sdb1,/dev/sdd1,/dev/sde1
       MAILADDR shaikhlab@adnanshaikh.com
     '';
   };
