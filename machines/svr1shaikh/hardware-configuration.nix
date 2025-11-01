@@ -74,6 +74,12 @@
   # NixOS will auto-detect the RAID array from superblock metadata
   boot.swraid.enable = true;
   
+  # Configure mdadm monitoring to prevent service crash
+  # mdadm requires either MAILADDR or PROGRAM to be set, otherwise mdmon will crash
+  boot.swraid.mdadmConf = ''
+    MAILADDR shaikhlab@adnanshaikh.com
+  '';
+  
   # Enable LVM support in initrd
   # Required for activating the storage volume group during boot
   boot.initrd.services.lvm.enable = true;
