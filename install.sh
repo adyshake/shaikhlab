@@ -241,14 +241,38 @@ elif [ "$(uname)" == "Linux" ]; then
   ssh-keygen -t ed25519 -N "" -C "" -f /mnt/nix/secret/initrd/ssh_host_ed25519_key
   echo -e "\033[32mSSH host key generated successfully.\033[0m"
 
+  # Installing sops and just for sops-nix setup
+  echo -e "\n\033[1mInstalling sops and just...\033[0m"
+  echo "To make sops and just available, run:"
+  echo -e "\033[1mnix-shell -p sops\033[0m"
+  echo -e "\033[1mnix-shell -p just\033[0m"
+  echo "Or enter a nix-shell with both:"
+  echo -e "\033[1mnix-shell -p sops just\033[0m"
+  echo -e "\033[32mNote: These tools will be needed for the next steps.\033[0m"
+
   # Creating public age key for sops-nix
   echo -e "\n\033[1mConverting initrd public SSH host key into public age key for sops-nix...\033[0m"
-  nix-shell --extra-experimental-features flakes -p ssh-to-age --run 'cat /mnt/nix/secret/initrd/ssh_host_ed25519_key.pub | ssh-to-age'
+  AGE_PUBLIC_KEY=$(nix-shell --extra-experimental-features flakes -p ssh-to-age --run 'cat /mnt/nix/secret/initrd/ssh_host_ed25519_key.pub | ssh-to-age')
+  echo -e "\033[32mAge public key: \033[1m${AGE_PUBLIC_KEY}\033[0m"
   echo -e "\033[32mAge public key generated successfully.\033[0m"
+
+  # Converting private SSH key to age format and saving for sops
+  echo -e "\n\033[1mConverting private SSH key to age format for sops-nix...\033[0m"
+  SOPS_AGE_DIR="$HOME/.config/sops/age"
+  mkdir -p "$SOPS_AGE_DIR"
+  nix-shell --extra-experimental-features flakes -p ssh-to-age --run "ssh-to-age -private-key -i /mnt/nix/secret/initrd/ssh_host_ed25519_key -o ${SOPS_AGE_DIR}/keys.txt"
+  chmod 600 "${SOPS_AGE_DIR}/keys.txt"
+  chown nixos:nixos "${SOPS_AGE_DIR}/keys.txt" 2>/dev/null || true
+  echo -e "\033[32mPrivate age key saved to ${SOPS_AGE_DIR}/keys.txt\033[0m"
 
   # Completed
   echo -e "\n\033[1;32mAll steps completed successfully. NixOS is now ready to be installed.\033[0m\n"
-  echo -e "Remember to commit and push the new server's public host key to sops-nix/update all sops encrypted files before installing!"
-  echo -e "To install NixOS configuration for svr1shaikh, run the following command:\n"
+  echo -e "\033[1mNext steps:\033[0m"
+  echo -e "1. Copy the generated age public key above: \033[1m${AGE_PUBLIC_KEY}\033[0m"
+  echo -e "2. Add it to your \033[1m.sops.yaml\033[0m file under the \033[1mkeys\033[0m section"
+  echo -e "3. Run \033[1mjust sops-update\033[0m to update all encrypted secrets with the new key"
+  echo -e "   (You can use: \033[1mnix-shell -p just --run 'just sops-update'\033[0m)"
+  echo -e "4. Commit and push the updated \033[1m.sops.yaml\033[0m and encrypted secret files"
+  echo -e "\nTo install NixOS configuration for svr1shaikh, run:\n"
   echo -e "\033[1msudo nixos-install --no-root-passwd --root /mnt --flake github:adyshake/shaikhlab#svr1shaikh\033[0m\n"
 fi
