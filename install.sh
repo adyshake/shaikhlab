@@ -34,12 +34,6 @@ if [ "$(uname)" == "Darwin" ]; then
   echo -e "\033[1mnix run nix-darwin -- switch --flake github:adyshake/shaikhlab#mac1chng\033[0m\n"
   echo -e "Remember to add the new host public key to sops-nix!"
 elif [ "$(uname)" == "Linux" ]; then
-  # GitHub CLI authentication
-  echo -e "\n\033[1mSetting up GitHub CLI authentication...\033[0m"
-  nix-shell -p gh
-  gh auth login
-  echo -e "\033[32mGitHub CLI authentication completed.\033[0m"
-
   # Check if running as root
   if [ "$EUID" -ne 0 ]; then
     echo -e "\033[1;31mError: This script must be run as root (use sudo)\033[0m"
@@ -53,7 +47,7 @@ elif [ "$(uname)" == "Linux" ]; then
   OS_NIX_PARTITION="/dev/nvme0n1p2"
   
   # Data drives for RAID array
-  DATA_DRIVES=("/dev/sdb" "/dev/sdc" "/dev/sdd" "/dev/sde")
+  DATA_DRIVES=("/dev/sda" "/dev/sdb" "/dev/sdd" "/dev/sde")
   RAID_DEVICE="/dev/md0"
   OS_LUKS_DEVICE="cryptroot"
   DATA_LUKS_DEVICE="cryptdata"
