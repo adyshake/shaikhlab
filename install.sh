@@ -73,12 +73,60 @@ elif [ "$(uname)" == "Linux" ]; then
   set +e
   umount -R /mnt
   umount -R /mnt/data
-  cryptsetup close $OS_LUKS_DEVICE
-  cryptsetup close $DATA_LUKS_DEVICE
-  vgchange -a n $VG_NAME
-  mdadm --stop $RAID_DEVICE
+  # Remove LVM structures before closing LUKS devices (LVM needs unlocked LUKS devices)
+  echo "Removing LVM structures..."
+  vgchange -a n $VG_NAME 2>/dev/null || true
+  vgremove -f $VG_NAME 2>/dev/null || true
+  pvremove -f /dev/mapper/$DATA_LUKS_DEVICE 2>/dev/null || true
+  # Now close LUKS devices
+  cryptsetup close $OS_LUKS_DEVICE 2>/dev/null || true
+  cryptsetup close $DATA_LUKS_DEVICE 2>/dev/null || true
+  mdadm --stop $RAID_DEVICE 2>/dev/null || true
   set -e
   echo -e "\033[32mPrevious changes undone.\033[0m"
+
+  # Wiping all disks from clean state
+  echo -e "\n\033[1mWiping all disks from clean state...\033[0m"
+  set +e
+  
+  # Stop and remove any existing RAID arrays
+  echo "Stopping existing RAID arrays..."
+  for md in /dev/md*; do
+    if [ -b "$md" ]; then
+      mdadm --stop "$md" 2>/dev/null || true
+    fi
+  done
+  
+  # Wipe RAID superblocks from data drives
+  echo "Wiping RAID superblocks from data drives..."
+  for drive in "${DATA_DRIVES[@]}"; do
+    if [ -b "$drive" ]; then
+      echo "  Wiping $drive..."
+      wipefs -a "$drive" 2>/dev/null || true
+    fi
+  done
+  
+  # Wipe partition tables from OS disk
+  echo "Wiping partition table from OS disk..."
+  if [ -b "$OS_DISK" ]; then
+    wipefs -a "$OS_DISK" 2>/dev/null || true
+  fi
+  
+  # Clear partition table signatures from all data drive partitions
+  echo "Clearing partition signatures from data drives..."
+  for drive in "${DATA_DRIVES[@]}"; do
+    for part in "${drive}"?*; do
+      if [ -b "$part" ]; then
+        wipefs -a "$part" 2>/dev/null || true
+      fi
+    done
+  done
+  
+  # Sync to ensure all writes are flushed
+  sync
+  
+  set -e
+  echo -e "\033[32mAll disks wiped clean.\033[0m"
 
   # Partitioning OS disk (NVMe)
   echo -e "\n\033[1mPartitioning OS disk (NVMe)...\033[0m"
