@@ -91,10 +91,20 @@ elif [ "$(uname)" == "Linux" ]; then
   
   # Stop and remove any existing RAID arrays
   echo "Stopping existing RAID arrays..."
+  # Stop all arrays more aggressively
+  mdadm --stop --scan 2>/dev/null || true
   for md in /dev/md*; do
     if [ -b "$md" ]; then
       mdadm --stop "$md" 2>/dev/null || true
     fi
+  done
+  # Also zero superblocks from any partitions that might exist
+  for drive in "${DATA_DRIVES[@]}"; do
+    for part in "${drive}"?*; do
+      if [ -b "$part" ]; then
+        mdadm --zero-superblock "$part" 2>/dev/null || true
+      fi
+    done
   done
   
   # Wipe RAID superblocks from data drives
@@ -147,6 +157,29 @@ elif [ "$(uname)" == "Linux" ]; then
     parted $drive -- set 1 raid on
   done
   echo -e "\033[32mData drives partitioned successfully.\033[0m"
+
+  # Re-read partition tables to ensure kernel recognizes changes
+  echo -e "\n\033[1mRe-reading partition tables...\033[0m"
+  for drive in "${DATA_DRIVES[@]}"; do
+    if [ -b "$drive" ]; then
+      partprobe "$drive" 2>/dev/null || true
+      blockdev --rereadpt "$drive" 2>/dev/null || true
+    fi
+  done
+  sleep 2
+
+  # Clear any existing RAID metadata from partitions
+  echo -e "\n\033[1mClearing RAID metadata from partitions...\033[0m"
+  for drive in "${DATA_DRIVES[@]}"; do
+    part="${drive}1"
+    if [ -b "$part" ]; then
+      echo "  Clearing RAID metadata from $part..."
+      mdadm --zero-superblock "$part" 2>/dev/null || true
+    fi
+  done
+  # Give the kernel a moment to process the changes
+  sleep 1
+  echo -e "\033[32mRAID metadata cleared.\033[0m"
 
   # Creating RAID array
   echo -e "\n\033[1mCreating RAID 5 array...\033[0m"
