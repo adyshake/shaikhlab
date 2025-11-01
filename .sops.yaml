@@ -1,5 +1,5 @@
 keys:
-  - &svr1shaikh age18cfmzsc7x57aqyjzrgwqmmzk8chcemwtq2psdksnd7wy9ehxeymsyqtamq
+  - &svr1shaikh age15pdz4hhg57r4vhezcu6qk2j3h3vf8r3699sq3d4c5xs227jyduesscjuuh
 creation_rules:
   - path_regex: secrets/[^/]+(\.(yaml|json|env|ini|conf))?$
     key_groups:
