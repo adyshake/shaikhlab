@@ -265,6 +265,15 @@ elif [ "$(uname)" == "Linux" ]; then
   chown nixos "${SOPS_AGE_DIR}/keys.txt"
   echo -e "\033[32mPrivate age key saved to ${SOPS_AGE_DIR}/keys.txt\033[0m"
 
+  # Configuring git for nixos user
+  echo -e "\n\033[1mConfiguring git...\033[0m"
+  git config --global core.editor vim
+  git config --global user.email "github@adnanshaikh.com"
+  git config --global user.name "Adnan Shaikh"
+  echo -e "\033[32mGit configured successfully.\033[0m"
+
+  export EDITOR="vim"
+
   # Completed
   echo -e "\n\033[1;32mAll steps completed successfully. NixOS is now ready to be installed.\033[0m\n"
   echo -e "\033[1mNext steps:\033[0m"
