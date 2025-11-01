@@ -72,7 +72,7 @@
   # Enable software RAID support in initrd
   # Required for assembling the RAID5 array during boot
   # NixOS will auto-detect the RAID array from superblock metadata
-  boot.initrd.services.swraid.enable = true;
+  boot.swraid.enable = true;
   
   # Enable LVM support in initrd
   # Required for activating the storage volume group during boot

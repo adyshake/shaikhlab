@@ -32,4 +32,12 @@
   };
 
   networking.hostName = "svr1shaikh";
+
+  # Configure mdadm monitoring to prevent service crash
+  # mdadm requires either MAILADDR or PROGRAM to be set, otherwise mdmon will crash
+  services.mdadm.monitor = {
+    enable = true;
+    mailTo = "shaikhlab@adnanshaikh.com";  # Email for RAID alerts
+    runOnDegraded = true;
+  };
 }
