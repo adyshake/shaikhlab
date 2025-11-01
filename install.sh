@@ -34,6 +34,13 @@ if [ "$(uname)" == "Darwin" ]; then
   echo -e "\033[1mnix run nix-darwin -- switch --flake github:adyshake/shaikhlab#mac1chng\033[0m\n"
   echo -e "Remember to add the new host public key to sops-nix!"
 elif [ "$(uname)" == "Linux" ]; then
+  # Check if running as root
+  if [ "$EUID" -ne 0 ]; then
+    echo -e "\033[1;31mError: This script must be run as root (use sudo)\033[0m"
+    echo -e "Run: sudo $0"
+    exit 1
+  fi
+
   # Define disks
   OS_DISK="/dev/nvme0n1"
   OS_BOOT_PARTITION="/dev/nvme0n1p1"
@@ -95,7 +102,8 @@ elif [ "$(uname)" == "Linux" ]; then
 
   # Creating RAID array
   echo -e "\n\033[1mCreating RAID 5 array...\033[0m"
-  mdadm --create $RAID_DEVICE --level=5 --raid-devices=4 "${DATA_DRIVES[@]}1"
+  # ${DATA_DRIVES[@]/%/1} appends "1" to each drive (sdb -> sdb1, etc.)
+  mdadm --create $RAID_DEVICE --level=5 --raid-devices=4 "${DATA_DRIVES[@]/%/1}"
   echo -e "\033[32mRAID array created successfully.\033[0m"
 
   # Setting up encryption
@@ -154,7 +162,7 @@ elif [ "$(uname)" == "Linux" ]; then
 
   # Creating public age key for sops-nix
   echo -e "\n\033[1mConverting initrd public SSH host key into public age key for sops-nix...\033[0m"
-  sudo nix-shell --extra-experimental-features flakes -p ssh-to-age --run 'cat /mnt/nix/secret/initrd/ssh_host_ed25519_key.pub | ssh-to-age'
+  nix-shell --extra-experimental-features flakes -p ssh-to-age --run 'cat /mnt/nix/secret/initrd/ssh_host_ed25519_key.pub | ssh-to-age'
   echo -e "\033[32mAge public key generated successfully.\033[0m"
 
   # Completed
