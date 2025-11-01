@@ -75,13 +75,13 @@ elif [ "$(uname)" == "Linux" ]; then
   umount -R /mnt/data
   # Remove LVM structures before closing LUKS devices (LVM needs unlocked LUKS devices)
   echo "Removing LVM structures..."
-  vgchange -a n $VG_NAME 2>/dev/null || true
-  vgremove -f $VG_NAME 2>/dev/null || true
-  pvremove -f /dev/mapper/$DATA_LUKS_DEVICE 2>/dev/null || true
+  vgchange -a n $VG_NAME
+  vgremove -f $VG_NAME
+  pvremove -f /dev/mapper/$DATA_LUKS_DEVICE
   # Now close LUKS devices
-  cryptsetup close $OS_LUKS_DEVICE 2>/dev/null || true
-  cryptsetup close $DATA_LUKS_DEVICE 2>/dev/null || true
-  mdadm --stop $RAID_DEVICE 2>/dev/null || true
+  cryptsetup close $OS_LUKS_DEVICE
+  cryptsetup close $DATA_LUKS_DEVICE
+  mdadm --stop $RAID_DEVICE
   set -e
   echo -e "\033[32mPrevious changes undone.\033[0m"
 
@@ -92,17 +92,17 @@ elif [ "$(uname)" == "Linux" ]; then
   # Stop and remove any existing RAID arrays
   echo "Stopping existing RAID arrays..."
   # Stop all arrays more aggressively
-  mdadm --stop --scan 2>/dev/null || true
+  mdadm --stop --scan
   for md in /dev/md*; do
     if [ -b "$md" ]; then
-      mdadm --stop "$md" 2>/dev/null || true
+      mdadm --stop "$md"
     fi
   done
   # Also zero superblocks from any partitions that might exist
   for drive in "${DATA_DRIVES[@]}"; do
     for part in "${drive}"?*; do
       if [ -b "$part" ]; then
-        mdadm --zero-superblock "$part" 2>/dev/null || true
+        mdadm --zero-superblock "$part"
       fi
     done
   done
@@ -112,14 +112,14 @@ elif [ "$(uname)" == "Linux" ]; then
   for drive in "${DATA_DRIVES[@]}"; do
     if [ -b "$drive" ]; then
       echo "  Wiping $drive..."
-      wipefs -a "$drive" 2>/dev/null || true
+      wipefs -a "$drive"
     fi
   done
   
   # Wipe partition tables from OS disk
   echo "Wiping partition table from OS disk..."
   if [ -b "$OS_DISK" ]; then
-    wipefs -a "$OS_DISK" 2>/dev/null || true
+    wipefs -a "$OS_DISK"
   fi
   
   # Clear partition table signatures from all data drive partitions
@@ -127,7 +127,7 @@ elif [ "$(uname)" == "Linux" ]; then
   for drive in "${DATA_DRIVES[@]}"; do
     for part in "${drive}"?*; do
       if [ -b "$part" ]; then
-        wipefs -a "$part" 2>/dev/null || true
+        wipefs -a "$part"
       fi
     done
   done
@@ -162,8 +162,8 @@ elif [ "$(uname)" == "Linux" ]; then
   echo -e "\n\033[1mRe-reading partition tables...\033[0m"
   for drive in "${DATA_DRIVES[@]}"; do
     if [ -b "$drive" ]; then
-      partprobe "$drive" 2>/dev/null || true
-      blockdev --rereadpt "$drive" 2>/dev/null || true
+      partprobe "$drive"
+      blockdev --rereadpt "$drive"
     fi
   done
   sleep 2
@@ -174,7 +174,7 @@ elif [ "$(uname)" == "Linux" ]; then
     part="${drive}1"
     if [ -b "$part" ]; then
       echo "  Clearing RAID metadata from $part..."
-      mdadm --zero-superblock "$part" 2>/dev/null || true
+      mdadm --zero-superblock "$part"
     fi
   done
   # Give the kernel a moment to process the changes
@@ -262,7 +262,7 @@ elif [ "$(uname)" == "Linux" ]; then
   SOPS_AGE_DIR="$NIXOS_HOME/.config/sops/age"
   mkdir -p "$SOPS_AGE_DIR"
   nix-shell --extra-experimental-features flakes -p ssh-to-age --run "ssh-to-age -private-key -i /mnt/nix/secret/initrd/ssh_host_ed25519_key -o ${SOPS_AGE_DIR}/keys.txt"
-  chown nixos "${SOPS_AGE_DIR}/keys.txt" 2>/dev/null || true
+  chown nixos "${SOPS_AGE_DIR}/keys.txt"
   echo -e "\033[32mPrivate age key saved to ${SOPS_AGE_DIR}/keys.txt\033[0m"
 
   # Completed
