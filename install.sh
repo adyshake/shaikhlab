@@ -258,11 +258,11 @@ elif [ "$(uname)" == "Linux" ]; then
 
   # Converting private SSH key to age format and saving for sops
   echo -e "\n\033[1mConverting private SSH key to age format for sops-nix...\033[0m"
-  SOPS_AGE_DIR="$HOME/.config/sops/age"
+  NIXOS_HOME="/home/nixos"
+  SOPS_AGE_DIR="$NIXOS_HOME/.config/sops/age"
   mkdir -p "$SOPS_AGE_DIR"
   nix-shell --extra-experimental-features flakes -p ssh-to-age --run "ssh-to-age -private-key -i /mnt/nix/secret/initrd/ssh_host_ed25519_key -o ${SOPS_AGE_DIR}/keys.txt"
-  chmod 600 "${SOPS_AGE_DIR}/keys.txt"
-  chown nixos:nixos "${SOPS_AGE_DIR}/keys.txt" 2>/dev/null || true
+  chown nixos "${SOPS_AGE_DIR}/keys.txt" 2>/dev/null || true
   echo -e "\033[32mPrivate age key saved to ${SOPS_AGE_DIR}/keys.txt\033[0m"
 
   # Completed
