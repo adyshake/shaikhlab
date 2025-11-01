@@ -40,16 +40,17 @@ elif [ "$(uname)" == "Linux" ]; then
   OS_NIX_PARTITION="/dev/nvme0n1p2"
   
   # Data drives for RAID array
-  DATA_DRIVES=("/dev/sda" "/dev/sdc" "/dev/sdd" "/dev/sde")
+  DATA_DRIVES=("/dev/sdb" "/dev/sdc" "/dev/sdd" "/dev/sde")
   RAID_DEVICE="/dev/md0"
-  LUKS_DEVICE="cryptdata"
+  OS_LUKS_DEVICE="cryptroot"
+  DATA_LUKS_DEVICE="cryptdata"
   VG_NAME="storage"
   LV_NAME="data"
 
   # Display warning and wait for confirmation to proceed
   echo "Linux detected"
   echo -e "\n\033[1;31m**Warning:** This script is irreversible and will prepare system for NixOS installation.\033[0m"
-  echo -e "\033[1;33m**Setup:** OS on NVMe, Data RAID on 4x 2.5TB SSDs with RAID→LUKS→LVM→ext4\033[0m"
+  echo -e "\033[1;33m**Setup:** OS on NVMe, Data RAID on 4x 1.8TB drives (sdb, sdc, sdd, sde) with RAID→LUKS→LVM→ext4\033[0m"
   read -n 1 -s -r -p "Press any key to continue or Ctrl+C to abort..."
 
   # Clear screen before showing disk layout
@@ -65,7 +66,8 @@ elif [ "$(uname)" == "Linux" ]; then
   set +e
   umount -R /mnt
   umount -R /mnt/data
-  cryptsetup close $LUKS_DEVICE
+  cryptsetup close $OS_LUKS_DEVICE
+  cryptsetup close $DATA_LUKS_DEVICE
   vgchange -a n $VG_NAME
   mdadm --stop $RAID_DEVICE
   set -e
@@ -74,8 +76,10 @@ elif [ "$(uname)" == "Linux" ]; then
   # Partitioning OS disk (NVMe)
   echo -e "\n\033[1mPartitioning OS disk (NVMe)...\033[0m"
   parted $OS_DISK -- mklabel gpt
+  # Create partition 1: EFI boot partition ($OS_BOOT_PARTITION)
   parted $OS_DISK -- mkpart ESP fat32 1MiB 512MiB
   parted $OS_DISK -- set 1 boot on
+  # Create partition 2: NixOS root partition ($OS_NIX_PARTITION)
   parted $OS_DISK -- mkpart Nix 512MiB 100%
   echo -e "\033[32mOS disk partitioned successfully.\033[0m"
 
@@ -98,19 +102,19 @@ elif [ "$(uname)" == "Linux" ]; then
   echo -e "\n\033[1mSetting up encryption...\033[0m"
   # OS encryption
   cryptsetup -q -v luksFormat $OS_NIX_PARTITION
-  cryptsetup -q -v open $OS_NIX_PARTITION cryptroot
+  cryptsetup -q -v open $OS_NIX_PARTITION $OS_LUKS_DEVICE
   echo -e "\033[32mOS encryption setup completed.\033[0m"
   
   # Data encryption (RAID → LUKS)
   echo -e "\n\033[1mSetting up data encryption...\033[0m"
   cryptsetup -q -v luksFormat $RAID_DEVICE
-  cryptsetup -q -v open $RAID_DEVICE $LUKS_DEVICE
+  cryptsetup -q -v open $RAID_DEVICE $DATA_LUKS_DEVICE
   echo -e "\033[32mData encryption setup completed.\033[0m"
 
   # Setting up LVM for data
   echo -e "\n\033[1mSetting up LVM for data...\033[0m"
-  pvcreate /dev/mapper/$LUKS_DEVICE
-  vgcreate $VG_NAME /dev/mapper/$LUKS_DEVICE
+  pvcreate /dev/mapper/$DATA_LUKS_DEVICE
+  vgcreate $VG_NAME /dev/mapper/$DATA_LUKS_DEVICE
   lvcreate -l 100%FREE -n $LV_NAME $VG_NAME
   echo -e "\033[32mLVM setup completed.\033[0m"
 
@@ -118,7 +122,7 @@ elif [ "$(uname)" == "Linux" ]; then
   echo -e "\n\033[1mCreating filesystems...\033[0m"
   # OS filesystems
   mkfs.fat -F32 -n boot $OS_BOOT_PARTITION
-  mkfs.ext4 -F -L nix -m 0 /dev/mapper/cryptroot
+  mkfs.ext4 -F -L nix -m 0 /dev/mapper/$OS_LUKS_DEVICE
   
   # Data filesystem (RAID → LUKS → LVM → ext4)
   mkfs.ext4 -F -L data -m 0 /dev/mapper/$VG_NAME-$LV_NAME
@@ -137,6 +141,10 @@ elif [ "$(uname)" == "Linux" ]; then
   mkdir -pv /mnt/nix/{secret/initrd,persist/{etc/ssh,var/{lib,log}}}
   chmod 0700 /mnt/nix/secret
   mount -o bind /mnt/nix/persist/var/log /mnt/var/log
+  
+  # Save mdadm configuration for reference (NixOS will auto-detect from superblocks)
+  mkdir -p /mnt/etc/mdadm
+  mdadm --detail --scan > /mnt/etc/mdadm/mdadm.conf
   echo -e "\033[32mFilesystems mounted successfully.\033[0m"
 
   # Generating initrd SSH host key
