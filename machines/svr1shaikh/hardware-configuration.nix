@@ -17,33 +17,7 @@
       # - raid456, md_mod: Software RAID support for data drives
       # - dm_mod, dm_crypt: Device mapper and LUKS encryption
       availableKernelModules = ["nvme" "xhci_pci" "ahci" "usb_storage" "sd_mod" "raid456" "md_mod" "dm_mod" "dm_crypt"];
-      
-      # Pre-device hook to ensure RAID array is assembled before LUKS unlock
-      # This ensures /dev/md0 is available when cryptdata tries to open it
-      # Runs early in boot, before device mapper and LUKS unlock
-      preDeviceCommands = ''
-        # Wait for RAID devices to appear
-        for i in {1..30}; do
-          if [ -b /dev/sdb1 ] && [ -b /dev/sdc1 ] && [ -b /dev/sdd1 ] && [ -b /dev/sde1 ]; then
-            break
-          fi
-          sleep 1
-        done
-        
-        # Assemble RAID array if not already assembled
-        if [ ! -b /dev/md0 ]; then
-          mdadm --assemble --scan || mdadm --assemble /dev/md0 /dev/sdb1 /dev/sdc1 /dev/sdd1 /dev/sde1 || true
-        fi
-        
-        # Wait for /dev/md0 to appear
-        for i in {1..10}; do
-          if [ -b /dev/md0 ]; then
-            break
-          fi
-          sleep 1
-        done
-      '';
-      
+            
       luks = {
         # Reuse passphrases to avoid multiple password prompts during boot
         reusePassphrases = true;
@@ -97,14 +71,16 @@
 
   # Enable software RAID support in initrd
   # Required for assembling the RAID5 array during boot
-  # NixOS will auto-detect the RAID array from superblock metadata
-  boot.swraid.enable = true;
-  
-  # Configure mdadm monitoring to prevent service crash
-  # mdadm requires either MAILADDR or PROGRAM to be set, otherwise mdmon will crash
-  boot.swraid.mdadmConf = ''
-    MAILADDR shaikhlab@adnanshaikh.com
-  '';
+  boot.swraid = {
+    enable = true;
+    
+    # Replace with the output from step 9.
+    mdadmConf = ''
+      // NOTE: Dump the output from `mdadm --detail --scan --verbose` here.
+      ARRAY /dev/md0 level=raid1 num-devices=2 metadata=1.2 name=nixos:0 UUID=... devices=/dev/sda2,/dev/sdb2
+      MAILADDR shaikhlab@adnanshaikh.com
+    '';
+  };
   
   # Enable LVM support in initrd
   # Required for activating the storage volume group during boot

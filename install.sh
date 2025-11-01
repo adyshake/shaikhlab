@@ -230,10 +230,6 @@ elif [ "$(uname)" == "Linux" ]; then
   mkdir -pv /mnt/nix/{secret/initrd,persist/{etc/ssh,var/{lib,log}}}
   chmod 0700 /mnt/nix/secret
   mount -o bind /mnt/nix/persist/var/log /mnt/var/log
-  
-  # Save mdadm configuration for reference (NixOS will auto-detect from superblocks)
-  mkdir -p /mnt/etc/mdadm
-  mdadm --detail --scan > /mnt/etc/mdadm/mdadm.conf
   echo -e "\033[32mFilesystems mounted successfully.\033[0m"
 
   # Generating initrd SSH host key
@@ -282,6 +278,9 @@ elif [ "$(uname)" == "Linux" ]; then
   echo -e "3. Run \033[1mjust sops-update\033[0m to update all encrypted secrets with the new key"
   echo -e "   (You can use: \033[1mnix-shell -p just --run 'just sops-update'\033[0m)"
   echo -e "4. Commit and push the updated \033[1m.sops.yaml\033[0m and encrypted secret files"
+  echo -e "5. Run \033[1mmdadm --detail --scan --verbose\033[0m and copy the output"
+  echo -e "6. Replace the \033[1mmdadmConf\033[0m section in \033[1mmachines/svr1shaikh/hardware-configuration.nix\033[0m"
+  echo -e "   with the output from the previous command"
   echo -e "\nTo install NixOS configuration for svr1shaikh, run:\n"
   echo -e "\033[1msudo nixos-install --no-root-passwd --root /mnt --flake github:adyshake/shaikhlab#svr1shaikh\033[0m\n"
 fi
