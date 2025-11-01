@@ -34,6 +34,12 @@ if [ "$(uname)" == "Darwin" ]; then
   echo -e "\033[1mnix run nix-darwin -- switch --flake github:adyshake/shaikhlab#mac1chng\033[0m\n"
   echo -e "Remember to add the new host public key to sops-nix!"
 elif [ "$(uname)" == "Linux" ]; then
+  # GitHub CLI authentication
+  echo -e "\n\033[1mSetting up GitHub CLI authentication...\033[0m"
+  nix-shell -p gh
+  gh auth login
+  echo -e "\033[32mGitHub CLI authentication completed.\033[0m"
+
   # Check if running as root
   if [ "$EUID" -ne 0 ]; then
     echo -e "\033[1;31mError: This script must be run as root (use sudo)\033[0m"
