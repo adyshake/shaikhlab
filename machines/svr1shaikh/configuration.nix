@@ -14,8 +14,8 @@
     ./../../modules/nixos/base.nix
     ./../../modules/nixos/remote-unlock.nix
 
-    ./../../services/nextcloud.nix
-    ./../../services/tailscale.nix
+    # ./../../services/nextcloud.nix  # Requires: nextcloud-adminpassfile, kopia-repository-token, cloudflare-api-key (via _acme.nix)
+    # ./../../services/tailscale.nix  # Requires: tailscale-authkey
   ];
 
   home-manager = {
