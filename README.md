@@ -9,7 +9,7 @@
 </p>
 
 [![nixos 25.05](https://img.shields.io/badge/NixOS-25.05-blue.svg?&logo=NixOS&logoColor=white)](https://nixos.org)
-[![blog post](https://img.shields.io/badge/blog%20post-snazzy-purple.svg)](https://chengeric.com/homelab?gh)
+[![blog post](https://img.shields.io/badge/blog%20post-snazzy-purple.svg)](https://adnanshaikh.com/homelab?gh)
 ![stars](https://img.shields.io/github/stars/adyshake/shaikhlab?logo=github&style=flat&color)
 
 ## Highlights
@@ -79,7 +79,7 @@ sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/adyshake/shaikhlab/
 > [!TIP]
 > When installing NixOS onto a headless local server, place your own
 > custom NixOS ISO file onto a USB drive with Ventoy.
-> [Ventoy can automatically load the NixOS ISO file](https://chengeric.com/homelab/#remotely-entering-nixos-installer),
+> [Ventoy can automatically load the NixOS ISO file](https://adnanshaikh.com/homelab/#remotely-entering-nixos-installer),
 > and you can enable connectivity by building your own custom ISO with your own
 > personal SSH key.
 > [The custom ISO released in this repo](https://github.com/adyshake/shaikhlab/releases)
