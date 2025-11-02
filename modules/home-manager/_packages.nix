@@ -44,6 +44,7 @@ in {
         wget
         ssh-to-age
         sops
+        just
       ]
       ++ (
         if builtins.substring 0 3 osConfig.networking.hostName != "svr"
@@ -53,7 +54,6 @@ in {
           alejandra
           bun
           doppler
-          just
           gnupg1
           ffmpeg
           nil
