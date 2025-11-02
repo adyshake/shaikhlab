@@ -42,6 +42,7 @@
   };
 
   networking.useDHCP = lib.mkDefault true;
+  networking.nameservers = [ "1.1.1.1" "9.9.9.9" ];
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }
