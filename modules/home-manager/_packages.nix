@@ -43,6 +43,7 @@ in {
         tree
         wget
         ssh-to-age
+        sops
       ]
       ++ (
         if builtins.substring 0 3 osConfig.networking.hostName != "svr"
@@ -61,7 +62,6 @@ in {
           pkgs-unstable.claude-code
           pkgs-unstable.codex
           pkgs-unstable.gemini-cli
-          sops
           statix
           stripe-cli
           zola
