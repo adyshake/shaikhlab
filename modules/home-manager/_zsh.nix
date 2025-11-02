@@ -19,7 +19,7 @@
     initContent = ''
       fortune
 
-      export SOPS_AGE_KEY_CMD='ssh-to-age -private-key -i /nix/secret/initrd/ssh_host_ed25519_key'
+      export SOPS_AGE_KEY_CMD='sudo ssh-to-age -private-key -i /nix/secret/initrd/ssh_host_ed25519_key'
 
       if [[ $(uname -m) == 'arm64' ]] && [[ $(uname -s) == 'Darwin' ]]; then
         eval "$(/opt/homebrew/bin/brew shellenv)"
