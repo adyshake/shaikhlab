@@ -42,6 +42,7 @@ in {
         qrencode
         tree
         wget
+        ssh-to-age
       ]
       ++ (
         if builtins.substring 0 3 osConfig.networking.hostName != "svr"
