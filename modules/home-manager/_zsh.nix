@@ -30,22 +30,22 @@
 
       # Convert any format to mp4
       function convert_to_mp4() {
-        for file in *; do ffmpeg -i "$file" -c:v libx264 -crf 23 -c:a aac -map_metadata 0 "${file}_output.mp4"; done
+        for file in *; do ffmpeg -i "''$file" -c:v libx264 -crf 23 -c:a aac -map_metadata 0 "''${file}_output.mp4"; done
       }
 
       # Convert any format to mp4 without reencoding
       function convert_to_mp4_without_reencoding() {
-        for file in *; do ffmpeg -i "$file" -c copy "${file}_output.mp4"; done
+        for file in *; do ffmpeg -i "''$file" -c copy "''${file}_output.mp4"; done
       }
 
       # Download an mp3 from a YouTube link
       function download_mp3() {
-        yt-dlp -x --audio-format mp3 --prefer-ffmpeg "$1"
+        yt-dlp -x --audio-format mp3 --prefer-ffmpeg "''$1"
       }
 
       # Download an mp4 from a YouTube link
       function download_mp4() {
-        yt-dlp -f 'bv[height=1080][ext=mp4]+ba[ext=m4a]' --merge-output-format mp4 "$1"
+        yt-dlp -f 'bv[height=1080][ext=mp4]+ba[ext=m4a]' --merge-output-format mp4 "''$1"
       }
     '';
     plugins = [
