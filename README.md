@@ -1,21 +1,8 @@
-<p align="center">
-  <img src=".github/images/background.gif" width=500 alt="shaikhlab" />
-  <br>
-  <img src=".github/images/servers.jpg" alt="shaikhlab" width=500 style="border-radius: 12px;"/>
-  <br>
-  Homelab hardware: ThinkCenter M710q Tiny, Intel i5-7500T and 8GB RAM
-  <br>
-  <br>
-</p>
-
 [![nixos 25.05](https://img.shields.io/badge/NixOS-25.05-blue.svg?&logo=NixOS&logoColor=white)](https://nixos.org)
-[![blog post](https://img.shields.io/badge/blog%20post-snazzy-purple.svg)](https://adnanshaikh.com/homelab?gh)
-![stars](https://img.shields.io/github/stars/adyshake/shaikhlab?logo=github&style=flat&color)
 
 ## Highlights
 
-This repo contains the Nix configurations for my homelab, AMD Ryzen desktop, M1
-MacBook Air, and work WSL setup.
+This repo contains the Nix configurations for my homelab, AMD Ryzen desktop and M1 MacBook Pro.
 
 - ❄️ Nix flakes handle upstream dependencies and track latest stable release of Nixpkgs (currently 25.05)
 - 🏠 [home-manager](https://github.com/nix-community/home-manager) manages
@@ -84,6 +71,106 @@ sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/adyshake/shaikhlab/
 > personal SSH key.
 > [The custom ISO released in this repo](https://github.com/adyshake/shaikhlab/releases)
 > is baked with my own key.
+
+### Headless Server Installation
+
+First create a bootable image with SSH enabled using this [repo](https://github.com/splitbrain/nixsshinstall). You'll need to run the docker container on an x86_64 machine and ARM machines won't work.
+
+Once you've booted in, set the password for the `nixos` user on the machine using the BMC's remote management software using
+
+```bash
+passwd
+```
+
+Then you can log in from your computer with the private key, whose corresponding public key you set while creating the ISO in the first step.
+
+```bash
+sshpass -p<password> ssh nixos@192.168.1.94
+```
+
+Clone the repository and set git config
+
+```bash
+git clone https://github.com/adyshake/shaikhlab.git
+
+git config --global user.email "github@adnanshaikh.com"
+
+git config --global user.name "Adnan Shaikh"
+```
+
+Install dependencies
+
+```bash
+nix-shell -p gh just sops
+```
+
+Login to Github
+
+```bash
+gh auth login
+```
+
+Run the install script
+
+```bash
+sudo ./install.sh
+```
+
+Once it's done, take the age public key it spits out in the output and place it in the `.sops.yaml` file next to the machine hostname you're configuring.
+
+```bash
+export EDITOR=vim
+
+rm secrets/secrets.yaml
+
+mkdir -p /home/nixos/.config/sops/age/
+
+sudo nix-shell --extra-experimental-features flakes -p ssh-to-age --run 'ssh-to-age -private-key -i /mnt/nix/secret/initrd/ssh_host_ed25519_key -o /home/nixos/.config/sops/age/keys.txt'
+
+sudo chown nixos "/home/nixos/.config/sops/age/keys.txt"
+```
+
+Create a hashed version of the username's password and copy the output. The username that gets created is specified in the vars.nix file
+
+```bash
+echo "password" | mkpasswd -m SHA-512 -s
+```
+
+Finally, run the sops-edit command,
+
+```bash
+just sops-edit
+```
+
+Add the following line to it, and save
+
+```yaml
+user-password: <hashed-password-you-copied>
+```
+
+Check git status, commit and save
+
+```bash
+git diff
+
+git add .
+
+git commit -m "update secrets"
+
+git push
+```
+
+Install NixOS
+
+```bash
+sudo nixos-install --no-root-passwd --root /mnt --flake github:adyshake/shaikhlab#svr1shaikh
+```
+
+Reboot
+
+```bash
+sudo shutdown -r now
+```
 
 ### Windows Subsystem for Linux (WSL)
 
@@ -156,7 +243,7 @@ To modify user password, first generate a hash
 echo "password" | mkpasswd -m SHA-512 -s
 ```
 
-Then run `just edit-secrets` to replace the existing decrypted hash with the one
+Then run `just sops-edit` to replace the existing decrypted hash with the one
 that you just generated. If you use a password manager, sure to update the new
 password as necessary.
 
