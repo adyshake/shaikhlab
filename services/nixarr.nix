@@ -130,14 +130,7 @@
   };
 
   systemd = {
-    tmpfiles.rules = [
-      "d /var/lib/nixarr 0755 root root"
-      "d /var/lib/nixarr/jellyfin 0755 jellyfin jellyfin"
-      "d /var/lib/nixarr/jellyfin/data 0755 jellyfin jellyfin"
-      "d /var/lib/nixarr/jellyfin/config 0755 jellyfin jellyfin"
-      "d /var/lib/nixarr/jellyfin/cache 0755 jellyfin jellyfin"
-      "d /var/lib/nixarr/jellyfin/log 0755 jellyfin jellyfin"
-    ];
+    tmpfiles.rules = ["d /var/lib/nixarr 0755 root root"];
 
     #services = {
     #  "backup-nixarr" = {
