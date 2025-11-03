@@ -12,7 +12,7 @@
 
   sops = {
     secrets = {
-      "kopia-repository-token" = {};
+      #"kopia-repository-token" = {};
       "wg.conf" = {
         format = "binary";
         sopsFile = ./../secrets/wg.conf;
@@ -132,29 +132,29 @@
   systemd = {
     tmpfiles.rules = ["d /var/lib/nixarr 0755 root root"];
 
-    services = {
-      "backup-nixarr" = {
-        description = "Backup Nixarr installation with Kopia";
-        wantedBy = ["default.target"];
-        serviceConfig = {
-          User = "root";
-          ExecStartPre = "${pkgs.kopia}/bin/kopia repository connect from-config --token-file ${config.sops.secrets."kopia-repository-token".path}";
-          ExecStart = "${pkgs.kopia}/bin/kopia snapshot create /var/lib/nixarr";
-          ExecStartPost = "${pkgs.kopia}/bin/kopia repository disconnect";
-        };
-      };
-    };
+    #services = {
+    #  "backup-nixarr" = {
+    #    description = "Backup Nixarr installation with Kopia";
+    #    wantedBy = ["default.target"];
+    #    serviceConfig = {
+    #      User = "root";
+    #      ExecStartPre = "${pkgs.kopia}/bin/kopia repository connect from-config --token-file ${config.sops.secrets."kopia-repository-token".path}";
+    #      ExecStart = "${pkgs.kopia}/bin/kopia snapshot create /var/lib/nixarr";
+    #      ExecStartPost = "${pkgs.kopia}/bin/kopia repository disconnect";
+    #    };
+    #  };
+    #};
 
-    timers = {
-      "backup-nixarr" = {
-        description = "Backup Nixarr installation with Kopia";
-        wantedBy = ["timers.target"];
-        timerConfig = {
-          OnCalendar = "*-*-* 4:00:00";
-          RandomizedDelaySec = "1h";
-        };
-      };
-    };
+    #timers = {
+    #  "backup-nixarr" = {
+    #    description = "Backup Nixarr installation with Kopia";
+    #    wantedBy = ["timers.target"];
+    #    timerConfig = {
+    #      OnCalendar = "*-*-* 4:00:00";
+    #      RandomizedDelaySec = "1h";
+    #    };
+    #  };
+    #};
   };
 
   environment.persistence."/nix/persist" = {
