@@ -213,7 +213,7 @@
         download-queue-size = 20;
         speed-limit-up = 500;
         speed-limit-up-enabled = true;
-        rpc-authentication-required = true;
+        rpc-authentication-required = false;
         rpc-username = vars.userName;
         rpc-whitelist-enabled = false;
         # todo: figure out how to integrate rpc-password into sops-nix
