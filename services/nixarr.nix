@@ -137,6 +137,9 @@
       "d /var/lib/nixarr/jellyfin/config 0755 jellyfin jellyfin"
       "d /var/lib/nixarr/jellyfin/cache 0755 jellyfin jellyfin"
       "d /var/lib/nixarr/jellyfin/log 0755 jellyfin jellyfin"
+      "d /fun/torrents 0755 root root"
+      "d /fun/torrents/radarr 0775 radarr radarr"
+      "d /fun/torrents/sonarr 0775 sonarr sonarr"
     ];
 
     #services = {
