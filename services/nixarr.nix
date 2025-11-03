@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  lib,
   vars,
   ...
 }: {
@@ -129,6 +130,10 @@
     };
   };
 
+  users.groups.multimedia = {};
+
+  users.users.${vars.userName}.extraGroups = [ "multimedia" ];
+
   systemd = {
     tmpfiles.rules = [
       "d /var/lib/nixarr 0755 root root"
@@ -137,10 +142,16 @@
       "d /var/lib/nixarr/jellyfin/config 0755 jellyfin jellyfin"
       "d /var/lib/nixarr/jellyfin/cache 0755 jellyfin jellyfin"
       "d /var/lib/nixarr/jellyfin/log 0755 jellyfin jellyfin"
-      "d /fun/torrents 0755 root root"
-      "d /fun/torrents/radarr 0775 radarr radarr"
-      "d /fun/torrents/sonarr 0775 sonarr sonarr"
+      "d /fun/torrents 2770 root multimedia"
     ];
+
+    services = {
+      jellyfin.serviceConfig.SupplementaryGroups = [ "multimedia" ];
+      radarr.serviceConfig.SupplementaryGroups = [ "multimedia" ];
+      sonarr.serviceConfig.SupplementaryGroups = [ "multimedia" ];
+      prowlarr.serviceConfig.SupplementaryGroups = [ "multimedia" ];
+      transmission.serviceConfig.SupplementaryGroups = [ "multimedia" ];
+    };
 
     #services = {
     #  "backup-nixarr" = {
