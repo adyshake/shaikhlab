@@ -74,10 +74,11 @@ echo ""
 echo -e "${YELLOW}Step 2: Check for existing partitions${NC}"
 echo "--------------------------------------------------"
 for disk in "${DISKS[@]}"; do
-    PARTITIONS=$(lsblk -l -o NAME,TYPE "$disk" | grep part | wc -l || echo "0")
-    if [[ "$PARTITIONS" -gt 0 ]]; then
-        echo -e "${YELLOW}  $disk has $PARTITIONS partition(s)${NC}"
-        lsblk -l -o NAME,TYPE,SIZE,MOUNTPOINT "$disk" | grep part
+    PARTITION_COUNT=$(lsblk -l -o NAME,TYPE "$disk" 2>/dev/null | grep -c part || echo "0")
+    PARTITION_COUNT=$((PARTITION_COUNT + 0))  # Convert to integer
+    if [[ $PARTITION_COUNT -gt 0 ]]; then
+        echo -e "${YELLOW}  $disk has $PARTITION_COUNT partition(s)${NC}"
+        lsblk -l -o NAME,TYPE,SIZE,MOUNTPOINT "$disk" | grep part || true
     else
         echo -e "${GREEN}  $disk has no partitions${NC}"
     fi
