@@ -84,7 +84,7 @@
         serviceConfig = {
           User = "root";
           ExecStartPre = "${pkgs.kopia}/bin/kopia repository connect from-config --token-file ${config.sops.secrets."kopia-repository-token".path}";
-          ExecStart = "${pkgs.kopia}/bin/kopia snapshot create /fun/nextcloud";
+          ExecStart = "${pkgs.kopia}/bin/kopia snapshot create /data/nextcloud";
           ExecStartPost = "${pkgs.kopia}/bin/kopia repository disconnect";
         };
       };
