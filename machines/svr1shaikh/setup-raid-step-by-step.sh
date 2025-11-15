@@ -97,15 +97,69 @@ for disk in "${DISKS[@]}"; do
 done
 
 echo ""
-echo -e "${YELLOW}Step 4: Creating RAID 5 array${NC}"
+echo -e "${YELLOW}Step 4: Checking for existing RAID arrays${NC}"
 echo "--------------------------------------------------"
 
 # Check if array already exists
 if [[ -e "$ARRAY_DEVICE" ]]; then
-    echo -e "${RED}Array $ARRAY_DEVICE already exists!${NC}"
-    echo "To remove it, run: mdadm --stop $ARRAY_DEVICE && mdadm --remove $ARRAY_DEVICE"
-    exit 1
+    echo -e "${YELLOW}Array $ARRAY_DEVICE already exists!${NC}"
+    echo "Stopping existing array..."
+    mdadm --stop "$ARRAY_DEVICE" 2>/dev/null || true
+    mdadm --remove "$ARRAY_DEVICE" 2>/dev/null || true
+    echo "✓ Existing array stopped"
 fi
+
+# Check if any of the disks are part of other arrays
+echo "Checking if disks are in use by other arrays..."
+for disk in "${DISKS[@]}"; do
+    # Check if disk is part of any RAID array
+    if mdadm --examine "$disk" >/dev/null 2>&1; then
+        echo -e "${YELLOW}  $disk has RAID metadata${NC}"
+        # Try to find which array it belongs to
+        ARRAY_INFO=$(mdadm --examine "$disk" 2>/dev/null | grep "ARRAY" || true)
+        if [[ -n "$ARRAY_INFO" ]]; then
+            echo "    $ARRAY_INFO"
+        fi
+    fi
+done
+
+# Check if disks are mounted
+echo "Checking if disks are mounted..."
+for disk in "${DISKS[@]}"; do
+    MOUNTED=$(lsblk -n -o MOUNTPOINT "$disk" 2>/dev/null | grep -v "^$" || true)
+    if [[ -n "$MOUNTED" ]]; then
+        echo -e "${RED}  ERROR: $disk is mounted at: $MOUNTED${NC}"
+        echo "    Please unmount it first: umount $MOUNTED"
+        exit 1
+    fi
+done
+
+# Stop any arrays that might be using these disks
+echo "Stopping any arrays using these disks..."
+for disk in "${DISKS[@]}"; do
+    # Try to find arrays using this disk
+    for md_dev in /dev/md*; do
+        if [[ -e "$md_dev" ]]; then
+            if mdadm --detail "$md_dev" 2>/dev/null | grep -q "$(basename $disk)"; then
+                echo "  Stopping $md_dev (uses $disk)..."
+                mdadm --stop "$md_dev" 2>/dev/null || true
+            fi
+        fi
+    done
+done
+
+# Clear any existing RAID metadata from disks
+echo "Clearing any existing RAID metadata..."
+for disk in "${DISKS[@]}"; do
+    if mdadm --examine "$disk" >/dev/null 2>&1; then
+        echo "  Clearing metadata from $disk..."
+        mdadm --zero-superblock "$disk" 2>/dev/null || true
+    fi
+done
+
+echo ""
+echo -e "${YELLOW}Step 5: Creating RAID 5 array${NC}"
+echo "--------------------------------------------------"
 
 # Create RAID 5 array
 echo "Creating RAID 5 array (this may take a moment)..."
@@ -127,13 +181,13 @@ echo ""
 cat /proc/mdstat
 
 echo ""
-echo -e "${YELLOW}Step 5: Saving mdadm configuration${NC}"
+echo -e "${YELLOW}Step 6: Saving mdadm configuration${NC}"
 echo "--------------------------------------------------"
 mdadm --detail --scan >> /etc/mdadm.conf
 echo "✓ mdadm configuration saved to /etc/mdadm.conf"
 
 echo ""
-echo -e "${YELLOW}Step 6: Setting up LUKS encryption${NC}"
+echo -e "${YELLOW}Step 7: Setting up LUKS encryption${NC}"
 echo "--------------------------------------------------"
 read -sp "Enter LUKS passphrase for $ARRAY_NAME: " luks_passphrase
 echo ""
@@ -161,13 +215,13 @@ echo -n "$luks_passphrase" | cryptsetup open \
 LUKS_DEVICE="/dev/mapper/${ARRAY_NAME}"
 
 echo ""
-echo -e "${YELLOW}Step 7: Formatting filesystem${NC}"
+echo -e "${YELLOW}Step 8: Formatting filesystem${NC}"
 echo "--------------------------------------------------"
 echo "Formatting with ext4..."
 mkfs.ext4 -L "$ARRAY_NAME" "$LUKS_DEVICE"
 
 echo ""
-echo -e "${YELLOW}Step 8: Creating mount point and test mount${NC}"
+echo -e "${YELLOW}Step 9: Creating mount point and test mount${NC}"
 echo "--------------------------------------------------"
 mkdir -p "$MOUNT_POINT"
 mkdir -p "${MOUNT_POINT}/fun"
