@@ -32,7 +32,7 @@ fi
 # Your disks
 DISKS=("/dev/sda" "/dev/sdb" "/dev/sdc" "/dev/sdd")
 ARRAY_NAME="data"
-ARRAY_DEVICE="/dev/md/${ARRAY_NAME}"
+ARRAY_DEVICE="/dev/md0"  # Use md0 instead of letting mdadm auto-assign
 MOUNT_POINT="/data"
 
 echo -e "${YELLOW}Step 1: Verify these are the correct disks${NC}"
@@ -95,6 +95,13 @@ for disk in "${DISKS[@]}"; do
     # Clear partition table
     sgdisk -Z "$disk" 2>/dev/null || dd if=/dev/zero of="$disk" bs=1M count=100 2>/dev/null || true
 done
+
+# Refresh kernel's view of partition tables
+echo "Refreshing kernel partition table..."
+for disk in "${DISKS[@]}"; do
+    partprobe "$disk" 2>/dev/null || true
+done
+sleep 1
 
 echo ""
 echo -e "${YELLOW}Step 4: Checking for existing RAID arrays${NC}"
@@ -162,23 +169,90 @@ echo -e "${YELLOW}Step 5: Creating RAID 5 array${NC}"
 echo "--------------------------------------------------"
 
 # Create RAID 5 array
-echo "Creating RAID 5 array (this may take a moment)..."
-mdadm --create "$ARRAY_DEVICE" \
+echo "Creating RAID 5 array as $ARRAY_DEVICE (this may take a moment)..."
+if ! mdadm --create "$ARRAY_DEVICE" \
     --level=5 \
     --raid-devices=4 \
     --metadata=1.2 \
     --name="$ARRAY_NAME" \
-    "${DISKS[@]}"
+    "${DISKS[@]}"; then
+    echo -e "${RED}Failed to create RAID array!${NC}"
+    echo "Checking current RAID status:"
+    cat /proc/mdstat
+    echo ""
+    echo "Checking disk status:"
+    for disk in "${DISKS[@]}"; do
+        echo "  $disk:"
+        mdadm --examine "$disk" 2>/dev/null | head -5 || echo "    No RAID metadata"
+    done
+    exit 1
+fi
 
 echo ""
 echo -e "${GREEN}✓ RAID array created successfully!${NC}"
 echo ""
+
+# Verify the array exists - mdadm sometimes creates numeric names like /dev/md126
+if [[ ! -e "$ARRAY_DEVICE" ]]; then
+    echo -e "${YELLOW}Warning: $ARRAY_DEVICE not found, checking alternative paths...${NC}"
+    # Check if it was created with a different name
+    for md_dev in /dev/md/*; do
+        if [[ -e "$md_dev" ]]; then
+            echo "Found: $md_dev"
+            ARRAY_DEVICE="$md_dev"
+            break
+        fi
+    done
+    
+    # If still not found, check /dev/md[0-9]* (numeric names like md126)
+    if [[ ! -e "$ARRAY_DEVICE" ]]; then
+        for md_dev in /dev/md[0-9]*; do
+            if [[ -e "$md_dev" ]]; then
+                # Check if this array uses our disks
+                ARRAY_DISKS=$(mdadm --detail "$md_dev" 2>/dev/null | grep -oP '/dev/sd[a-z]' | sort | tr '\n' ' ')
+                EXPECTED_DISKS=$(printf '%s\n' "${DISKS[@]}" | sort | tr '\n' ' ')
+                if [[ "$ARRAY_DISKS" == "$EXPECTED_DISKS" ]]; then
+                    echo "Found array using our disks: $md_dev"
+                    ARRAY_DEVICE="$md_dev"
+                    break
+                fi
+            fi
+        done
+    fi
+    
+    # Also check by name in metadata
+    if [[ ! -e "$ARRAY_DEVICE" ]]; then
+        for md_dev in /dev/md[0-9]*; do
+            if [[ -e "$md_dev" ]]; then
+                ARRAY_INFO=$(mdadm --detail "$md_dev" 2>/dev/null | grep "Name :" || true)
+                if echo "$ARRAY_INFO" | grep -q "$ARRAY_NAME"; then
+                    echo "Found array with name $ARRAY_NAME: $md_dev"
+                    ARRAY_DEVICE="$md_dev"
+                    break
+                fi
+            fi
+        done
+    fi
+    
+    if [[ ! -e "$ARRAY_DEVICE" ]]; then
+        echo -e "${RED}ERROR: RAID array device not found!${NC}"
+        echo "Current RAID status:"
+        cat /proc/mdstat
+        exit 1
+    fi
+fi
+
+# Update the device path if we found it with a different name
+echo -e "${GREEN}Using RAID device: $ARRAY_DEVICE${NC}"
+
 echo "RAID build is starting in the background..."
 echo "You can monitor progress with: watch -n 5 'cat /proc/mdstat'"
 echo ""
 
 # Show current status
 cat /proc/mdstat
+echo ""
+echo -e "${GREEN}Using RAID device: $ARRAY_DEVICE${NC}"
 
 echo ""
 echo -e "${YELLOW}Step 6: Saving mdadm configuration${NC}"
