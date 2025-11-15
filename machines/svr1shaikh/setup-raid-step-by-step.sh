@@ -150,7 +150,6 @@ echo "Creating LUKS container..."
 echo -n "$luks_passphrase" | cryptsetup luksFormat \
     --type luks2 \
     --label "$ARRAY_NAME" \
-    --allow-discards \
     "$ARRAY_DEVICE" -
 
 echo ""
