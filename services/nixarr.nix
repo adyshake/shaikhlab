@@ -323,10 +323,7 @@
   };
 
   systemd = {
-    tmpfiles.rules = [
-      "d /var/lib/nixarr 0755 root root"
-      "d /data/fun 0755 root root"
-    ];
+    tmpfiles.rules = ["d /var/lib/nixarr 0755 root root"];
 
     #services = {
     #  "backup-nixarr" = {
