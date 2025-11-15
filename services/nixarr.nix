@@ -2,6 +2,7 @@
   config,
   pkgs,
   vars,
+  lib,
   ...
 }: {
   imports = [
@@ -20,15 +21,30 @@
     };
   };
 
+  vpnNamespaces.wg.accessibleFrom = lib.mkForce [
+    "192.168.0.0/16"
+    "100.64.0.0/10"
+    "127.0.0.1"
+  ];
+
   nixarr = {
     enable = true;
     mediaDir = "/fun";
     stateDir = "/var/lib/nixarr";
 
     jellyfin.enable = true;
-    prowlarr.enable = true;
-    radarr.enable = true;
-    sonarr.enable = true;
+    prowlarr = {
+      enable = true;
+      vpn.enable = true;
+    };
+    radarr = {
+      enable = true;
+      vpn.enable = true;
+    };
+    sonarr = {
+      enable = true;
+      vpn.enable = true;
+    };
 
     recyclarr = {
       enable = true;
@@ -204,6 +220,7 @@
       # todo: figure out how to update this easier
       peerPort = 46634;
       vpn.enable = true;
+      extraAllowedIps = [ "100.64.0.0/10" ];
       extraSettings = {
         peer-limit-global = 500;
         cache-size-mb = 256;
@@ -226,6 +243,13 @@
       wgConf = config.sops.secrets."wg.conf".path;
     };
   };
+
+  systemd.services.flaresolverr.vpnConfinement = {
+    enable = true;
+    vpnNamespace = "wg";
+  };
+
+  services.flaresolverr.enable = true;
 
   nixpkgs.config.packageOverrides = pkgs: {
     vaapiIntel = pkgs.vaapiIntel.override {enableHybridCodec = true;};
