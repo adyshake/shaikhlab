@@ -230,6 +230,7 @@
         download-queue-size = 20;
         speed-limit-up = 500;
         speed-limit-up-enabled = true;
+        rpc-bind-address = "0.0.0.0";
         rpc-authentication-required = false;
         rpc-username = vars.userName;
         rpc-whitelist-enabled = false;
