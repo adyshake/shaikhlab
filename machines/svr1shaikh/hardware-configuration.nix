@@ -29,6 +29,7 @@
     };
   };
 
+  services.mdadm.enable = true;
   # Configure mdadm to auto-assemble the RAID array
   # Generated with: mdadm --detail --scan
   environment.etc."mdadm.conf".text = ''
