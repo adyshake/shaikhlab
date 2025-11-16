@@ -2,6 +2,7 @@
   config,
   lib,
   modulesPath,
+  vars,
   ...
 }: {
   imports = [
@@ -20,7 +21,7 @@
             allowDiscards = true;
           };
           "data" = {
-            device = "/dev/md/data";
+            device = "/dev/md0";
             allowDiscards = true;
           };
         };
@@ -28,19 +29,12 @@
     };
   };
 
-  # Enable mdadm for RAID management
-  # RAID 5 Configuration:
-  # - Level: RAID 5 (striped with distributed parity)
-  # - 4 drives: sda, sdb, sdc, sdd (4x 1.8TB WD Blue SA510 SSDs)
-  # - Data striped across 3 drives, parity distributed across all drives
-  # - Usable capacity: ~5.4TB (75% of 7.2TB total)
-  # - Redundancy: Can survive failure of 1 drive
-  # - Performance: Excellent read performance, good sequential write performance
-  # - Rebuild time: Moderate (requires reading all remaining drives to rebuild)
-  # The RAID array should be created manually first with:
-  # mdadm --create /dev/md/data --level=5 --raid-devices=4 /dev/sda /dev/sdb /dev/sdc /dev/sdd --metadata=1.2 --name=data
-  # Then save the config: mdadm --detail --scan >> /etc/mdadm.conf
-  services.mdadm.enable = true;
+  # Configure mdadm to auto-assemble the RAID array
+  # Generated with: mdadm --detail --scan
+  environment.etc."mdadm.conf".text = ''
+    ARRAY /dev/md0 metadata=1.2 UUID=e229efd8:ba77234e:59375065:9edda13b
+    MAILADDR ${vars.userEmail}
+  '';
   
   # Ensure mdadm is available in initrd for LUKS
   boot.initrd.services.swraid.enable = true;
