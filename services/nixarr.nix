@@ -30,7 +30,7 @@
   nixarr = {
     enable = true;
     mediaDir = "/data/fun";
-    stateDir = "/var/lib/nixarr";
+    stateDir = "/data/nixarr";
 
     jellyfin.enable = true;
     prowlarr = {
@@ -224,7 +224,8 @@
       extraSettings = {
         peer-limit-global = 500;
         cache-size-mb = 256;
-        incomplete-dir = "/var/lib/transmission/.incomplete";
+        download-dir = "/data/transmission";
+        incomplete-dir = "/data/transmission/.incomplete";
         incomplete-dir-enabled = true;
         download-queue-enabled = true;
         download-queue-size = 20;
@@ -323,7 +324,11 @@
   };
 
   systemd = {
-    tmpfiles.rules = ["d /var/lib/nixarr 0755 root root"];
+    tmpfiles.rules = [
+      "d /data/nixarr 0755 root root"
+      "d /data/transmission 0755 root root"
+      "d /data/transmission/.incomplete 0755 root root"
+    ];
 
     #services = {
     #  "backup-nixarr" = {
@@ -352,8 +357,8 @@
 
   environment.persistence."/nix/persist" = {
     directories = [
-      "/var/lib/nixarr"
-      "/var/lib/transmission/.incomplete"
+      # Note: /data/nixarr and /data/transmission are on the RAID array,
+      # so they don't need to be persisted via impermanence
     ];
   };
 }
