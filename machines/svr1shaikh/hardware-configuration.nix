@@ -27,6 +27,8 @@
         };
       };
     };
+    # Ensure mdadm is available in initrd for LUKS
+    swraid.enable = true;
   };
 
   # Configure mdadm to auto-assemble the RAID array
@@ -35,9 +37,6 @@
     ARRAY /dev/md0 metadata=1.2 UUID=e229efd8:ba77234e:59375065:9edda13b
     MAILADDR ${vars.userEmail}
   '';
-  
-  # Ensure mdadm is available in initrd for LUKS
-  boot.initrd.services.swraid.enable = true;
 
   fileSystems = {
     "/" = {
