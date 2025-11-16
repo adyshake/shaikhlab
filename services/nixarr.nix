@@ -323,12 +323,48 @@
     };
   };
 
+  # Create shared group for nixarr services
+  users.groups.media = {};
+
   systemd = {
     tmpfiles.rules = [
-      "d /data/nixarr 0755 root root"
-      "d /data/transmission 0755 root root"
-      "d /data/transmission/.incomplete 0755 root root"
+      # Create directories with media group ownership and setgid bit
+      # 2775 = setgid (2) + rwxrwxr-x (775) - new files inherit group
+      "d /data/nixarr 2775 root media"
+      "d /data/transmission 2775 root media"
+      "d /data/transmission/.incomplete 2775 root media"
+      "d /data/transmission/radarr 2775 root media"
+      "d /data/transmission/sonarr 2775 root media"
     ];
+
+    # Ensure nixarr services run with media group access
+    services = {
+      "transmission" = {
+        serviceConfig = {
+          SupplementaryGroups = [ "media" ];
+        };
+      };
+      "radarr" = {
+        serviceConfig = {
+          SupplementaryGroups = [ "media" ];
+        };
+      };
+      "sonarr" = {
+        serviceConfig = {
+          SupplementaryGroups = [ "media" ];
+        };
+      };
+      "prowlarr" = {
+        serviceConfig = {
+          SupplementaryGroups = [ "media" ];
+        };
+      };
+      "jellyfin" = {
+        serviceConfig = {
+          SupplementaryGroups = [ "media" ];
+        };
+      };
+    };
 
     #services = {
     #  "backup-nixarr" = {
