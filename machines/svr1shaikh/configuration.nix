@@ -16,7 +16,6 @@
     ./../../modules/nixos/remote-unlock.nix
 
     # ./../../services/nextcloud.nix  # Requires: nextcloud-adminpassfile, kopia-repository-token, cloudflare-api-key (via _acme.nix)
-    ./../../services/invidious.nix
     ./../../services/nixarr.nix
     ./../../services/tailscale.nix  # Requires: tailscale-authkey
   ];
