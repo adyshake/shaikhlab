@@ -190,6 +190,41 @@ Reboot
 sudo shutdown -r now
 ```
 
+### Configure Cloudflare Tunnel
+
+After the system has rebooted and you've logged in, set up the Cloudflare tunnel. **Run these commands on your Mac:**
+
+```bash
+brew install cloudflared
+
+cloudflared tunnel login
+
+cloudflared tunnel create shaikhlab-01
+
+scp /Users/adnan/.cloudflared/cert.pem <server-username>@<server-ip>:/home/adnan/shaikhlab/secrets/cloudflare-cert.pem
+
+scp /Users/adnan/.cloudflared/<uuid>.json <server-username>@<server-ip>:/home/adnan/shaikhlab/secrets/cloudflare-tunnel
+```
+
+On the server, encrypt the files with sops:
+
+```bash
+cd /home/adnan/shaikhlab
+
+sops -e -i secrets/cloudflare-cert.pem
+
+sops -e -i secrets/cloudflare-tunnel
+```
+
+Commit and push the encrypted files:
+
+```bash
+git add secrets/cloudflare-cert.pem secrets/cloudflare-tunnel
+
+git commit -m "add encrypted cloudflare tunnel secrets"
+
+git push
+
 ### Windows Subsystem for Linux (WSL)
 
 1. Enable WSL if you haven't done already:
