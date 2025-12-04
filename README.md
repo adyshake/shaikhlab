@@ -160,6 +160,24 @@ git commit -m "update secrets"
 git push
 ```
 
+We also need to set up the RAID array. The proceeding install should work even without it, though most services that use the array will fail to start.
+
+```bash
+ sudo ./setup-raid.sh
+```
+
+Copy the output of the `mdadm --detail --scan` command and place it in the appropriate machines/<hostname>/hardware-configuration.nix within the `environment.etc."mdadm.conf".text` section and then commit those changes as well.
+
+```bash
+git diff
+
+git add .
+
+git commit -m "add raid array config"
+
+git push
+```
+
 Install NixOS
 
 ```bash
