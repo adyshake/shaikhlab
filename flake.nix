@@ -86,6 +86,7 @@
 
     darwinConfigurations = {
       mac1chng = mkDarwinConfig ./machines/mac1chng/configuration.nix;
+      mac1shaikh = mkDarwinConfig ./machines/mac1shaikh/configuration.nix;
     };
 
     nixosConfigurations = {

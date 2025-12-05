@@ -28,8 +28,6 @@ in {
         fortune-kind
         gdu
         genact
-        gti
-        hyperfine
         imagemagick
         openssl
         jdupes
@@ -52,18 +50,12 @@ in {
           # Below packages are for personal machines only; excluded from servers
           # inspo: https://discourse.nixos.org/t/how-to-use-hostname-in-a-path/42612/3
           alejandra
-          bun
-          doppler
           gnupg1
           ffmpeg
-          nil
           nixos-rebuild # need for macOS
           nodejs
-          pkgs-unstable.claude-code
-          pkgs-unstable.codex
           pkgs-unstable.gemini-cli
           statix
-          stripe-cli
           zola
         ]
         else [

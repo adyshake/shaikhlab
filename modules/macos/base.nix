@@ -49,7 +49,7 @@
     startup.chime = false;
     defaults = {
       loginwindow.LoginwindowText = "If lost, contact ${vars.userEmail}";
-      screencapture.location = "~/OneDrive/30-39 Hobbies/34 Photos/34.01 Screenshots";
+      screencapture.location = "~/Users/${vars.userName}/Documents/Screenshots";
 
       dock = {
         autohide = true;
@@ -91,9 +91,6 @@
         {path = "/Applications/Zed.app";}
         {path = "/Applications/Discord.app";}
         {path = "/Applications/Messages.app";}
-        {path = "/Applications/Messenger.app";}
-        {path = "/Applications/1Password.app";}
-        {path = "/Applications/Obsidian.app";}
         {path = "/Applications/System Settings.app";}
       ];
     };
