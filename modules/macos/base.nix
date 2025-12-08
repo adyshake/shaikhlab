@@ -54,10 +54,12 @@
       dock = {
         autohide = true;
         mru-spaces = false;
-        tilesize = 96;
-        wvous-br-corner = 4;
-        wvous-bl-corner = 11;
-        wvous-tr-corner = 5;
+        tilesize = 48;
+        # Disable all hot corners (0 = no action)
+        wvous-tl-corner = 0;
+        wvous-tr-corner = 0;
+        wvous-bl-corner = 0;
+        wvous-br-corner = 0;
       };
 
       finder = {
