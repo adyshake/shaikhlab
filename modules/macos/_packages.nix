@@ -13,6 +13,7 @@
     enableRosetta = true;
     user = vars.userName;
     mutableTaps = false;
+    autoMigrate = true;
     taps = {
       "homebrew/homebrew-bundle" = inputs.homebrew-bundle;
       "homebrew/homebrew-cask" = inputs.homebrew-cask;
