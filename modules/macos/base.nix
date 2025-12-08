@@ -55,11 +55,11 @@
         autohide = true;
         mru-spaces = false;
         tilesize = 48;
-        # Disable all hot corners (1 = noop)
-        wvous-tl-corner = 1;
-        wvous-tr-corner = 1;
-        wvous-bl-corner = 1;
-        wvous-br-corner = 1;
+        # Disable all hot corners (null = noop)
+        wvous-tl-corner = null;
+        wvous-tr-corner = null;
+        wvous-bl-corner = null;
+        wvous-br-corner = null;
       };
 
       finder = {
