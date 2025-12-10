@@ -49,7 +49,7 @@
         latitude = "40.730610"; #NYC
         longitude = "-73.935242"; #NYC
         elevation = "100";
-        unit_system = "imperial";
+        unit_system = "us_customary";
         time_zone = "America/Los_Angeles";
       };
 
