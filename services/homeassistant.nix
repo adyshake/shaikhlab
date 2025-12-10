@@ -42,6 +42,9 @@
       radios
       # Google Translate TTS integration
       gtts
+
+      zlib_ng
+      isal
     ];
 
     # This section allows you to declaratively configure Home Assistant
