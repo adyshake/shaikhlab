@@ -20,10 +20,12 @@
 
     extraComponents = [
       # Core integrations
-      "default_config"
+      "analytics"
+      "google_translate"
       "met"
-      "esphome"
       "radio_browser"
+      "shopping_list"
+      "default_config"
 
       # Camera and media
       "stream"
@@ -31,6 +33,9 @@
       # Automation and scripting
       "python_script"
       "shell_command"
+      # Recommended for fast zlib compression
+      # https://www.home-assistant.io/integrations/isal
+      "isal"
     ];
 
     extraPackages = python3Packages: with python3Packages; [
@@ -42,9 +47,6 @@
       radios
       # Google Translate TTS integration
       gtts
-      # Performance improvements for aiohttp
-      aiohttp-fast-zlib
-      aiohttp-fast-zlib
     ];
 
     # This section allows you to declaratively configure Home Assistant
