@@ -36,6 +36,10 @@
       pillow
       numpy
       opencv4
+      # Radio Browser integration
+      radios
+      # Google Translate TTS integration
+      gtts
     ];
 
     # This section allows you to declaratively configure Home Assistant
