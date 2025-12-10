@@ -74,12 +74,6 @@
         ];
       };
 
-      # Enable Python scripts
-      python_script = {};
-
-      # Shell commands (add custom commands here as needed)
-      shell_command = {};
-
     };
   };
 
