@@ -44,7 +44,7 @@
       gtts
       # Performance improvements for aiohttp
       aiohttp-fast-zlib
-      aiohttp-isal
+      aiohttp-fast-zlib
     ];
 
     # This section allows you to declaratively configure Home Assistant
