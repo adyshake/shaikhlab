@@ -43,7 +43,7 @@
       # Google Translate TTS integration
       gtts
       # Performance improvements for aiohttp
-      aiohttp-zlib-ng
+      aiohttp-fast-zlib
       aiohttp-isal
     ];
 
