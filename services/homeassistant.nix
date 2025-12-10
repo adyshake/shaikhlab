@@ -23,6 +23,8 @@
       "default_config"
       "met"
       "esphome"
+      "radio_browser"
+
       # Camera and media
       "stream"
       "ffmpeg"
