@@ -42,9 +42,9 @@
       radios
       # Google Translate TTS integration
       gtts
-
-      zlib_ng
-      isal
+      # Performance improvements for aiohttp
+      aiohttp-zlib-ng
+      aiohttp-isal
     ];
 
     # This section allows you to declaratively configure Home Assistant
