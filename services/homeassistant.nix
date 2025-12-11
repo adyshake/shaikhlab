@@ -14,9 +14,22 @@
 
   services.home-assistant = {
     enable = true;
+    envsubst = true;
 
     # Use latest version for best integration support
     package = pkgs.home-assistant;
+
+    # Custom components from GitHub
+    customComponents = {
+      # Mazda Connected Services integration
+      # https://github.com/fano0001/home-assistant-mazda
+      mazda_cs = (pkgs.fetchFromGitHub {
+        owner = "fano0001";
+        repo = "home-assistant-mazda";
+        rev = "v1.8.5"; # Latest release as of 2025-12-09
+        sha256 = "sha256-uj901mT8yfCUeXhD/UJhz5W8WTYmjthgnStUGsbuWP4=";
+      }) + "/custom_components/mazda_cs";
+    };
 
     extraComponents = [
       # Core integrations
