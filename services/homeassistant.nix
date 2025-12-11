@@ -30,7 +30,7 @@
           owner = "fano0001";
           repo = "home-assistant-mazda";
           rev = "v${version}";
-          sha256 = "sha256-uj901mT8yfCUeXhD/UJhz5W8WTYmjthgnStUGsbuWP4=";
+          sha256 = "sha256-7CQM7qIBUDVSKOsgjRg+/A2h3UYoXVsC51Q5LpOBMbQ=";
         };
       })
     ];
