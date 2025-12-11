@@ -14,7 +14,6 @@
 
   services.home-assistant = {
     enable = true;
-    envsubst = true;
 
     # Use latest version for best integration support
     package = pkgs.home-assistant;
