@@ -14,4 +14,4 @@
   - reset key timings?
 - security
 - move git to local
-
+- clean up transmission after download
