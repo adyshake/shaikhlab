@@ -1,0 +1,17 @@
+- set up kopia
+- set up backups for *arr
+- set up backups for home assistant
+- configure home-assistant to be declarative
+- set up splitt (https://github.com/e-v-o-l-v-e/nix-config/blob/c68b2c3ddd761f481633565ba619c22eb2b3c23b/system/services/spliit.nix )
+- set up immich
+- set up pastebin
+- set up google drive
+- set up git config with gpg keys
+- set up mac to be declarative
+  - aerospace
+  - linear mouse settings
+  - terminal + zsh
+  - reset key timings?
+- security
+- move git to local
+

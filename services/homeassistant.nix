@@ -14,6 +14,7 @@
 
   services.home-assistant = {
     enable = true;
+    configWritable = false;
 
     # Use latest version for best integration support
     package = pkgs.home-assistant;
@@ -144,9 +145,16 @@
   #   };
   # };
 
-  # environment.persistence."/nix/persist" = {
-  #   directories = [
-  #     "/var/lib/homeassistant"
-  #   ];
-  # };
+  # Persist Home Assistant configuration and storage
+  # This ensures integrations and their configs survive reboots
+  environment.persistence."/nix/persist" = {
+    directories = [
+      {
+        directory = "/var/lib/hass";
+        user = "hass";
+        group = "hass";
+        mode = "0700";
+      }
+    ];
+  };
 }
