@@ -30,7 +30,7 @@
   nixarr = {
     enable = true;
     mediaDir = "/data/fun";
-    stateDir = "/data/nixarr";
+    stateDir = "/var/lib/nixarr";
 
     jellyfin.enable = true;
     prowlarr = {
@@ -224,8 +224,7 @@
       extraSettings = {
         peer-limit-global = 500;
         cache-size-mb = 256;
-        download-dir = "/data/transmission";
-        incomplete-dir = "/data/transmission/.incomplete";
+        incomplete-dir = "/var/lib/transmission/.incomplete";
         incomplete-dir-enabled = true;
         download-queue-enabled = true;
         download-queue-size = 20;
@@ -325,48 +324,8 @@
     };
   };
 
-  # Create shared group for nixarr services
-  users.groups.media = {};
-
   systemd = {
-    tmpfiles.rules = [
-      # Create directories with media group ownership and setgid bit
-      # 2775 = setgid (2) + rwxrwxr-x (775) - new files inherit group
-      "d /data/nixarr 2775 root media"
-      "d /data/transmission 2775 root media"
-      "d /data/transmission/.incomplete 2775 root media"
-      "d /data/transmission/radarr 2775 root media"
-      "d /data/transmission/sonarr 2775 root media"
-    ];
-
-    # Ensure nixarr services run with media group access
-    services = {
-      "transmission" = {
-        serviceConfig = {
-          SupplementaryGroups = [ "media" ];
-        };
-      };
-      "radarr" = {
-        serviceConfig = {
-          SupplementaryGroups = [ "media" ];
-        };
-      };
-      "sonarr" = {
-        serviceConfig = {
-          SupplementaryGroups = [ "media" ];
-        };
-      };
-      "prowlarr" = {
-        serviceConfig = {
-          SupplementaryGroups = [ "media" ];
-        };
-      };
-      "jellyfin" = {
-        serviceConfig = {
-          SupplementaryGroups = [ "media" ];
-        };
-      };
-    };
+    tmpfiles.rules = ["d /var/lib/nixarr 0755 root root"];
 
     #services = {
     #  "backup-nixarr" = {
@@ -395,8 +354,8 @@
 
   environment.persistence."/nix/persist" = {
     directories = [
-      # Note: /data/nixarr and /data/transmission are on the RAID array,
-      # so they don't need to be persisted via impermanence
+      "/var/lib/nixarr"
+      "/var/lib/transmission/.incomplete"
     ];
   };
 }
