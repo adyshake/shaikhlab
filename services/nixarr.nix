@@ -224,6 +224,7 @@
       extraSettings = {
         peer-limit-global = 500;
         cache-size-mb = 256;
+        download-dir = "/var/lib/transmission/downloads";
         incomplete-dir = "/var/lib/transmission/.incomplete";
         incomplete-dir-enabled = true;
         download-queue-enabled = true;
@@ -324,8 +325,19 @@
     };
   };
 
+  # Create a shared group for media services
+  users.groups.media = {};
+
+  # Add radarr, sonarr, and transmission users to the media group
+  users.users.radarr.extraGroups = [ "media" ];
+  users.users.sonarr.extraGroups = [ "media" ];
+  users.users.transmission.extraGroups = [ "media" ];
+
   systemd = {
-    tmpfiles.rules = ["d /var/lib/nixarr 0755 root root"];
+    tmpfiles.rules = [
+      "d /var/lib/nixarr 0755 root root"
+      "d /var/lib/transmission/downloads 2775 transmission media -"
+    ];
 
     #services = {
     #  "backup-nixarr" = {
