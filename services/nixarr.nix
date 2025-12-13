@@ -337,6 +337,8 @@
     tmpfiles.rules = [
       "d /var/lib/nixarr 0755 root root"
       "d /var/lib/transmission/downloads 2775 transmission media -"
+      "d /var/lib/transmission/downloads/radarr 2775 transmission media -"
+      "d /var/lib/transmission/downloads/tv-sonarr 2775 transmission media -"
     ];
 
     #services = {
