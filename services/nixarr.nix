@@ -328,10 +328,12 @@
   # Create a shared group for media services
   users.groups.media = {};
 
-  # Add radarr, sonarr, and transmission users to the media group
+  # Add all nixarr service users to the media group
   users.users.radarr.extraGroups = [ "media" ];
   users.users.sonarr.extraGroups = [ "media" ];
+  users.users.prowlarr.extraGroups = [ "media" ];
   users.users.transmission.extraGroups = [ "media" ];
+  users.users.jellyfin.extraGroups = [ "media" ];
 
   systemd = {
     tmpfiles.rules = [
