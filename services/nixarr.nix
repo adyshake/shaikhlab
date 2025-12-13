@@ -224,8 +224,8 @@
       extraSettings = {
         peer-limit-global = 500;
         cache-size-mb = 256;
-        download-dir = "/var/lib/transmission/downloads";
-        incomplete-dir = "/var/lib/transmission/.incomplete";
+        download-dir = "/data/transmission/downloads";
+        incomplete-dir = "/data/transmission/.incomplete";
         incomplete-dir-enabled = true;
         download-queue-enabled = true;
         download-queue-size = 20;
@@ -336,9 +336,9 @@
   systemd = {
     tmpfiles.rules = [
       "d /var/lib/nixarr 0755 root root"
-      "d /var/lib/transmission/downloads 2775 transmission media -"
-      "d /var/lib/transmission/downloads/radarr 2775 transmission media -"
-      "d /var/lib/transmission/downloads/tv-sonarr 2775 transmission media -"
+      "d /data/transmission/downloads 2775 transmission media -"
+      "d /data/transmission/downloads/radarr 2775 transmission media -"
+      "d /data/transmission/downloads/tv-sonarr 2775 transmission media -"
     ];
 
     #services = {
@@ -369,7 +369,6 @@
   environment.persistence."/nix/persist" = {
     directories = [
       "/var/lib/nixarr"
-      "/var/lib/transmission/.incomplete"
     ];
   };
 }
