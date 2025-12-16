@@ -118,6 +118,7 @@
   };
 
   sops.secrets."hass-secrets" = {
+    format = "binary";
     sopsFile = ./../secrets/hass-secrets.yaml;
     owner = "hass";
     group = "hass";
