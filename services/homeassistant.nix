@@ -74,10 +74,10 @@
       default_config = {};
 
       homeassistant = {
-        name = "My Nix Home";
-        latitude = "40.730610"; #NYC
-        longitude = "-73.935242"; #NYC
-        elevation = "100";
+        name = "Home";
+        latitude = "!secret latitude";
+        longitude = "!secret longitude";
+        elevation = "!secret elevation";
         unit_system = "us_customary";
         time_zone = "America/Los_Angeles";
       };
@@ -115,6 +115,14 @@
         };
       };
     };
+  };
+
+  sops.secrets."hass-secrets" = {
+    sopsFile = ./../secrets/hass-secrets.yaml;
+    owner = "hass";
+    group = "hass";
+    path = "/var/lib/hass/secrets.yaml";
+    restartUnits = [ "home-assistant.service" ];
   };
 
   # sops.secrets."kopia-repository-token" = {};
