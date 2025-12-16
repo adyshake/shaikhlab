@@ -117,7 +117,7 @@
     };
   };
 
-  sops.secrets."hass-secrets" = {
+  config.sops.secrets."hass-secrets" = {
     sopsFile = ./../secrets/hass-secrets.yaml;
     owner = "hass";
     group = "hass";
