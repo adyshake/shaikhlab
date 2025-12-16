@@ -79,7 +79,7 @@
         longitude = "!secret longitude";
         elevation = "!secret elevation";
         unit_system = "us_customary";
-        time_zone = "America/Los_Angeles";
+        time_zone = "!secret time_zone";
       };
 
       # HTTP interface
