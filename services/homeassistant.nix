@@ -54,6 +54,8 @@
       # Recommended for fast zlib compression
       # https://www.home-assistant.io/integrations/isal
       "isal"
+      
+      "roborock"
     ];
 
     extraPackages = python3Packages: with python3Packages; [
