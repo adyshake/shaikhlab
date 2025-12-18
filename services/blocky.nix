@@ -4,7 +4,10 @@
   lib,
   vars,
   ...
-}: {
+}: let
+  # Server IP address for DNS records
+  serverIP = "100.72.152.7";
+in {
   services.blocky = {
     enable = true;
     settings = {
@@ -47,9 +50,21 @@
       };
 
       # Custom DNS entries
+      # All nginx server mappings should be added here
       customDNS = {
-          mapping = {
-              "home.adnanshaikh.com" = "100.72.152.7";
+          mapping = {              
+              # DNS service
+              "dns.adnanshaikh.com" = serverIP;
+              
+              # Nixarr services
+              "watch.adnanshaikh.com" = serverIP;
+              "prowlarr.adnanshaikh.com" = serverIP;
+              "radarr.adnanshaikh.com" = serverIP;
+              "sonarr.adnanshaikh.com" = serverIP;
+              "transmission.adnanshaikh.com" = serverIP;
+              
+              # Home Assistant
+              "hass.adnanshaikh.com" = serverIP;
           };
       };
     };

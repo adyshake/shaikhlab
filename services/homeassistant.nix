@@ -102,7 +102,7 @@
 
   services.nginx = {
     virtualHosts = {
-      "homeassistant.adnanshaikh.com" = {
+      "hass.adnanshaikh.com" = {
         forceSSL = true;
         useACMEHost = "adnanshaikh.com";
         locations."/" = {
