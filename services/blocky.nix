@@ -39,6 +39,19 @@
         maxTime = "30m";
         prefetching = true;
       };
+
+      # For initially solving DoH/DoT Requests when no system Resolver is available.
+      bootstrapDns = {
+          upstream = "https://dns.quad9.net/dns-query";
+          ips = [ "9.9.9.9" ];
+      };
+
+      # Custom DNS entries
+      customDNS = {
+          mapping = {
+              "home.adnanshaikh.com" = "100.72.152.7";
+          };
+      };
     };
   };
 
