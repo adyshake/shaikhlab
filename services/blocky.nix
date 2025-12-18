@@ -53,6 +53,8 @@ in {
       # All nginx server mappings should be added here
       customDNS = {
           mapping = {              
+              # Server
+              "server.adnanshaikh.com" = serverIP;
               # DNS service
               "dns.adnanshaikh.com" = serverIP;
               
