@@ -110,7 +110,7 @@ in {
         # Default blocking policy
         clientGroupsBlock = {
           default = [ "ads" "porn" ];
-          iphone1shaikh.tailcf75cf.ts.net = [ "ads" "fakenews" "gambling" "porn" "news" "distractions" ];
+          iphone1shaikh.tailcf75cf.ts.net = [ "ads" "porn" "news" "distractions" ];
         };
       };
 
