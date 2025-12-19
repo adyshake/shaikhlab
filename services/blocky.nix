@@ -111,6 +111,7 @@ in {
         clientGroupsBlock = {
           default = [ "ads" "porn" ];
           "100.122.173.69" = [ "ads" "porn" "news" "distractions" ]; #iphone1shaikh
+          "100.91.170.46" = [ "ads" "porn" "news" "distractions" ]; #mac1shaikh
         };
       };
 
