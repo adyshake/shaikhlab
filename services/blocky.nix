@@ -105,13 +105,12 @@ in {
                 tiktok.com
               ''
             ];
-          ];
         };
         
         # Default blocking policy
         clientGroupsBlock = {
           default = [ "ads" "porn" ];
-          iphone1shaikh = [ "ads" "fakenews" "gambling", "porn", "news", "distractions" ];
+          iphone1shaikh = [ "ads" "fakenews" "gambling" "porn" "news" "distractions" ];
         };
       };
 
