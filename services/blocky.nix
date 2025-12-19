@@ -111,8 +111,8 @@ in {
         # Default blocking policy
         clientGroupsBlock = {
           default = [ "ads" "porn" ];
-          "100.122.173.69" = [ "ads" "porn" "news" "distractions" ]; #iphone1shaikh
-          "100.91.170.46" = [ "ads" "porn" "news" "distractions" ]; #mac1shaikh
+          "100.122.173.69" = [ "ads" "porn" "news" ]; #iphone1shaikh
+          "100.91.170.46" = [ "ads" "porn" "news" ]; #mac1shaikh
         };
       };
 
