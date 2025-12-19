@@ -27,12 +27,90 @@ in {
             fakenews = ["${stephenBlackUrl}/alternates/fakenews-only/hosts"];
             gambling = ["${stephenBlackUrl}/alternates/gambling-only/hosts"];
             porn = ["${stephenBlackUrl}/alternates/porn-only/hosts"];
+            news = [
+              ''
+                reuters.com
+                apnews.com
+                aljazeera.com
+                bloomberg.com
+                nytimes.com
+                cnn.com
+                washingtonpost.com
+                foxnews.com
+                nbcnews.com
+                usatoday.com
+                nypost.com
+                npr.org
+                bbc.com
+                bbc.co.uk
+                theguardian.com
+                dailymail.co.uk
+                telegraph.co.uk
+                independent.co.uk
+                sky.com
+                wsj.com
+                forbes.com
+                cnbc.com
+                ft.com
+                businessinsider.com
+                wired.com
+                theverge.com
+                arstechnica.com
+                cnet.com
+                techcrunch.com
+                news.google.com
+                yahoo.com
+                msn.com
+                indiatimes.com
+                ndtv.com
+                hindustantimes.com
+                thehindu.com
+                indianexpress.com
+                indiatoday.in
+                news18.com
+                livemint.com
+                economictimes.com
+                moneycontrol.com
+                india.com
+                abplive.com
+                aajtak.in
+                firstpost.com
+                scroll.in
+                thewire.in
+                theprint.in
+                outlookindia.com
+                business-standard.com
+                timesnownews.com
+                republicworld.com
+                thequint.com
+                jagran.com
+                bhaskar.com
+                amarujala.com
+                deccanherald.com
+                newindianexpress.com
+                financialexpress.com
+                oneindia.com
+                dnaindia.com
+              ''
+            ];
+            distractions = [
+              ''
+                news.ycombinator.com
+                reddit.com
+                instagram.com
+                facebook.com
+                twitter.com
+                x.com
+                twitch.tv
+                tiktok.com
+              ''
+            ];
         };
         
         # Default blocking policy
         clientGroupsBlock = {
           default = [ "ads" "porn" ];
-          iphone1shaikh.tailcf75cf.ts.net = [ "ads" "porn" ];
+          iphone1shaikh = [ "ads" "porn" "news" "distractions" ];
         };
       };
 
