@@ -103,5 +103,10 @@
     osascript -e 'tell application "Finder" to set desktop picture to POSIX file "/System/Library/Desktop Pictures/Solid Colors/Black.png"'
   '';
 
+  system.activationScripts.DisableSiri.text = ''
+    echo >&2 "Disabling Siri..."
+    sudo -u ${vars.userName} defaults write com.apple.assistant.support "Assistant Enabled" -bool false
+  '';
+
   system.stateVersion = 4;
 }
