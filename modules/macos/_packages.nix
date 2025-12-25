@@ -59,9 +59,9 @@
       "whatsapp"
       "zed"
     ];
-    masApps = {
-      "Infuse" = 1136220934;
-      "Tailscale" = 1475387142;
-    };
+    # masApps = {
+    #   "Infuse" = 1136220934;
+    #   "Tailscale" = 1475387142;
+    # };
   };
 }
