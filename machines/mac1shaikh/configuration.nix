@@ -21,6 +21,7 @@
         imports = [
           ./../../modules/home-manager/alacritty.nix
           ./../../modules/home-manager/base.nix
+          ./../../modules/home-manager/firefox/default.nix
           ./../../modules/home-manager/fonts.nix
           ./../../modules/home-manager/git.nix
         ];
