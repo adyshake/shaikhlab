@@ -14,8 +14,12 @@
   programs = {
     git = {
       enable = true;
-      userName = vars.fullName;
-      inherit (vars) userEmail;
+      settings = {
+        user = {
+          name = vars.fullName;
+          email = vars.userEmail;
+        };
+      };
       #extraConfig = {
       #  commit.gpgsign = true;
       #  gpg.format = "ssh";

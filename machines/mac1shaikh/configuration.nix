@@ -16,6 +16,7 @@
     extraSpecialArgs = {inherit inputs outputs vars;};
     useGlobalPkgs = true;
     useUserPackages = true;
+    backupFileExtension = "backup";
     users = {
       ${vars.userName} = {
         imports = [

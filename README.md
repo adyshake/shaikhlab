@@ -1,10 +1,10 @@
-[![nixos 25.05](https://img.shields.io/badge/NixOS-25.05-blue.svg?&logo=NixOS&logoColor=white)](https://nixos.org)
+[![nixos 25.11](https://img.shields.io/badge/NixOS-25.11-blue.svg?&logo=NixOS&logoColor=white)](https://nixos.org)
 
 ## Highlights
 
 This repo contains the Nix configurations for my homelab, AMD Ryzen desktop and M1 MacBook Pro.
 
-- ❄️ Nix flakes handle upstream dependencies and track latest stable release of Nixpkgs (currently 25.05)
+- ❄️ Nix flakes handle upstream dependencies and track latest stable release of Nixpkgs (currently 25.11)
 - 🏠 [home-manager](https://github.com/nix-community/home-manager) manages
   dotfiles
 - 🍎 [nix-darwin](https://github.com/LnL7/nix-darwin) manages MacBook

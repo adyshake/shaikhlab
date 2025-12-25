@@ -206,7 +206,7 @@
           search.force = true;
         };
       };
-      extensions.packages = with inputs.firefox-addons.packages.${pkgs.system}; [
+      extensions.packages = with inputs.firefox-addons.packages.${pkgs.stdenv.hostPlatform.system}; [
         dearrow
         # untrap-for-youtube # has unfree license
         sponsorblock
