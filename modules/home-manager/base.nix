@@ -16,7 +16,8 @@
       (lib.mkIf pkgs.stdenv.isLinux "/home/${vars.userName}")
       (lib.mkIf pkgs.stdenv.isDarwin "/Users/${vars.userName}")
     ];
-    stateVersion = "25.11";
+    # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
+    stateVersion = "23.11";
     sessionVariables = lib.mkIf pkgs.stdenv.isDarwin {
       SOPS_AGE_KEY_FILE = "$HOME/.config/sops/age/keys.txt";
     };
