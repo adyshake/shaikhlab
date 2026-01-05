@@ -61,7 +61,7 @@
       font = {
         size = lib.mkMerge [
           (lib.mkIf pkgs.stdenv.isLinux 12)
-          (lib.mkIf pkgs.stdenv.isDarwin 15)
+          (lib.mkIf pkgs.stdenv.isDarwin 18)
         ];
         normal = {
           family = "Iosevka Medium";

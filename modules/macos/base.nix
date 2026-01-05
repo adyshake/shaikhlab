@@ -80,6 +80,18 @@
         KeyRepeat = 2;
         InitialKeyRepeat = 15;
       };
+
+      CustomUserPreferences = {
+        # Disable Siri
+        "com.apple.Siri" = {
+          "UAProfileCheckingStatus" = 0;
+          "siriEnabled" = 0;
+        };
+        # Disable personalized ads
+        "com.apple.AdLib" = {
+          allowApplePersonalizedAdvertising = false;
+        };
+      };
     };
   };
 
@@ -89,11 +101,11 @@
       username = vars.userName;
       entries = [
         {path = "/Applications/Firefox.app";}
-        {path = "/Applications/Alacritty.app";}
-        {path = "/Applications/Zed.app";}
         {path = "/Applications/Discord.app";}
-        {path = "/Applications/Messages.app";}
-        {path = "/Applications/System Settings.app";}
+        {path = "/Applications/Zed.app";}
+        {path = "/Applications/Alacritty.app";}
+        {path = "/Applications/Sublime Text.app";}
+        {path = "/Users/${vars.userName}/Downloads"; section = "others";}
       ];
     };
   };
@@ -101,11 +113,6 @@
   system.activationScripts.Wallpaper.text = ''
     echo >&2 "Setting up wallpaper..."
     osascript -e 'tell application "Finder" to set desktop picture to POSIX file "/System/Library/Desktop Pictures/Solid Colors/Black.png"'
-  '';
-
-  system.activationScripts.DisableSiri.text = ''
-    echo >&2 "Disabling Siri..."
-    sudo -u ${vars.userName} defaults write com.apple.assistant.support "Assistant Enabled" -bool false
   '';
 
   system.stateVersion = 4;
