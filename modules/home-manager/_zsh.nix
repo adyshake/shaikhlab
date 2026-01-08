@@ -49,6 +49,20 @@
       function download_mp4() {
         yt-dlp -f 'bv[height=1080][ext=mp4]+ba[ext=m4a]' --merge-output-format mp4 "''$1"
       }
+
+      # Shrink a PDF file
+      function shrink_pdf() {
+        if [ -z "''$1" ] || [ -z "''$2" ]; then
+          echo "Usage: shrink_pdf <input.pdf> <output.pdf>"
+          return 1
+        fi
+        local gs_path=$(whence -p gs)
+        if [ -z "$gs_path" ]; then
+          echo "Error: ghostscript (gs) not found in PATH"
+          return 1
+        fi
+        "$gs_path" -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dNOPAUSE -dQUIET -dBATCH -sOutputFile="''$2" "''$1"
+      }
     '';
     plugins = [
       {

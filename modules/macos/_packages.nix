@@ -33,6 +33,8 @@
     };
     brews = [
       "trash"
+      "imagemagick"
+      "ghostscript"
     ];
     taps = builtins.attrNames config.nix-homebrew.taps;
     casks = [
