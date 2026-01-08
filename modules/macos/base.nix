@@ -105,7 +105,11 @@
         {path = "/Applications/Zed.app";}
         {path = "/Applications/Alacritty.app";}
         {path = "/Applications/Sublime Text.app";}
-        {path = "/Users/${vars.userName}/Downloads"; section = "others";}
+        {
+          path = "/Users/${vars.userName}/Downloads";
+          section = "others";
+          options = "--sort dateadded --view fan --display stack";
+        }
       ];
     };
   };

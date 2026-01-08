@@ -32,7 +32,7 @@
       cleanup = "zap";
     };
     brews = [
-      "trash"
+      "trash-cli"
       "imagemagick"
       "ghostscript"
     ];

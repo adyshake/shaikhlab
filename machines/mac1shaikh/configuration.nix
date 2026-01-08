@@ -1,6 +1,8 @@
 {
+  config,
   inputs,
   outputs,
+  pkgs,
   vars,
   ...
 }: {
@@ -17,6 +19,7 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "backup";
+    backupCommand = "${pkgs.trash-cli}/bin/trash-put";
     users = {
       ${vars.userName} = {
         imports = [
