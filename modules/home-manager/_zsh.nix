@@ -42,7 +42,7 @@
 
       # Download an mp3 from a YouTube link
       function download_mp3() {
-        yt-dlp -x --audio-format mp3 --prefer-ffmpeg "''$1"
+        yt-dlp -x --audio-format mp3 "''$1"
       }
 
       # Download an mp4 from a YouTube link
