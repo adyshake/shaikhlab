@@ -17,8 +17,6 @@
     };
     # inspo: https://discourse.nixos.org/t/brew-not-on-path-on-m1-mac/26770/4
     initContent = ''
-      fortune
-
       export SOPS_AGE_KEY_CMD='sudo ssh-to-age -private-key -i /nix/secret/initrd/ssh_host_ed25519_key'
 
       if [[ $(uname -m) == 'arm64' ]] && [[ $(uname -s) == 'Darwin' ]]; then
