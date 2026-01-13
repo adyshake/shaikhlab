@@ -49,7 +49,7 @@
       "firefox"
       "flycut"
       "grandperspective"
-      "handbrake"
+      "handbrake-app"
       "itsycal"
       "linearmouse"
       "rar"
