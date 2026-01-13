@@ -8,32 +8,32 @@
     settings = {
       colors = {
         bright = {
-          black = "0x737475";
-          blue = "0x959697";
-          cyan = "0xb15928";
-          green = "0x2e2f30";
-          magenta = "0xdadbdc";
-          red = "0xe6550d";
-          white = "0xfcfdfe";
-          yellow = "0x515253";
+          black = "#737475";
+          blue = "#959697";
+          cyan = "#b15928";
+          green = "#2e2f30";
+          magenta = "#dadbdc";
+          red = "#e6550d";
+          white = "#fcfdfe";
+          yellow = "#515253";
         };
         cursor = {
-          cursor = "0xb7b8b9";
-          text = "0x0c0d0e";
+          cursor = "#b7b8b9";
+          text = "#0c0d0e";
         };
         normal = {
-          black = "0x0c0d0e";
-          blue = "0x3182bd";
-          cyan = "0x80b1d3";
-          green = "0x31a354";
-          magenta = "0x756bb1";
-          red = "0xe31a1c";
-          white = "0xb7b8b9";
-          yellow = "0xdca060";
+          black = "#0c0d0e";
+          blue = "#3182bd";
+          cyan = "#80b1d3";
+          green = "#31a354";
+          magenta = "#756bb1";
+          red = "#e31a1c";
+          white = "#b7b8b9";
+          yellow = "#dca060";
         };
         primary = {
-          background = "0x0c0d0e";
-          foreground = "0xb7b8b9";
+          background = "#0c0d0e";
+          foreground = "#b7b8b9";
         };
       };
 
@@ -68,6 +68,7 @@
         };
       };
 
+      # Keybinding to send a newline
       keyboard = {
         bindings = [
           {
@@ -76,6 +77,12 @@
             chars = "\n";
           }
         ];
+      };
+
+      # Launch Zellij and attempt to attach to an existing session
+      terminal.shell = {
+        program = "${pkgs.zellij}/bin/zellij";
+        args = [ "attach" "--create" "main" ];
       };
     };
   };
