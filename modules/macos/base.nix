@@ -52,7 +52,7 @@
       screencapture.location = "~/Users/${vars.userName}/Documents/Screenshots";
 
       dock = {
-        autohide = false;
+        autohide = true;
         mru-spaces = false;
         tilesize = 48;
         # Disable all hot corners (1 = noop)
