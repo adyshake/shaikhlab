@@ -184,27 +184,51 @@
         "extensions.formautofill.heuristics.enabled" = false;
 
       };
-      search.engines = {
-        "Nix Packages" = {
-          urls = [
-            {
-              template = "https://search.nixos.org/packages";
-              params = [
-                {
-                  name = "type";
-                  value = "packages";
-                }
-                {
-                  name = "query";
-                  value = "{searchTerms}";
-                }
-              ];
-            }
-          ];
-          icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
-          definedAliases = ["@np"];
-          search.force = true;
+      userChrome = ''
+        /* For Toggle Native Tab Bar extension */
+        #main-window[titlepreface*=" "] #TabsToolbar {
+            display: none;
+        }
+      '';
+      search = {
+        engines = {
+          "Nix Packages" = {
+            urls = [
+              {
+                template = "https://search.nixos.org/packages";
+                params = [
+                  {
+                    name = "type";
+                    value = "packages";
+                  }
+                  {
+                    name = "query";
+                    value = "{searchTerms}";
+                  }
+                ];
+              }
+            ];
+            icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
+            definedAliases = ["@np"];
+          };
+          google = {
+            metaData.hidden = true;
+          };
+          ddg = {
+            metaData.hidden = true;
+          };
+          wikipedia = {
+            metaData.hidden = true;
+          };
+          bing = {
+            metaData.hidden = true;
+          };
+          ebay = {
+            metaData.hidden = true;
+          };
         };
+        force = true;
+        default = "Kagi";
       };
       extensions.packages = with inputs.firefox-addons.packages.${pkgs.stdenv.hostPlatform.system}; [
         dearrow
@@ -224,6 +248,11 @@
         kagi-search
         kagi-privacy-pass
         consent-o-matic
+        (pkgs.fetchFirefoxAddon {
+          name = "toggle-native-tab-bar";
+          url = "https://github.com/irvinm/Toggle-Native-Tab-Bar/releases/download/v0.9.5/toggle_native_tab_bar-0.9.5.xpi";
+          sha256 = "sha256-Ns1gSYNQkf0NCFXjDX4C84G+MQxB98r/kCbqVv/jV+g=";
+        })
       ];
       extensions.force = true;
       extensions.settings = {
