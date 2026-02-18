@@ -19,6 +19,8 @@
         domain = "grafana.adnanshaikh.com";
       };
       security = {
+        admin_user = "admin";
+        admin_password = "admin";
         cookie_secure = true;
       };
       analytics.reporting_enabled = false;
