@@ -17,8 +17,12 @@
       server = {
         http_addr = "127.0.0.1";
         http_port = 3000;
-        root_url = "https://grafana.adnanshaikh.com";
+        root_url = "https://grafana.adnanshaikh.com/";
         domain = "grafana.adnanshaikh.com";
+        # Don't enforce domain checking - let nginx handle it
+        enforce_domain = false;
+        # Serve from root path
+        serve_from_sub_path = false;
       };
       
       # Security settings
@@ -59,12 +63,15 @@
         useACMEHost = "adnanshaikh.com";
         locations."/" = {
           recommendedProxySettings = true;
-          proxyPass = "http://127.0.0.1:3000";
+          proxyPass = "http://127.0.0.1:3000/";
           extraConfig = ''
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Server $host;
+            proxy_redirect off;
           '';
         };
       };
