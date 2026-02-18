@@ -11,6 +11,7 @@
 
   services.grafana = {
     enable = true;
+
     settings = {
       server = {
         http_addr = "127.0.0.1";
@@ -19,12 +20,23 @@
         domain = "grafana.adnanshaikh.com";
       };
       security = {
-        admin_user = "admin";
-        admin_password = "admin";
+        admin_user = "admin"; # TODO: change to sops secret
+        admin_email = vars.userEmail;
+        admin_password = "admin"; # TODO: change to sops secret
         cookie_secure = true;
+      };
+      users = {
+        allow_sign_up = false;
+        # home_page = "";
+        default_theme = "dark";
       };
       analytics.reporting_enabled = false;
     };
+
+    # https://github.com/NixOS/nixpkgs/tree/master/pkgs/servers/monitoring/grafana/plugins
+    declarativePlugins = with pkgs.grafanaPlugins; [
+      grafana-googlesheets-datasource
+    ];
   };
 
   services.nginx = {
