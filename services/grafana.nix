@@ -10,8 +10,36 @@
     ./_nginx.nix
   ];
 
+  sops.secrets = {
+    "grafana-google-sheets-client-email" = {owner = "grafana"; group = "grafana";};
+    "grafana-google-sheets-project-id" = {owner = "grafana"; group = "grafana";};
+    "grafana-google-sheets-private-key" = {owner = "grafana"; group = "grafana";};
+  };
+
   services.grafana = {
     enable = true;
+
+    provision = {
+      enable = true;
+      datasources.settings = {
+        datasources = [
+          {
+            name = "Google Sheets";
+            type = "grafana-googlesheets-datasource";
+            uid = "googlesheets";
+            jsonData = {
+              authenticationType = "jwt";
+              clientEmail = "$__file{${config.sops.secrets."grafana-google-sheets-client-email".path}}";
+              defaultProject = "$__file{${config.sops.secrets."grafana-google-sheets-project-id".path}}";
+              tokenUri = "https://oauth2.googleapis.com/token";
+            };
+            secureJsonData = {
+              privateKey = "$__file{${config.sops.secrets."grafana-google-sheets-private-key".path}}";
+            };
+          }
+        ];
+      };
+    };
 
     settings = {
       server = {
