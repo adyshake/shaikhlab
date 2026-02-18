@@ -11,9 +11,9 @@
   ];
 
   sops.secrets = {
-    "grafana-google-jwt" = {
+    "grafana-google-privatekey" = {
       format = "binary";
-      sopsFile = ./../secrets/grafana-google-jwt.json;
+      sopsFile = ./../secrets/grafana-google-privatekey;
       owner = "grafana";
       group = "grafana";
       mode = "0440";
@@ -37,7 +37,7 @@
               authenticationType = "jwt";
               clientEmail = "$__file{${config.sops.secrets."grafana-google-sheets-client-email".path}}";
               defaultProject = "$__file{${config.sops.secrets."grafana-google-sheets-project-id".path}}";
-              privateKeyPath = config.sops.secrets."grafana-google-jwt".path;
+              privateKeyPath = config.sops.secrets."grafana-google-privatekey".path;
               tokenUri = "https://oauth2.googleapis.com/token";
             };
           }
