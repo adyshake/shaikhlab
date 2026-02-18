@@ -147,6 +147,9 @@ in {
               
               # Home Assistant
               "hass.adnanshaikh.com" = serverIP;
+              
+              # Grafana
+              "grafana.adnanshaikh.com" = serverIP;
           };
       };
     };

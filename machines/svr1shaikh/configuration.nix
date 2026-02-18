@@ -20,6 +20,7 @@
     ./../../services/tailscale.nix  # Requires: tailscale-authkey
     ./../../services/homeassistant.nix
     ./../../services/blocky.nix
+    ./../../services/grafana.nix
   ];
 
   home-manager = {
