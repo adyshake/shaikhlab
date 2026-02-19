@@ -14,3 +14,9 @@
   - reset key timings?
 - security
 - move git to local
+- add airgradient to home assistant
+- customize home assisstant interface
+- add sui
+- configure dns to block based on different devices
+- remove watch.adnanshaikh.com binding
+- Add Kagi to the Nix config
