@@ -41,6 +41,7 @@ in {
         ssh-to-age
         sops
         just
+        nodejs
       ]
       ++ (
         if builtins.substring 0 3 osConfig.networking.hostName != "svr"
@@ -51,7 +52,6 @@ in {
           gnupg1
           ffmpeg
           nixos-rebuild # need for macOS
-          nodejs
           pkgs-unstable.gemini-cli
           statix
           zola
