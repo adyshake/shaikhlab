@@ -255,6 +255,31 @@
 
   services.flaresolverr.enable = true;
 
+  # Make WireGuard service wait for DNS/network to be ready
+  # This prevents failures when the endpoint can't be resolved during boot
+  systemd.services.wg = {
+    after = [
+      "network-online.target"
+      "blocky.service"
+      "nss-lookup.target"
+    ];
+    wants = [
+      "network-online.target"
+      "blocky.service"
+      "nss-lookup.target"
+    ];
+    # Wait a bit for DNS to be ready before starting
+    serviceConfig = {
+      # Don't fail the service if endpoint is temporarily unreachable
+      Restart = "on-failure";
+      RestartSec = "15s";
+      # Give more time for DNS resolution
+      TimeoutStartSec = "120s";
+      # Never give up retrying (default would stop after 5 failures in 10min)
+      StartLimitIntervalSec = 0;
+    };
+  };
+
   nixpkgs.config.packageOverrides = pkgs: {
     intel-vaapi-driver = pkgs.intel-vaapi-driver.override {enableHybridCodec = true;};
   };
