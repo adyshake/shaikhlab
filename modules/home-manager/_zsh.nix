@@ -48,6 +48,15 @@
         yt-dlp -f 'bv[height=1080][ext=mp4]+ba[ext=m4a]' --merge-output-format mp4 "''$1"
       }
 
+      # Extract data from a QR code image
+      function qr_decode() {
+        if [ -z "''$1" ]; then
+          echo "Usage: qr_decode <image>"
+          return 1
+        fi
+        zbarimg -q --raw "''$1"
+      }
+
       # Shrink a PDF file
       function shrink_pdf() {
         if [ -z "''$1" ] || [ -z "''$2" ]; then
