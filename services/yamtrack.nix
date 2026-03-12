@@ -95,6 +95,8 @@
 
     services = {
       "podman-yamtrack" = {
+        after = ["systemd-tmpfiles-setup.service"];
+        requires = ["systemd-tmpfiles-setup.service"];
         serviceConfig = {
           Restart = lib.mkOverride 500 "always";
         };
@@ -107,6 +109,8 @@
       };
 
       "podman-yamtrack-redis" = {
+        after = ["systemd-tmpfiles-setup.service"];
+        requires = ["systemd-tmpfiles-setup.service"];
         serviceConfig = {
           Restart = lib.mkOverride 500 "always";
         };
