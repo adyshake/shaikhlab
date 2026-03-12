@@ -150,6 +150,9 @@ in {
               
               # Grafana
               "grafana.adnanshaikh.com" = serverIP;
+              
+              # Yamtrack
+              "yamtrack.adnanshaikh.com" = serverIP;
           };
       };
     };

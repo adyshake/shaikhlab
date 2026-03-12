@@ -21,6 +21,7 @@
     ./../../services/homeassistant.nix
     ./../../services/blocky.nix
     ./../../services/grafana.nix
+    ./../../services/yamtrack.nix
   ];
 
   home-manager = {
