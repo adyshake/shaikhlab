@@ -271,6 +271,28 @@ To remotely deploy `MACHINE`, which has an IP address of `10.0.10.2`
 just deploy MACHINE 10.0.10.2
 ```
 
+### Update flake inputs
+
+Bump all flake inputs (nixpkgs, home-manager, etc.) to their latest versions:
+
+```bash
+nix flake update
+```
+
+### Rebuild macOS configuration
+
+Apply the nix-darwin configuration from your local checkout:
+
+```bash
+sudo nix run nix-darwin -- switch --flake '.#mac1shaikh'
+```
+
+Or build directly from the remote GitHub repository:
+
+```bash
+sudo nix run nix-darwin -- switch --flake github:adyshake/shaikhlab#mac1shaikh
+```
+
 ### Edit secrets
 
 Make sure each machine's public key is listed as entry in `.sops.yaml`. To
