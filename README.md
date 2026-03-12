@@ -224,6 +224,29 @@ git add secrets/cloudflare-cert.pem secrets/cloudflare-tunnel
 git commit -m "add encrypted cloudflare tunnel secrets"
 
 git push
+```
+
+### Encrypting new secret files
+
+Each server has an age keypair. The **public** key lives in `.sops.yaml` under the server's name (e.g. `&svr1shaikh`). The matching **private** key lives only on the server itself, derived from its SSH host key during installation. When you encrypt a file with the public key, only that server can decrypt it at runtime using its private key.
+
+To encrypt a new secret file, create it in the `secrets/` directory and encrypt it in-place using the server's public key from `.sops.yaml`:
+
+```bash
+sops --encrypt --age age1jszawvhfr0pcvjkp902amjmhruywyt3k6yg09yukl7z4w49wte6srgah6h -i secrets/<filename>
+```
+
+Alternatively, if the filename matches the `path_regex` in `.sops.yaml`, sops will pick up the key automatically:
+
+```bash
+sops -e -i secrets/<filename>
+```
+
+To edit an existing encrypted file:
+
+```bash
+sops secrets/<filename>
+```
 
 ### Windows Subsystem for Linux (WSL)
 
