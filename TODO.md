@@ -20,3 +20,6 @@
 - configure dns to block based on different devices
 - remove watch.adnanshaikh.com binding
 - Add Kagi to the Nix config
+- Add Yomu to list of mas apps in Nix and add it to dock
+- Add hammerspoon to list of apps in Nix
+- Add hammerspoon script as well
