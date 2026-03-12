@@ -35,7 +35,7 @@
         extraOptions = [
           "--log-opt=max-file=1"
           "--log-opt=max-size=10mb"
-          "--network=yamtrack-net"
+          "--network=host"
         ];
       };
 
@@ -44,7 +44,7 @@
         dependsOn = ["yamtrack-redis"];
         environment = {
           TZ = "America/Chicago";
-          REDIS_URL = "redis://yamtrack-redis:6379";
+          REDIS_URL = "redis://localhost:6379";
           URLS = "https://yamtrack.adnanshaikh.com";
           REGISTRATION = "False";
         };
@@ -54,12 +54,11 @@
         volumes = [
           "/var/lib/yamtrack/db:/yamtrack/db:rw"
         ];
-        ports = ["8000:8000"];
         log-driver = "journald";
         extraOptions = [
           "--log-opt=max-file=1"
           "--log-opt=max-size=10mb"
-          "--network=yamtrack-net"
+          "--network=host"
           "--dns=1.1.1.1,1.0.0.1"
         ];
       };
@@ -122,17 +121,7 @@
         ];
       };
 
-      "create-yamtrack-network" = {
-        description = "Create Podman network for Yamtrack";
-        after = ["podman.service"];
-        wantedBy = ["podman-yamtrack.service" "podman-yamtrack-redis.service"];
-        before = ["podman-yamtrack.service" "podman-yamtrack-redis.service"];
-        serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-          ExecStart = "${pkgs.podman}/bin/podman network create yamtrack-net --ignore";
-        };
-      };
+
     };
   };
 
