@@ -40,7 +40,7 @@
       };
 
       "yamtrack" = {
-        image = "ghcr.io/dannyvfilms/yamtrack:v26.3.5";
+        image = "ghcr.io/dannyvfilms/yamtrack:26.3.5";
         dependsOn = ["yamtrack-redis"];
         environment = {
           TZ = "America/Chicago";
