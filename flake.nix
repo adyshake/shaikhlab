@@ -46,6 +46,8 @@
       flake = false;
     };
 
+    nix-darwin-custom-icons.url = "github:ryanccn/nix-darwin-custom-icons";
+
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";

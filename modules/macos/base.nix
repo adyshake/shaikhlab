@@ -5,6 +5,7 @@
 }: {
   imports = [
     ./_dock.nix
+    ./_icons.nix
     ./_packages.nix
   ];
 
@@ -102,7 +103,7 @@
       entries = [
         {path = "/Applications/Firefox.app";}
         {path = "/Applications/Discord.app";}
-        {path = "/Applications/Zed.app";}
+        {path = "/Applications/Cursor.app";}
         {path = "/Applications/Alacritty.app";}
         {path = "/Applications/Sublime Text.app";}
         {

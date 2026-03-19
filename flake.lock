@@ -178,6 +178,21 @@
         "type": "github"
       }
     },
+    "nix-darwin-custom-icons": {
+      "locked": {
+        "lastModified": 1719071371,
+        "narHash": "sha256-SPazmoL3Pls4QTiZ2CRtavecNJgzpL4GeiwafTmtdJ8=",
+        "owner": "ryanccn",
+        "repo": "nix-darwin-custom-icons",
+        "rev": "ad3e8cf49ef0b276ccf67410f544ff33d965d821",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ryanccn",
+        "repo": "nix-darwin-custom-icons",
+        "type": "github"
+      }
+    },
     "nix-homebrew": {
       "inputs": {
         "brew-src": "brew-src"
@@ -281,6 +296,7 @@
         "homebrew-core": "homebrew-core",
         "impermanence": "impermanence",
         "nix-darwin": "nix-darwin",
+        "nix-darwin-custom-icons": "nix-darwin-custom-icons",
         "nix-homebrew": "nix-homebrew",
         "nixarr": "nixarr",
         "nixos-wsl": "nixos-wsl",
