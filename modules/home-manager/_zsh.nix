@@ -14,6 +14,7 @@
       gd = "git diff";
       gca = "git commit --amend";
       glo = "git fetch && git log HEAD..origin";
+      journal = "jrnl --file /Users/adnan/JD/30-39_Documents/35_jrnl/journal.txt";
     };
     # inspo: https://discourse.nixos.org/t/brew-not-on-path-on-m1-mac/26770/4
     initContent = ''

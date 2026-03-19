@@ -35,6 +35,7 @@
       "trash-cli"
       "imagemagick"
       "ghostscript"
+      "jrnl"
       "zbar"
     ];
     taps = builtins.attrNames config.nix-homebrew.taps;
