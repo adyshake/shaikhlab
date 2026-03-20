@@ -43,11 +43,14 @@
         default_layout = "compact";
         pane_frames = false;
       };
-      extraConfig = ''
-        compact-bar location="zellij:compact-bar" {
-            tooltip "F1"
-        }
-      '';
+      # Probably dont need this just yet since I'm starting out with Zellij
+      # extraConfig = ''
+      #   plugins {
+      #       compact-bar location="zellij:compact-bar" {
+      #           tooltip "F1"
+      #       }
+      #   }
+      # '';
     };
     tealdeer = {
       enable = true;
