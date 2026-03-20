@@ -79,10 +79,8 @@
         ];
       };
 
-      # Launch Zellij and attempt to attach to an existing session
       terminal.shell = {
         program = "${pkgs.zellij}/bin/zellij";
-        args = [ "attach" "--create" "main" ];
       };
     };
   };

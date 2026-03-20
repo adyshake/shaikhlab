@@ -40,7 +40,14 @@
       settings = {
         theme = "dracula";
         show_startup_tips = false;
+        default_layout = "compact";
+        pane_frames = false;
       };
+      extraConfig = ''
+        compact-bar location="zellij:compact-bar" {
+            tooltip "F1"
+        }
+      '';
     };
     tealdeer = {
       enable = true;
