@@ -1,0 +1,506 @@
+{
+  "_readme": "Channel lineup inspired by YTCH.tv and Channel Surfer. Use this as a reference for creating Tunarr channels. Tunarr channels are populated from your Jellyfin library, not YouTube directly. The YouTube sources below are for reference/inspiration on what content to curate.",
+  "channels": [
+    {
+      "number": 1,
+      "name": "Science & Technology",
+      "group": "Education",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCbfYPyITQ-7l4upoX8nvctg",
+        "https://youtube.com/channel/UCcIXc5mJsHVYTZR1maL5l9w",
+        "https://youtube.com/channel/UCZHmQk67mSJgfCCTn7xBfew",
+        "https://youtube.com/channel/UCXUPKJO5MZQN11PqgIvyuvQ",
+        "https://youtube.com/channel/UCSHZKyawb77ixDdsGog4iWA",
+        "https://youtube.com/channel/UCNIkB2IeJ-6AmZv7bQ1oBYg"
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Code & Dev",
+      "group": "Education",
+      "youtube_sources": [
+        "https://youtube.com/@Fireship",
+        "https://youtube.com/channel/UC9-y-6csu5WGm29I7JiwpnA",
+        "https://youtube.com/channel/UC0e3QhIYukixgh5VVpKHH9Q",
+        "https://youtube.com/channel/UC9x0AN7BWHpCDHSm9NiJFJQ",
+        "https://youtube.com/channel/UClcE-kVhqyiHCcjYwcpfj9w",
+        "https://youtube.com/channel/UCbRP3c757lWg9M-U7TyEkXA"
+      ]
+    },
+    {
+      "number": 3,
+      "name": "Popular Science",
+      "group": "Education",
+      "youtube_sources": [
+        "https://youtube.com/@veritasium",
+        "https://youtube.com/@MarkRober",
+        "https://youtube.com/@smartereveryday",
+        "https://youtube.com/@StuffMadeHere",
+        "https://youtube.com/channel/UCEIwxahdLz7bap-VDs9h35A",
+        "https://youtube.com/channel/UCJ0-OtVpF0wOKEqT2Z1HEtA",
+        "https://youtube.com/channel/UCZYTClx2T1of7BRZ86-8fow",
+        "https://youtube.com/channel/UCiDJtJKMICpb9B1qf7qjEOA"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Explainers",
+      "group": "Education",
+      "youtube_sources": [
+        "https://youtube.com/channel/UC9RM-iSvTu1uPJb8X5yp3EQ",
+        "https://youtube.com/channel/UCuCkxoKLYO_EQ2GeFtbM_bw",
+        "https://youtube.com/channel/UC-2YHgc363EdcusLIBbgxzg",
+        "https://youtube.com/channel/UCvQECJukTDE2i6aCoMnS-Vg",
+        "https://youtube.com/channel/UC2C_jShtL725hvbm1arSV9w",
+        "https://youtube.com/channel/UC6nSFpj9HTCZ5t-N3Rm3-HA",
+        "https://youtube.com/channel/UCgNg3vwj3xt7QOrcIDaHdFg",
+        "https://youtube.com/channel/UCsXVk37bltHxD1rDPwtNM8Q"
+      ]
+    },
+    {
+      "number": 5,
+      "name": "Mathematics",
+      "group": "Education",
+      "youtube_sources": [
+        "https://youtube.com/watch?v=p_di4Zn4wz4",
+        "https://youtube.com/watch?v=xkUcOQqVSQc",
+        "https://youtube.com/watch?v=TeY1fY0Bi_M",
+        "https://youtube.com/watch?v=kuOxDh3egN0"
+      ]
+    },
+    {
+      "number": 6,
+      "name": "History",
+      "group": "Education",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCCODtTcd5M1JavPCOr_Uydg",
+        "https://youtube.com/channel/UCUcyEsEjhPEDf69RRVhRh4A",
+        "https://youtube.com/channel/UCtVc6SNeAgIIX48KzsZvUjg",
+        "https://youtube.com/channel/UCvPXiKxH-eH9xq-80vpgmKQ",
+        "https://youtube.com/channel/UC22BdTgxefuvUivrjesETjg",
+        "https://youtube.com/channel/UCMmaBzfCCwZ2KqaBJjkj0fw",
+        "https://youtube.com/channel/UCLfMmOriSyPbd5JhHpnj4Ng",
+        "https://youtube.com/channel/UCT6Y5JJPKe_JDMivpKgVXew",
+        "https://youtube.com/channel/UCxr2d4As312LulcajAkKJYw",
+        "https://youtube.com/channel/UCqBiWcuTF8IaLH7wBqnihsQ"
+      ]
+    },
+    {
+      "number": 7,
+      "name": "Geopolitics",
+      "group": "News",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCsy9I56PY3IngCf_VGjunMQ",
+        "https://youtube.com/channel/UCwnKziETDbHJtx78nIkfYug",
+        "https://youtube.com/channel/UCP5tjEmvPItGyLhmjdwP7Ww",
+        "https://youtube.com/channel/UCJDIGW0ywWw9Kh9_vtwqxXA",
+        "https://youtube.com/channel/UC-uhvujip5deVcEtLxnW8qg",
+        "https://youtube.com/channel/UCn7XHZiW6EUgSuxItybLLMg"
+      ]
+    },
+    {
+      "number": 8,
+      "name": "World News",
+      "group": "News",
+      "youtube_sources": [
+        "https://youtube.com/channel/UChqUTb7kYRX8-EiaN3XFrSQ",
+        "https://youtube.com/channel/UC16niRr50-MSBwiO3YDb3RA",
+        "https://youtube.com/channel/UC6ZFN9Tx6xh-skXCuRHCDpQ",
+        "https://youtube.com/channel/UCBi2mrWuNuyYy4gbM6fU18Q",
+        "https://youtube.com/channel/UC8p1vwvWtl6T73JiExfWs1g",
+        "https://youtube.com/channel/UCeY0bbntWzzVIaj2z3QigXg",
+        "https://youtube.com/channel/UCdG5p24FH9cmpjQZeFsLpBg"
+      ]
+    },
+    {
+      "number": 9,
+      "name": "Economics & Finance",
+      "group": "News",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCkCGANrihzExmu9QiqZpPlQ",
+        "https://youtube.com/channel/UCASM0cgfkJxQ1ICmRilfHLw",
+        "https://youtube.com/channel/UCFCEuCsyWP0YkP3CZ3Mr01Q",
+        "https://youtube.com/channel/UCCKpicnIwBP3VPxBAZWDeNA",
+        "https://youtube.com/channel/UCUMZ7gohGI9HcU9VNsr2FJQ",
+        "https://youtube.com/channel/UCrp_UI8XtuYfpiqluWLD7Lw"
+      ]
+    },
+    {
+      "number": 10,
+      "name": "Documentaries",
+      "group": "Entertainment",
+      "youtube_sources": [
+        "https://youtube.com/watch?v=4RCtk_YQ4jM",
+        "https://youtube.com/watch?v=jLJQ12OqjOo",
+        "https://youtube.com/watch?v=068rdc75mHM"
+      ]
+    },
+    {
+      "number": 11,
+      "name": "Film & Animation",
+      "group": "Entertainment",
+      "youtube_sources": [
+        "https://youtube.com/watch?v=k0ypDaiO8hA",
+        "https://youtube.com/watch?v=_4ZDT8XWRWw",
+        "https://youtube.com/watch?v=Ghk287KXTc4",
+        "https://youtube.com/watch?v=sBJ87ivq3Ss",
+        "https://youtube.com/watch?v=KkNBh24cLvo",
+        "https://youtube.com/watch?v=W4JPZonR9po"
+      ]
+    },
+    {
+      "number": 12,
+      "name": "Comedy",
+      "group": "Entertainment",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCqFzWxSCi39LnW1JKFR3efg",
+        "https://youtube.com/channel/UCUsN5ZwHx2kILm84-jPDeXw",
+        "https://youtube.com/channel/UCdN4aXTrHAtfgbVG9HjBmxQ",
+        "https://youtube.com/channel/UCi7GJNg51C3jgmYTUwqoUXA",
+        "https://youtube.com/channel/UCObk_g1hQBy0RKKriVX_zOQ",
+        "https://youtube.com/channel/UC_zEzzq54Rm0iy7lmmZbCIg"
+      ]
+    },
+    {
+      "number": 13,
+      "name": "Movie Trailers",
+      "group": "Entertainment",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCi8e0iOVk1fEOogdfu4YgfA",
+        "https://youtube.com/channel/UC3gNmTGu-TTbFPpfSs5kNkg",
+        "https://youtube.com/channel/UCjmJDM5pRKbUlVIzDYYWb6g",
+        "https://youtube.com/channel/UCq0OueAsdxH6b8nyAspwViw",
+        "https://youtube.com/channel/UCF9imwPMSGz4Vq1NiTWCC7g"
+      ]
+    },
+    {
+      "number": 14,
+      "name": "Movies & TV",
+      "group": "Entertainment",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCWOA1ZGywLbqmigxE4Qlvuw",
+        "https://youtube.com/channel/UCQJWtTnAHhEG5w4uN0udnUQ",
+        "https://youtube.com/channel/UCE5mQnNl8Q4H2qcv4ikaXeA",
+        "https://youtube.com/channel/UCVTQuK2CaWaTgSsoNkn5AiQ",
+        "https://youtube.com/channel/UCz1GPotHecuLngiLuY739QQ"
+      ]
+    },
+    {
+      "number": 15,
+      "name": "Pop Culture",
+      "group": "Entertainment",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCRXiA3h1no_PFkb1JCP0yMA",
+        "https://youtube.com/channel/UCsEukrAd64fqA7FjwkmZ_Dw",
+        "https://youtube.com/channel/UCIsbLox_y9dCIMLd8tdC6qg",
+        "https://youtube.com/channel/UCPD_bxCRGpmmeQcbe2kpPaA",
+        "https://youtube.com/channel/UCdC0An4ZPNr_YiFiYoVbwaw"
+      ]
+    },
+    {
+      "number": 16,
+      "name": "Horror",
+      "group": "Entertainment",
+      "youtube_sources": [
+        "https://youtube.com/watch?v=ZUcAX-DlRxU",
+        "https://youtube.com/watch?v=KfTI2PoPvZs",
+        "https://youtube.com/watch?v=pPDshk86ihQ",
+        "https://youtube.com/watch?v=f5VggyCGwSc",
+        "https://youtube.com/watch?v=q7DRviMc2u0",
+        "https://youtube.com/watch?v=J_EpyxQh00I",
+        "https://youtube.com/watch?v=3EBpnzCgyVE"
+      ]
+    },
+    {
+      "number": 17,
+      "name": "Short Films",
+      "group": "Entertainment",
+      "youtube_sources": [
+        "https://youtube.com/watch?v=dXIZLBUby7c",
+        "https://youtube.com/watch?v=xXqjrjrDqas",
+        "https://youtube.com/watch?v=afqcm0187B8",
+        "https://youtube.com/watch?v=beXtqlusOAQ",
+        "https://youtube.com/watch?v=cKuUfVMRxy4",
+        "https://youtube.com/watch?v=JmO9qJSxjkk",
+        "https://youtube.com/watch?v=xhSuFVnoTNk"
+      ]
+    },
+    {
+      "number": 18,
+      "name": "Cartoons",
+      "group": "Entertainment",
+      "youtube_sources": [
+        "https://youtube.com/watch?v=tLGiuCSG3cM",
+        "https://youtube.com/watch?v=mXS9j7wb6AI",
+        "https://youtube.com/watch?v=kiakd1Havg0",
+        "https://youtube.com/watch?v=hqPYfFoOX_E",
+        "https://youtube.com/watch?v=d-H-mGdOmyA",
+        "https://youtube.com/watch?v=n9EIAI1BK8M",
+        "https://youtube.com/watch?v=djeeOp6urzc",
+        "https://youtube.com/watch?v=5-4nkVQ0b2k",
+        "https://youtube.com/watch?v=FYFViqptwRI"
+      ]
+    },
+    {
+      "number": 19,
+      "name": "Anime",
+      "group": "Entertainment",
+      "youtube_sources": [
+        "https://youtube.com/channel/UC6pGDc4bFGD1_36IKv3FnYg",
+        "https://youtube.com/channel/UCQYYekTKCb1y12sas08T6gQ"
+      ]
+    },
+    {
+      "number": 20,
+      "name": "Music",
+      "group": "Music",
+      "youtube_sources_playlists": [
+        "https://youtube.com/playlist?list=PLKcx-uWWgRjXpjZAzO4YS46Yp1gIvPnmw",
+        "https://youtube.com/playlist?list=PLmXxqSJJq-yXrCPGIT2gn8b34JjOrl4Xf",
+        "https://youtube.com/playlist?list=PLd9auH4JIHvupoMgW5YfOjqtj6Lih0MKw",
+        "https://youtube.com/playlist?list=PLEXox2R2RxZKD0KvMoTYSiKnxwOn2joVU"
+      ]
+    },
+    {
+      "number": 21,
+      "name": "Classical Music",
+      "group": "Music",
+      "youtube_sources": [
+        "https://youtube.com/watch?v=gT91esZK90I",
+        "https://youtube.com/watch?v=9SrIIS0xMqQ"
+      ]
+    },
+    {
+      "number": 22,
+      "name": "Lofi / Synthwave",
+      "group": "Music",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCSJ4gkVC6NrvII8umztf0Ow",
+        "https://youtube.com/channel/UCOxqgCwgOqC2lMqC5PYz_Dg",
+        "https://youtube.com/channel/UCmYTgpKxd-QOJCPDrmaXuqQ",
+        "https://youtube.com/channel/UCD-4g5w1h8xQpLaNS_ghU4g",
+        "https://youtube.com/channel/UCfR8HhkbpDAwvYxrecNg4Mg"
+      ]
+    },
+    {
+      "number": 23,
+      "name": "Cooking",
+      "group": "Lifestyle",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCIEv3lZ_tNXHzL3ox-_uUGQ",
+        "https://youtube.com/channel/UCDq5v10l4wkV5-ZBIJJFbzQ",
+        "https://youtube.com/channel/UCcjhYlL1WRBjKaJsMH_h7Lg",
+        "https://youtube.com/channel/UCzH5n3Ih5kgQoiDAQt2FwLw",
+        "https://youtube.com/channel/UCJHA_jMfCvEnv-3kRjTCQXw",
+        "https://youtube.com/channel/UChBEbMKI1eCcejTtmI32UEw",
+        "https://youtube.com/channel/UCSuT9FSddzI6W5Bij9XwtmA"
+      ]
+    },
+    {
+      "number": 24,
+      "name": "Food",
+      "group": "Lifestyle",
+      "youtube_sources": [
+        "https://youtube.com/watch?v=XSTijk37WAo",
+        "https://youtube.com/watch?v=x8A0HEVsoMg",
+        "https://youtube.com/watch?v=HdjdcOLVjDU",
+        "https://youtube.com/watch?v=oMWA97OYmMM",
+        "https://youtube.com/watch?v=Cch4mayoNgg"
+      ]
+    },
+    {
+      "number": 25,
+      "name": "Travel",
+      "group": "Lifestyle",
+      "youtube_sources": [
+        "https://youtube.com/channel/UC4ijq8Cg-8zQKx8OH12dUSw",
+        "https://youtube.com/channel/UC0Ize0RLIbGdH5x4wI45G-A",
+        "https://youtube.com/channel/UCFr3sz2t3bDp6Cux08B93KQ",
+        "https://youtube.com/channel/UCGaOvAFinZ7BCN_FDmw74fQ"
+      ]
+    },
+    {
+      "number": 26,
+      "name": "Health & Fitness",
+      "group": "Lifestyle",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCe0TLA0EsQbE-MjuHXevj2A",
+        "https://youtube.com/channel/UC0QHWhjbe5fGJEPz3sVb6nw",
+        "https://youtube.com/channel/UCFKE7WVJfvaHW5q283SxchA",
+        "https://youtube.com/channel/UCoR7CHkMETs3ByOv74OAbFw",
+        "https://youtube.com/channel/UCeJFgNahi--FKs0oJyeRDEw"
+      ]
+    },
+    {
+      "number": 27,
+      "name": "Architecture & Interiors",
+      "group": "Lifestyle",
+      "youtube_sources": [
+        "https://youtube.com/watch?v=KBIcPrWK4kM",
+        "https://youtube.com/watch?v=cdj1oJMqZP0",
+        "https://youtube.com/watch?v=Cx4W3beMrFM",
+        "https://youtube.com/watch?v=5G1MtjEYIGY",
+        "https://youtube.com/watch?v=u4_dtzCLgvk",
+        "https://youtube.com/watch?v=tZACcfnGNN8"
+      ]
+    },
+    {
+      "number": 28,
+      "name": "Gardening",
+      "group": "Lifestyle",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCSbyncU597LMwb3HhnAI_4w",
+        "https://youtube.com/channel/UCVGVbOl6F5rGF4wSYS6Y5yQ",
+        "https://youtube.com/channel/UCWsI0LmiDyezbnN2JCL4P9w",
+        "https://youtube.com/channel/UCB1J6siDdmhwah7q0O2WJBg",
+        "https://youtube.com/channel/UCJZTjBlrnDHYmf0F-eYXA3Q",
+        "https://youtube.com/channel/UC9r61qohBg1qgGty4_WzojA",
+        "https://youtube.com/channel/UC8EQAfueDGNeqb1ALm0LjHA"
+      ]
+    },
+    {
+      "number": 29,
+      "name": "Tech & Gadgets",
+      "group": "Tech",
+      "youtube_sources": [
+        "https://youtube.com/@MKBHD",
+        "https://youtube.com/channel/UCUQo7nzH1sXVpzL92VesANw",
+        "https://youtube.com/channel/UCMiJRAwDNSNzuYeN2uWa0pA",
+        "https://youtube.com/channel/UCVYamHliCI9rw1tHR1xbkfw",
+        "https://youtube.com/channel/UCXuqSBlHAE6Xw-yeJA0Tunw",
+        "https://youtube.com/channel/UCG7J20LhUeLl6y_Emi7OJrA"
+      ]
+    },
+    {
+      "number": 30,
+      "name": "Retro Tech",
+      "group": "Tech",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCy0tKL1T7wFoYcxCe0xjN6Q",
+        "https://youtube.com/channel/UCLx053rWZxCiYWsBETgdKrQ",
+        "https://youtube.com/channel/UC18ju52OET36bdewLRHzPdQ",
+        "https://youtube.com/channel/UC5I2hjZYiW9gZPVkvzM8_Cw",
+        "https://youtube.com/channel/UC8uT9cgJorJPWu7ITLGo9Ww",
+        "https://youtube.com/channel/UCXnNibvR_YIdyPs8PZIBoEw"
+      ]
+    },
+    {
+      "number": 31,
+      "name": "Gaming",
+      "group": "Gaming",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCKy1dAqELo0zrOtPkf0eTMw",
+        "https://youtube.com/channel/UCbu2SsF-Or3Rsn3NxqODImw",
+        "https://youtube.com/channel/UCBODyKF0JMbUd6D9Bklyzbw",
+        "https://youtube.com/channel/UCdBXOyqr8cDshsp7kcKDAkg"
+      ]
+    },
+    {
+      "number": 32,
+      "name": "Sports",
+      "group": "Sports",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCiWLfSweyRNmLpgEHekhoAg",
+        "https://youtube.com/channel/UCDVYQ4Zhbm3S2dlz7P1GBDg",
+        "https://youtube.com/channel/UCWJ2lWNubArHWmf3FIHbfcQ",
+        "https://youtube.com/channel/UCoLrcjPV5PbUrUyXq5mjc_A"
+      ]
+    },
+    {
+      "number": 33,
+      "name": "Auto & Garage",
+      "group": "Hobby",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCQMELFlXQL38KPm8kM-4Adg",
+        "https://youtube.com/channel/UClqhvGmHcvWL9w3R48t9QXQ",
+        "https://youtube.com/channel/UCL6JmiMXKoXS6bpP1D3bk8g",
+        "https://youtube.com/channel/UCLgEVx4mzk3T3mzgbKG54Eg"
+      ]
+    },
+    {
+      "number": 34,
+      "name": "Workshop & Crafts",
+      "group": "Hobby",
+      "youtube_sources": [
+        "https://youtube.com/watch?v=RBxztCOqOE4",
+        "https://youtube.com/watch?v=aCkhH85E7x0",
+        "https://youtube.com/watch?v=n7RegvEXXEM",
+        "https://youtube.com/watch?v=scUR0xeRk0w"
+      ]
+    },
+    {
+      "number": 35,
+      "name": "Nature & Wildlife",
+      "group": "Nature",
+      "youtube_sources": [
+        "https://youtube.com/channel/UC4lp9Emg1ci8eo2eDkB-Tag",
+        "https://youtube.com/channel/UCg72Hd6UZAgPBAUZplnmPMQ",
+        "https://youtube.com/channel/UCPotnGNahFjLWjfsq4KYvuQ",
+        "https://youtube.com/channel/UCCkmgsl8W18oR6c_W7UZ1lQ",
+        "https://youtube.com/channel/UCYWJ32GJbOgtzU2uHh0OMCQ"
+      ]
+    },
+    {
+      "number": 36,
+      "name": "Camping & Outdoors",
+      "group": "Nature",
+      "youtube_sources": [
+        "https://youtube.com/watch?v=v-vR0o6bkw0",
+        "https://youtube.com/watch?v=9P9b00zFGEk"
+      ]
+    },
+    {
+      "number": 37,
+      "name": "Space",
+      "group": "Science",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCZFipeZtQM5CKUjx6grh54g",
+        "https://youtube.com/channel/UC7_gcs09iThXybpVgjHZ_7g",
+        "https://youtube.com/channel/UCxzC4EngIsMrPmbm6Nxvb-A",
+        "https://youtube.com/channel/UCNqNkZ7kKfqimqHkgbWMNYA",
+        "https://youtube.com/channel/UCFk__1iexL3T5gvGcMpeHNA",
+        "https://youtube.com/channel/UCLA_DiR1FfKNvjuUpBHmylQ",
+        "https://youtube.com/channel/UCIBaDdAbGlFDeS33shmlD0A"
+      ]
+    },
+    {
+      "number": 38,
+      "name": "Crime & Mystery",
+      "group": "Entertainment",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCpFFItkfZz1qz5PpHpqzYBw",
+        "https://youtube.com/channel/UC9PIn6-XuRKZ5HmYeu46AIw",
+        "https://youtube.com/channel/UCL44k-cLrlsdr7PYuMU4yIw",
+        "https://youtube.com/channel/UCcUf33cEPky2GiWBgOP-jQA",
+        "https://youtube.com/channel/UCYwVxWpjeKFWwu8TML-Te9A",
+        "https://youtube.com/channel/UCJWKjrrUh2KL1d3zXQW79cQ"
+      ]
+    },
+    {
+      "number": 39,
+      "name": "Military & Defense",
+      "group": "Education",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCNPMEL4N_kfEC-w2A6CuPGg",
+        "https://youtube.com/channel/UCSq3p5NKEtyp5Rjd4ctiEbg",
+        "https://youtube.com/channel/UCwrpo8z3IgJln2ZidqBUiMA",
+        "https://youtube.com/channel/UCzMV_BNHRP71kMA7ZZ95MaA",
+        "https://youtube.com/channel/UC2I6Et1JkidnnbWgJFiMeHA",
+        "https://youtube.com/channel/UCC3ehuUksTyQ7bbjGntmx3Q",
+        "https://youtube.com/channel/UCnZJt7yQw5IztVwe-Dscd-Q",
+        "https://youtube.com/channel/UCpM4zrZ9c_apiEj6CApj2yw"
+      ]
+    },
+    {
+      "number": 40,
+      "name": "Productivity & Career",
+      "group": "Lifestyle",
+      "youtube_sources": [
+        "https://youtube.com/channel/UCwAnu01qlnVg1Ai2AbtTMaA",
+        "https://youtube.com/channel/UC02x9yG9ZFF_VZp1VnMoptg",
+        "https://youtube.com/channel/UCEHFikgnRuLd1HYKTLrae9Q",
+        "https://youtube.com/channel/UCoOae5nYA7VqaXzerajD0lg"
+      ]
+    }
+  ]
+}

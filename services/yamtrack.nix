@@ -43,7 +43,7 @@
         image = "ghcr.io/dannyvfilms/yamtrack:26.3.5";
         dependsOn = ["yamtrack-redis"];
         environment = {
-          TZ = "America/Chicago";
+          TZ = "America/Los_Angeles";
           REDIS_URL = "redis://localhost:6379";
           URLS = "https://yamtrack.adnanshaikh.com";
           REGISTRATION = "False";

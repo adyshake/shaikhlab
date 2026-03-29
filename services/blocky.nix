@@ -153,6 +153,9 @@ in {
               
               # Yamtrack
               "yamtrack.adnanshaikh.com" = serverIP;
+              
+              # Tunarr
+              "tunarr.adnanshaikh.com" = serverIP;
           };
       };
     };
