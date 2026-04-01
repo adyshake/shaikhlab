@@ -103,12 +103,6 @@
       installation_mode = "force_installed";
       default_area = "menupanel";
     };
-    # Redirector
-    "redirector@einaregilsson.com" = {
-      install_url = "https://addons.mozilla.org/firefox/downloads/latest/redirector/latest.xpi";
-      installation_mode = "force_installed";
-      default_area = "menupanel";
-    };
     # Kagi Search
     "search@kagi.com" = {
       install_url = "https://addons.mozilla.org/firefox/downloads/latest/kagi-search-for-firefox/latest.xpi";
@@ -167,6 +161,7 @@
       "https://github.com"
       "https://amazon.com"
       "https://kagi.com"
+      "https://bitwarden.com"
     ];
     Behavior = "reject-tracker-and-partition-foreign";
     Locked = true;
