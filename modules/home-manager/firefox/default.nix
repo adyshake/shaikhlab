@@ -89,14 +89,14 @@
         # Show whole URL in address bar
         "browser.urlbar.trimURLs" = false;
         # Disable some not so useful functionality.
-        "browser.disableResetPrompt" = true;       # "Looks like you haven't started Firefox in a while."
-        "browser.onboarding.enabled" = false;      # "New to Firefox? Let's get started!" tour
+        "browser.disableResetPrompt" = true; # "Looks like you haven't started Firefox in a while."
+        "browser.onboarding.enabled" = false; # "New to Firefox? Let's get started!" tour
         "browser.aboutConfig.showWarning" = false; # Warning when opening about:config
         "media.videocontrols.picture-in-picture.video-toggle.enabled" = false;
         "extensions.pocket.enabled" = false;
         "extensions.unifiedExtensions.enabled" = false;
         "extensions.shield-recipe-client.enabled" = false;
-        "reader.parse-on-load.enabled" = false;  # "reader view"
+        "reader.parse-on-load.enabled" = false; # "reader view"
 
         # Security-oriented defaults
         "security.family_safety.mode" = 0;
@@ -113,7 +113,7 @@
         "browser.newtabpage.activity-stream.asrouter.userprefs.cfr.features" = false;
         "extensions.htmlaboutaddons.recommendations.enabled" = false;
         "extensions.htmlaboutaddons.discover.enabled" = false;
-        "extensions.getAddons.showPane" = false;  # uses Google Analytics
+        "extensions.getAddons.showPane" = false; # uses Google Analytics
         "browser.discovery.enabled" = false;
         # Reduce File IO / SSD abuse
         # Otherwise, Firefox bombards the HD with writes. Not so nice for SSDs.
@@ -172,7 +172,7 @@
         # Disable crash reports
         "breakpad.reportURL" = "";
         "browser.tabs.crashReporting.sendReport" = false;
-        "browser.crashReports.unsubmittedCheck.autoSubmit2" = false;  # don't submit backlogged reports
+        "browser.crashReports.unsubmittedCheck.autoSubmit2" = false; # don't submit backlogged reports
 
         # Disable Form autofill
         # https://wiki.mozilla.org/Firefox/Features/Form_Autofill
@@ -182,7 +182,6 @@
         "extensions.formautofill.creditCards.available" = false;
         "extensions.formautofill.creditCards.enabled" = false;
         "extensions.formautofill.heuristics.enabled" = false;
-
       };
       userChrome = ''
         /* For Toggle Native Tab Bar extension */
@@ -338,6 +337,4 @@
       };
     };
   };
-
 }
-

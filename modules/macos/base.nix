@@ -101,7 +101,7 @@
       enable = true;
       username = vars.userName;
       entries = [
-        {path = "/Applications/Firefox.app";}
+        {path = "/Applications/LibreWolf.app";}
         {path = "/Applications/Discord.app";}
         {path = "/Applications/Cursor.app";}
         {path = "/Applications/Alacritty.app";}
@@ -114,6 +114,22 @@
       ];
     };
   };
+
+  system.activationScripts.postActivation.text = let
+    policies = builtins.toJSON {
+      policies = import ./../home-manager/librewolf/policies.nix;
+    };
+  in ''
+    echo >&2 "Removing quarantine attribute from LibreWolf..."
+    xattr -r -d com.apple.quarantine /Applications/LibreWolf.app 2>/dev/null || true
+
+    echo >&2 "Writing LibreWolf policies..."
+    policyDir="/Applications/LibreWolf.app/Contents/Resources/distribution"
+    if [ -d "/Applications/LibreWolf.app" ]; then
+      mkdir -p "$policyDir"
+      echo '${policies}' > "$policyDir/policies.json"
+    fi
+  '';
 
   system.activationScripts.Wallpaper.text = ''
     echo >&2 "Setting up wallpaper..."

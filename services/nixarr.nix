@@ -58,9 +58,9 @@
             replace_existing_custom_formats = true;
 
             include = [
-              { template = "sonarr-quality-definition-anime"; }
-              { template = "sonarr-v4-quality-profile-anime"; }
-              { template = "sonarr-v4-custom-formats-anime"; }
+              {template = "sonarr-quality-definition-anime";}
+              {template = "sonarr-v4-quality-profile-anime";}
+              {template = "sonarr-v4-custom-formats-anime";}
             ];
           };
 
@@ -69,9 +69,9 @@
             api_key = "!env_var SONARR_API_KEY";
 
             include = [
-              { template = "sonarr-quality-definition-series"; }
-              { template = "sonarr-v4-quality-profile-web-1080p"; }
-              { template = "sonarr-v4-custom-formats-web-1080p"; }
+              {template = "sonarr-quality-definition-series";}
+              {template = "sonarr-v4-quality-profile-web-1080p";}
+              {template = "sonarr-v4-custom-formats-web-1080p";}
             ];
 
             custom_formats = [
@@ -109,8 +109,8 @@
             api_key = "!env_var RADARR_API_KEY";
 
             include = [
-              { template = "radarr-quality-profile-anime"; }
-              { template = "radarr-custom-formats-anime"; }
+              {template = "radarr-quality-profile-anime";}
+              {template = "radarr-custom-formats-anime";}
             ];
 
             delete_old_custom_formats = true;
@@ -138,9 +138,9 @@
             api_key = "!env_var RADARR_API_KEY";
 
             include = [
-              { template = "radarr-quality-definition-movie"; }
-              { template = "radarr-quality-profile-hd-blueray-web"; }
-              { template = "radarr-custom-formats-hd-blueray-web"; }
+              {template = "radarr-quality-definition-movie";}
+              {template = "radarr-quality-profile-hd-blueray-web";}
+              {template = "radarr-custom-formats-hd-blueray-web";}
             ];
 
             delete_old_custom_formats = true;
@@ -167,9 +167,9 @@
             api_key = "!env_var RADARR_API_KEY";
 
             include = [
-              { template = "radarr-quality-definition-movie"; }
-              { template = "radarr-quality-profile-remux-web-1080p"; }
-              { template = "radarr-custom-formats-remux-web-1080p"; }
+              {template = "radarr-quality-definition-movie";}
+              {template = "radarr-quality-profile-remux-web-1080p";}
+              {template = "radarr-custom-formats-remux-web-1080p";}
             ];
 
             delete_old_custom_formats = true;
@@ -193,7 +193,7 @@
                   "240770601cc226190c367ef59aba7463" # AAC
                   "c2998bd0d90ed5621d8df281e839436e" # DD
                 ];
-                assign_scores_to = [ { name = "Remux + WEB 1080p"; } ];
+                assign_scores_to = [{name = "Remux + WEB 1080p";}];
               }
               {
                 trash_ids = [
@@ -213,14 +213,13 @@
       };
     };
 
-
     transmission = {
       enable = true;
       package = pkgs.transmission_4;
       # todo: figure out how to update this easier
       peerPort = 46634;
       vpn.enable = true;
-      extraAllowedIps = [ "100.64.0.0/10" ];
+      extraAllowedIps = ["100.64.0.0/10"];
       extraSettings = {
         peer-limit-global = 500;
         cache-size-mb = 256;
@@ -354,11 +353,11 @@
   users.groups.media = {};
 
   # Add all nixarr service users to the media group
-  users.users.radarr.extraGroups = [ "media" ];
-  users.users.sonarr.extraGroups = [ "media" ];
-  users.users.prowlarr.extraGroups = [ "media" ];
-  users.users.transmission.extraGroups = [ "media" ];
-  users.users.jellyfin.extraGroups = [ "media" ];
+  users.users.radarr.extraGroups = ["media"];
+  users.users.sonarr.extraGroups = ["media"];
+  users.users.prowlarr.extraGroups = ["media"];
+  users.users.transmission.extraGroups = ["media"];
+  users.users.jellyfin.extraGroups = ["media"];
 
   systemd = {
     tmpfiles.rules = [

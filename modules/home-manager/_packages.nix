@@ -36,6 +36,7 @@ in {
         pipes-rs
         poppler-utils
         qrencode
+        ripgrep
         tree
         wget
         ssh-to-age

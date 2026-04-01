@@ -54,20 +54,21 @@
       # Recommended for fast zlib compression
       # https://www.home-assistant.io/integrations/isal
       "isal"
-      
+
       "roborock"
     ];
 
-    extraPackages = python3Packages: with python3Packages; [
-      # Image processing
-      pillow
-      numpy
-      opencv4
-      # Radio Browser integration
-      radios
-      # Google Translate TTS integration
-      gtts
-    ];
+    extraPackages = python3Packages:
+      with python3Packages; [
+        # Image processing
+        pillow
+        numpy
+        opencv4
+        # Radio Browser integration
+        radios
+        # Google Translate TTS integration
+        gtts
+      ];
 
     # This section allows you to declaratively configure Home Assistant
     # using Nix expressions instead of YAML files (like configuration.yaml)
@@ -93,7 +94,6 @@
           "::1"
         ];
       };
-
     };
   };
 
@@ -123,7 +123,7 @@
     owner = "hass";
     group = "hass";
     path = "/var/lib/hass/secrets.yaml";
-    restartUnits = [ "home-assistant.service" ];
+    restartUnits = ["home-assistant.service"];
   };
 
   # sops.secrets."kopia-repository-token" = {};

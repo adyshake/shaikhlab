@@ -48,7 +48,7 @@
       "discord"
       "docker-desktop"
       "exifcleaner"
-      "firefox"
+      "librewolf"
       "flycut"
       "grandperspective"
       "handbrake-app"

@@ -18,8 +18,14 @@
       group = "grafana";
       mode = "0440";
     };
-    "grafana-google-sheets-client-email" = {owner = "grafana"; group = "grafana";};
-    "grafana-google-sheets-project-id" = {owner = "grafana"; group = "grafana";};
+    "grafana-google-sheets-client-email" = {
+      owner = "grafana";
+      group = "grafana";
+    };
+    "grafana-google-sheets-project-id" = {
+      owner = "grafana";
+      group = "grafana";
+    };
   };
 
   services.grafana = {
@@ -84,5 +90,4 @@
       };
     };
   };
-
 }
