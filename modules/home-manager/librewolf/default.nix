@@ -27,6 +27,9 @@
         "extensions.activeThemeID" = "firefox-compact-dark@mozilla.org";
         "layout.css.prefers-color-scheme.content-override" = 0;
 
+        # Media
+        "media.videocontrols.picture-in-picture.video-toggle.enabled" = false;
+
         # Allow dark mode on websites (LibreWolf's Resist Fingerprinting forces light mode by default)
         # We switch to Fingerprinting Protection (FPP) which is more granular, and exempt CSS prefers-color-scheme
         # "privacy.resistFingerprinting" = false;
@@ -123,6 +126,11 @@
             "untrap_video_page_hide_related_videos" = true;
             "untrap_video_page_center_content" = true;
             "untrap_video_player_hide_end_screen_suggestions" = true;
+
+            # Search page and suggestions
+            "untrap_search_bar_hide_suggestions" = true;
+            "untrap_search_hide_results_people_also_search" = true;
+            "untrap_search_hide_results_for_you" = true;
           };
         };
       };
