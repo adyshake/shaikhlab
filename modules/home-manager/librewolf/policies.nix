@@ -47,6 +47,14 @@
         IconURL = "https://kagi.com/favicon-32x32.png";
         SuggestURLTemplate = "https://kagisuggest.com/api/autosuggest?q={searchTerms}";
       }
+      {
+        Name = "@maps";
+        Description = "Google Maps search";
+        URLTemplate = "https://www.google.com/maps/search/{searchTerms}";
+        Method = "GET";
+        IconURL = "https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico";
+        Alias = "@maps";
+      }
     ];
   };
 
