@@ -27,6 +27,9 @@
         "extensions.activeThemeID" = "firefox-compact-dark@mozilla.org";
         "layout.css.prefers-color-scheme.content-override" = 0;
 
+        # Disable link preview on click and hold
+        "browser.ml.linkPreview.enabled" = false;
+
         # Media
         "media.videocontrols.picture-in-picture.video-toggle.enabled" = false;
 

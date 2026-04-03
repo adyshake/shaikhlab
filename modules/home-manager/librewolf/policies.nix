@@ -50,7 +50,18 @@
     ];
   };
 
-  # Custom extensions
+  # Extensions — force-installed via Mozilla policy templates
+  # Docs: https://mozilla.github.io/policy-templates/#extensionsettings
+  #
+  # To add a new extension:
+  #   1. Get the extension ID:
+  #      nix run github:tupakkatapa/mozid -- 'https://addons.mozilla.org/en/firefox/addon/<slug>'
+  #   2. Add an entry below using this template:
+  #      "<extension-id>" = {
+  #        install_url = "https://addons.mozilla.org/firefox/downloads/latest/<slug>/latest.xpi";
+  #        installation_mode = "force_installed";
+  #        default_area = "menupanel";  # or "navbar" to pin to toolbar
+  #      };
   ExtensionSettings = {
     "*" = {
       installation_mode = "blocked";

@@ -23,3 +23,12 @@
 - Add Yomu to list of mas apps in Nix and add it to dock
 - Add hammerspoon to list of apps in Nix
 - Add hammerspoon script as well
+- Install cursor
+- Install betterdisplay
+- Install itsycal
+- vimium keys to exclude
+  # this is to disable the mini player from being triggered
+  https?://www.youtube.com/*, i
+- meetingbar app
+- BetterDisplay
+~~Replace firefox with librewolf~~
