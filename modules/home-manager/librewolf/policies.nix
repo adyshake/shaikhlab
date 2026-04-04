@@ -55,6 +55,14 @@
         IconURL = "https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico";
         Alias = "@maps";
       }
+      {
+        Name = "@gem";
+        Description = "Google Gemini";
+        URLTemplate = "https://gemini.google.com/app?q={searchTerms}";
+        Method = "GET";
+        IconURL = "https://www.gstatic.com/lamda/images/gemini_favicon_f069958c85030456e93de685481c559f160ea06b.png";
+        Alias = "@gem";
+      }
     ];
   };
 
@@ -153,6 +161,52 @@
       default_area = "menupanel";
     };
   };
+
+  # Bookmarks — populate URL bar autocomplete
+  Bookmarks = [
+    {
+      Title = "Gmail";
+      URL = "https://gmail.com";
+      Placement = "toolbar";
+      Folder = "Quick Access";
+    }
+    {
+      Title = "Google Calendar";
+      URL = "https://calendar.google.com";
+      Placement = "toolbar";
+      Folder = "Quick Access";
+    }
+    {
+      Title = "Google Drive";
+      URL = "https://drive.google.com";
+      Placement = "toolbar";
+      Folder = "Quick Access";
+    }
+    {
+      Title = "Radarr";
+      URL = "https://radarr.adnanshaikh.com";
+      Placement = "toolbar";
+      Folder = "Homelab";
+    }
+    {
+      Title = "Sonarr";
+      URL = "https://sonarr.adnanshaikh.com";
+      Placement = "toolbar";
+      Folder = "Homelab";
+    }
+    {
+      Title = "Transmission";
+      URL = "https://transmission.adnanshaikh.com";
+      Placement = "toolbar";
+      Folder = "Homelab";
+    }
+    {
+      Title = "Home Assistant";
+      URL = "https://ha.adnanshaikh.com";
+      Placement = "toolbar";
+      Folder = "Homelab";
+    }
+  ];
 
   # Clear data on shutdown
   SanitizeOnShutdown = {
