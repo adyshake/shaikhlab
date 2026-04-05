@@ -56,12 +56,12 @@
         Alias = "@maps";
       }
       {
-        Name = "@gem";
-        Description = "Google Gemini";
-        URLTemplate = "https://gemini.google.com/app?q={searchTerms}";
+        Name = "@yt";
+        Description = "YouTube search";
+        URLTemplate = "https://www.youtube.com/results?search_query={searchTerms}";
         Method = "GET";
-        IconURL = "https://www.gstatic.com/lamda/images/gemini_favicon_f069958c85030456e93de685481c559f160ea06b.png";
-        Alias = "@gem";
+        IconURL = "https://www.youtube.com/favicon.ico";
+        Alias = "@yt";
       }
     ];
   };
@@ -70,14 +70,16 @@
   # Docs: https://mozilla.github.io/policy-templates/#extensionsettings
   #
   # To add a new extension:
-  #   1. Get the extension ID:
+  #   1. Get the extension ID (use this exact string as the attribute name below):
   #      nix run github:tupakkatapa/mozid -- 'https://addons.mozilla.org/en/firefox/addon/<slug>'
-  #   2. Add an entry below using this template:
-  #      "<extension-id>" = {
+  #   2. Add an entry using this template:
+  #      "<extension-id-from-mozid>" = {
   #        install_url = "https://addons.mozilla.org/firefox/downloads/latest/<slug>/latest.xpi";
   #        installation_mode = "force_installed";
   #        default_area = "menupanel";  # or "navbar" to pin to toolbar
   #      };
+  #   Toolbar order in browser.uiCustomization.state: Firefox derives widget IDs as
+  #   lowercase(extensionId) with @ and . replaced by _, then suffixed with -browser-action.
   ExtensionSettings = {
     "*" = {
       installation_mode = "blocked";
@@ -115,6 +117,12 @@
     # Bitwarden
     "{446900e4-71c2-419f-a6a7-df9c091e268b}" = {
       install_url = "https://addons.mozilla.org/firefox/downloads/latest/bitwarden-password-manager/latest.xpi";
+      installation_mode = "force_installed";
+      default_area = "navbar";
+    };
+    # Toggle Native Tab Bar (mozid: toggle-native-tab-bar)
+    "Toggle-Native-Tab_Bar@irvinm.addons.mozilla.org" = {
+      install_url = "https://addons.mozilla.org/firefox/downloads/latest/toggle-native-tab-bar/latest.xpi";
       installation_mode = "force_installed";
       default_area = "navbar";
     };
@@ -179,6 +187,12 @@
     {
       Title = "Google Drive";
       URL = "https://drive.google.com";
+      Placement = "toolbar";
+      Folder = "Quick Access";
+    }
+    {
+      Title = "Gemini";
+      URL = "https://gemini.google.com";
       Placement = "toolbar";
       Folder = "Quick Access";
     }

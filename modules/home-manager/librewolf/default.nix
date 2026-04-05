@@ -57,11 +57,17 @@
         "signon.autofillForms" = false;
         "extensions.formautofill.addresses.enabled" = false;
         "extensions.formautofill.creditCards.enabled" = false;
+
+        # Enable userChrome and UI customization
+        "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+
+        # Custom toolbar settings
         "browser.uiCustomization.state" = builtins.toJSON {
           currentVersion = 23;
           newElementCount = 10;
           placements = {
             widget-overflow-fixed-list = [];
+            # Nav bar: stock controls, then URL bar, then pinned extensions (order matters).
             nav-bar = [
               "back-button"
               "forward-button"
@@ -69,9 +75,12 @@
               "home-button"
               "urlbar-container"
               "downloads-button"
-              "446900e4-71c2-419f-a6a7-df9c091e268b_-browser-action" # Bitwarden
-              "jid0-3GUEt1r69sQNSrca5p8kx9Ezc3U_jetpack-browser-action" # ToS;DR
               "unified-extensions-button"
+              # Pinned extensions — keep in sync with ExtensionSettings default_area = "navbar" in policies.nix
+              "_446900e4-71c2-419f-a6a7-df9c091e268b_-browser-action" # Bitwarden
+              "toggle-native-tab_bar_irvinm_addons_mozilla_org-browser-action" # Toggle Native Tab Bar
+              "jid0-3GUEt1r69sQNSrca5p8kx9Ezc3U_jetpack-browser-action" # Terms of Service; Didn't Read
+              
             ];
             toolbar-menubar = ["menubar-items"];
             TabsToolbar = ["tabbrowser-tabs"];
@@ -93,6 +102,7 @@
             "c102b0e7-893d-444f-917c-fc530de507c9_-browser-action"
             "amptra_keepa_com-browser-action"
             "7esoorv3_alefvanoon_anonaddy_me-browser-action"
+            "toggle-native-tab_bar_irvinm_addons_mozilla_org-browser-action"
           ];
           dirtyAreaCache = [
             "nav-bar"
