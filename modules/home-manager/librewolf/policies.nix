@@ -133,14 +133,8 @@
       default_area = "menupanel";
     };
     # Stylus
-    "{c102b0e7-893d-444f-917c-fc530de507c9}" = {
+    "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}" = {
       install_url = "https://addons.mozilla.org/firefox/downloads/latest/styl-us/latest.xpi";
-      installation_mode = "force_installed";
-      default_area = "menupanel";
-    };
-    # Kagi Search
-    "search@kagi.com" = {
-      install_url = "https://addons.mozilla.org/firefox/downloads/latest/kagi-search-for-firefox/latest.xpi";
       installation_mode = "force_installed";
       default_area = "menupanel";
     };

@@ -92,14 +92,13 @@
             "ublock0_raymondhill_net-browser-action"
             "sponsorblocker_ajay_app-browser-action"
             "addon_darkreader_org-browser-action"
-            "search_kagi_com-browser-action"
             "privacypass_kagi_com-browser-action"
             "gdpr_cavi_au_dk-browser-action"
             "redirector_einaregilsson_com-browser-action"
             "d7742d87-e61d-4b78-b8a1-b469842139fa_-browser-action"
             "deArrow_ajay_app-browser-action"
             "2662ff67-b302-4363-95f3-b050218bd72c_-browser-action"
-            "c102b0e7-893d-444f-917c-fc530de507c9_-browser-action"
+            "7a7a4a92-a2a0-41d1-9fd7-1e92480d612d_-browser-action"
             "amptra_keepa_com-browser-action"
             "7esoorv3_alefvanoon_anonaddy_me-browser-action"
             "toggle-native-tab_bar_irvinm_addons_mozilla_org-browser-action"
@@ -122,6 +121,13 @@
       extensions.force = true;
       extensions.settings = {
         # Untrap for YouTube settings
+        # Stylus
+        "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}" = {
+          force = true;
+          settings = {
+            dbInChromeStorage = true;
+          };
+        };
         "{2662ff67-b302-4363-95f3-b050218bd72c}" = {
           force = true;
           settings = {
