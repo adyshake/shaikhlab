@@ -148,6 +148,9 @@ in {
           # Home Assistant
           "hass.adnanshaikh.com" = serverIP;
 
+          # Z-Wave JS UI
+          "zwave.adnanshaikh.com" = serverIP;
+
           # Grafana
           "grafana.adnanshaikh.com" = serverIP;
         };
