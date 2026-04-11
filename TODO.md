@@ -32,3 +32,4 @@
 - meetingbar app
 - BetterDisplay
 ~~Replace firefox with librewolf~~
+-There may be a better way to block hackernews
