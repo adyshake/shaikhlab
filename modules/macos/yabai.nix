@@ -13,6 +13,7 @@
     extraConfig = ''
       # Tell Yabai to completely ignore Reminders and keep it visible on all workspaces
       yabai -m rule --add app='^Reminders$' manage=off sticky=on
+      yabai -m rule --add app='^Sublime Text$' manage=off sticky=on
     '';
   };
 }
