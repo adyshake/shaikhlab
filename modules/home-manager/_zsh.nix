@@ -71,6 +71,64 @@
         fi
         "$gs_path" -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dNOPAUSE -dQUIET -dBATCH -sOutputFile="''$2" "''$1"
       }
+
+      # Wi-Fi focus: run `focus` for prompts; `focus lock|unlock` for scripts (see modules/macos/internet-focus.nix)
+      if [[ $(uname -s) == Darwin ]]; then
+        function focus() {
+          if [[ $# -gt 0 ]]; then
+            command focus "$@"
+            return $?
+          fi
+          if ! whence -p focus &> /dev/null; then
+            print -r "focus: focus(1) not in PATH (darwin rebuild?)" >&2
+            return 1
+          fi
+          local reason minutes defm=''${INET_FOCUS_MINUTES:-45}
+          read "reason?Why do you need the internet? "
+          if [[ -z "$reason" ]]; then
+            print -r "Aborted." >&2
+            return 1
+          fi
+          print -nr "How many minutes (default $defm)? "
+          read minutes
+          [[ -z "$minutes" ]] && minutes="$defm"
+          if [[ ! "$minutes" =~ '^[0-9]+$' ]] || [[ "$minutes" -lt 1 ]]; then
+            print -r "focus: minutes must be a positive integer" >&2
+            return 1
+          fi
+          local statedir="''${XDG_STATE_HOME:-$HOME/.local/state}/shaikhlab/internet-focus"
+          mkdir -p "$statedir"
+          local log="$statedir/access.log"
+          print -r "$(date -Iseconds) ''${minutes}m — $reason" >> "$log"
+          if [[ -f "$statedir/timer.pid" ]]; then
+            kill "$(<"$statedir/timer.pid")" 2>/dev/null || true
+            rm -f "$statedir/timer.pid"
+          fi
+          if ! command focus unlock; then
+            return 1
+          fi
+          print -r "Internet on for ''${minutes} minutes (then focus lock)."
+          (
+            sleep $((minutes * 60))
+            command focus lock
+            rm -f "$statedir/timer.pid"
+          ) &
+          print -r $! > "$statedir/timer.pid"
+        }
+
+        function focus-off() {
+          if ! whence -p focus &> /dev/null; then
+            print -r "focus-off: focus(1) not in PATH" >&2
+            return 1
+          fi
+          local statedir="''${XDG_STATE_HOME:-$HOME/.local/state}/shaikhlab/internet-focus"
+          if [[ -f "$statedir/timer.pid" ]]; then
+            kill "$(<"$statedir/timer.pid")" 2>/dev/null || true
+            rm -f "$statedir/timer.pid"
+          fi
+          command focus lock
+        }
+      fi
     '';
     plugins = [
       {

@@ -9,6 +9,7 @@
 }: let
   blockedDomains = [
     "news.ycombinator.com"
+    "lobste.rs"
   ];
   blockedHostsBody =
     lib.concatStringsSep "\n" (map (d: "0.0.0.0 ${d}\n::1 ${d}") blockedDomains);
@@ -22,9 +23,7 @@
 in {
   imports = [
     inputs.home-manager.darwinModules.home-manager
-
     ./hardware-configuration.nix
-
     ./../../modules/macos/base.nix
     ./../../modules/macos/yabai.nix
   ];
