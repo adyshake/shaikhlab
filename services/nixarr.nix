@@ -269,6 +269,12 @@
       lib.recursiveUpdate {
         bindsTo = ["wg.service"];
         after = ["wg.service"];
+        # Auto-start us whenever wg.service starts. BindsTo gives stop-on-stop,
+        # but without a symmetric wantedBy, a clean stop (triggered by wg
+        # going down) never gets reversed when wg comes back up. Adding
+        # wg.service as a wantedBy target installs `Wants=<us>` on wg, so
+        # every start of wg pulls us along.
+        wantedBy = ["wg.service"];
         serviceConfig = {
           Restart = lib.mkDefault "on-failure";
           RestartSec = lib.mkDefault "15s";
