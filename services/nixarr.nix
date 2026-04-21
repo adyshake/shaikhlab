@@ -257,8 +257,15 @@
 
   services.flaresolverr.enable = true;
 
-  # Make WireGuard service wait for DNS/network to be ready
-  # This prevents failures when the endpoint can't be resolved during boot
+  # Make WireGuard service wait for DNS/network to be ready before wg-up
+  # tries to resolve the VPN endpoint. The upstream wg-up script only retries
+  # DNS 5 times with a short delay, so on a cold boot where blocky hasn't
+  # finished warming up yet the first attempt fails and cascades into every
+  # service running inside the VPN namespace (radarr, sonarr, transmission...).
+  #
+  # Fix: actively probe blocky for the endpoint hostname in `preStart` before
+  # letting wg-up run. If the probe times out we still proceed and let
+  # systemd's Restart=on-failure handle it, so this never blocks boot forever.
   systemd.services.wg = {
     after = [
       "network-online.target"
@@ -270,16 +277,63 @@
       "blocky.service"
       "nss-lookup.target"
     ];
-    # Wait a bit for DNS to be ready before starting
+    preStart = ''
+      endpoint=$(${pkgs.gnused}/bin/sed -n \
+        's/^[[:space:]]*Endpoint[[:space:]]*=[[:space:]]*\([^:]*\):.*/\1/p' \
+        ${config.sops.secrets."wg.conf".path} | head -n1)
+      if [ -z "$endpoint" ]; then
+        echo "wg preStart: could not extract endpoint from wg.conf, skipping probe" >&2
+        exit 0
+      fi
+      echo "wg preStart: waiting for blocky to resolve $endpoint..." >&2
+      for i in $(seq 1 60); do
+        if ${pkgs.dnsutils}/bin/dig +short +time=2 +tries=1 "$endpoint" @127.0.0.1 \
+             | ${pkgs.gnugrep}/bin/grep -qE '^[0-9.]+$'; then
+          echo "wg preStart: DNS ready after $i attempt(s)" >&2
+          exit 0
+        fi
+        sleep 2
+      done
+      echo "wg preStart: DNS still not resolving after 120s, letting wg-up retry take over" >&2
+      exit 0
+    '';
     serviceConfig = {
-      # Don't fail the service if endpoint is temporarily unreachable
       Restart = "on-failure";
       RestartSec = "15s";
-      # Give more time for DNS resolution
-      TimeoutStartSec = "120s";
-      # Never give up retrying (default would stop after 5 failures in 10min)
+      TimeoutStartSec = "300s";
+    };
+    # StartLimitIntervalSec lives in [Unit], not [Service]. Previously it was
+    # set in serviceConfig and systemd silently ignored it (see journalctl
+    # warnings). Setting it to 0 disables the default "5 failures in 10min
+    # then give up" and lets wg keep retrying forever.
+    unitConfig = {
       StartLimitIntervalSec = 0;
     };
+  };
+
+  # Hard-couple every VPN-namespaced service to wg.service:
+  #   - BindsTo: refuses to start if wg.service isn't active, and is
+  #              force-stopped if wg later fails or is stopped.
+  #   - After:   ensures correct ordering (wg must be fully up first).
+  #   - Restart=on-failure means that once wg recovers and comes back up,
+  #              these services retry on their own without manual intervention.
+  # We deliberately use mkDefault on the Restart bits so nixarr's own tuning
+  # (if any) wins, but the BindsTo+After coupling is always enforced.
+  systemd.services = let
+    vpnBound = {
+      bindsTo = ["wg.service"];
+      after = ["wg.service"];
+      serviceConfig = {
+        Restart = lib.mkDefault "on-failure";
+        RestartSec = lib.mkDefault "15s";
+      };
+    };
+  in {
+    radarr = vpnBound;
+    sonarr = vpnBound;
+    prowlarr = vpnBound;
+    transmission = vpnBound;
+    flaresolverr = vpnBound;
   };
 
   nixpkgs.config.packageOverrides = pkgs: {
