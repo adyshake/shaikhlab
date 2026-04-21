@@ -104,9 +104,11 @@
       entries = [
         {path = "/Applications/LibreWolf.app";}
         {path = "/Applications/Discord.app";}
+        {path = "/Applications/Yomu EBook Reader.app";}
         {path = "/Applications/Cursor.app";}
         {path = "/Applications/Alacritty.app";}
         {path = "/Applications/Sublime Text.app";}
+        {path = "/System/Applications/Reminders.app";}
         {
           path = "/Users/${vars.userName}/Downloads";
           section = "others";

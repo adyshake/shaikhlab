@@ -45,15 +45,18 @@
       "audacity"
       "betterdisplay"
       "caffeine"
+      "cursor"
       "discord"
       "docker-desktop"
       "exifcleaner"
       "librewolf"
       "flycut"
       "grandperspective"
+      "hammerspoon"
       "handbrake-app"
       "itsycal"
       "linearmouse"
+      "meetingbar"
       "rar"
       "spotify"
       "steam"
@@ -63,9 +66,12 @@
       "whatsapp"
       "zed"
     ];
+    # TODO: masApps hangs on `darwin-rebuild switch` (see TODO.md). Re-enable
+    # once the root cause is fixed.
     # masApps = {
     #   "Infuse" = 1136220934;
     #   "Tailscale" = 1475387142;
+    #   "Yomu EBook Reader" = 562211012;
     # };
   };
 }
