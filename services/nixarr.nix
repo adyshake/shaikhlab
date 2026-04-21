@@ -338,27 +338,35 @@
       };
     };
 
-    # Declaratively upsert a native "Ntfy" Connect entry in Radarr and Sonarr
-    # on every boot. Runs on the host (not inside the VPN namespace) and
-    # reaches the *arr HTTP APIs via loopback.
+    # Declarative configuration of Radarr/Sonarr state that lives in their
+    # SQLite DB (and therefore can't be set via NixOS options on config.xml).
+    # Runs on the host (not inside the VPN namespace) and talks to the *arr
+    # HTTP APIs on loopback. Every mutator is idempotent: it GETs the current
+    # value, diffs, and only PUTs when something would actually change.
     #
-    # Field schema sourced from:
-    #   Radarr: src/NzbDrone.Core/Notifications/Ntfy/NtfySettings.cs
-    #   Sonarr: src/NzbDrone.Core/Notifications/Ntfy/NtfySettings.cs
-    # Both services share the same shape (implementation=Ntfy, configContract=NtfySettings).
-    arr-ntfy-bootstrap = let
+    # What it configures:
+    #   - Ntfy Connect entry (push notifications on download/upgrade/import)
+    #     Schema: src/NzbDrone.Core/Notifications/Ntfy/NtfySettings.cs
+    #   - Transmission download client, fully declared:
+    #       host=localhost, port=9091, category=radarr|tv-sonarr,
+    #       removeCompletedDownloads=true, removeFailedDownloads=true.
+    #     The seed ratio limit itself is configured on the Transmission
+    #     service a few dozen lines above (seedRatioLimit = 1.0).
+    arr-bootstrap = let
       ntfyServerUrl = "https://ntfy.adnanshaikh.com";
       ntfyUser = "arr";
       ntfyTopic = "media";
-      bootstrap = pkgs.writeShellScript "arr-ntfy-bootstrap" ''
+      bootstrap = pkgs.writeShellScript "arr-bootstrap" ''
         set -eu
         PW=$(cat "${config.sops.secrets."ntfy-secret".path}")
 
-        upsert() {
+        # ------------------------------------------------------------------
+        # Helpers: wait for an *arr instance to be ready, then return apiKey.
+        # ------------------------------------------------------------------
+        wait_for_api() {
           local service="$1" port="$2" configFile="$3"
 
-          # Radarr/Sonarr write their ApiKey into config.xml on first launch;
-          # wait for it to exist before we try to authenticate.
+          # *arr writes <ApiKey> into config.xml on first launch; wait for it.
           for _ in $(seq 1 120); do
             if [ -f "$configFile" ] && ${pkgs.gnugrep}/bin/grep -q '<ApiKey>' "$configFile"; then
               break
@@ -368,7 +376,7 @@
           local apiKey
           apiKey=$(${pkgs.gnused}/bin/sed -n 's|.*<ApiKey>\(.*\)</ApiKey>.*|\1|p' "$configFile")
 
-          # Wait until the HTTP API actually responds (service may still be starting).
+          # Wait until HTTP API actually responds (service may still be booting).
           for _ in $(seq 1 120); do
             if ${pkgs.curl}/bin/curl -fsS -H "X-Api-Key: $apiKey" \
                  "http://127.0.0.1:$port/api/v3/system/status" >/dev/null 2>&1; then
@@ -376,6 +384,15 @@
             fi
             sleep 1
           done
+
+          printf '%s' "$apiKey"
+        }
+
+        # ------------------------------------------------------------------
+        # Mutator 1: ntfy Connect (create or update).
+        # ------------------------------------------------------------------
+        upsert_ntfy() {
+          local service="$1" port="$2" apiKey="$3"
 
           local payload
           payload=$(${pkgs.jq}/bin/jq -n \
@@ -417,7 +434,7 @@
             | ${pkgs.jq}/bin/jq -r '.[] | select(.name=="ntfy") | .id // empty')
 
           if [ -n "$existing" ]; then
-            echo "[$service] updating existing ntfy Connect (id=$existing)"
+            echo "[$service] ntfy: updating existing Connect (id=$existing)"
             echo "$payload" | ${pkgs.jq}/bin/jq --argjson id "$existing" '. + {id: $id}' \
               | ${pkgs.curl}/bin/curl -fsS -X PUT \
                   -H "X-Api-Key: $apiKey" \
@@ -425,7 +442,7 @@
                   --data-binary @- \
                   "http://127.0.0.1:$port/api/v3/notification/$existing" >/dev/null
           else
-            echo "[$service] creating ntfy Connect"
+            echo "[$service] ntfy: creating Connect"
             echo "$payload" | ${pkgs.curl}/bin/curl -fsS -X POST \
                 -H "X-Api-Key: $apiKey" \
                 -H "Content-Type: application/json" \
@@ -434,11 +451,101 @@
           fi
         }
 
-        upsert radarr 7878 /var/lib/nixarr/radarr/config.xml
-        upsert sonarr 8989 /var/lib/nixarr/sonarr/config.xml
+        # ------------------------------------------------------------------
+        # Mutator 2: Transmission download client (full declaration).
+        # Upserts a named "Transmission" client pointing at localhost:9091
+        # (Radarr/Sonarr both run in the wg netns alongside Transmission,
+        # so loopback works). `appFields` is a JSON array of app-specific
+        # fields that differ between Radarr and Sonarr:
+        #   Radarr: movieCategory / recentMoviePriority / olderMoviePriority
+        #   Sonarr: tvCategory    / recentTvPriority    / olderTvPriority
+        # Categories cause Radarr/Sonarr to drop each torrent into
+        # /data/transmission/downloads/<category>/, keeping import scans
+        # cleanly partitioned. Priority 0 = "Last" (queue behind anything
+        # the user manually added), which is the correct default for
+        # automated downloads.
+        # ------------------------------------------------------------------
+        upsert_download_client() {
+          local service="$1" port="$2" apiKey="$3" appFields="$4"
+
+          local payload
+          payload=$(${pkgs.jq}/bin/jq -n \
+            --argjson appFields "$appFields" \
+            '{
+              name: "Transmission",
+              enable: true,
+              protocol: "torrent",
+              priority: 1,
+              removeCompletedDownloads: true,
+              removeFailedDownloads: true,
+              implementation:     "Transmission",
+              implementationName: "Transmission",
+              configContract:     "TransmissionSettings",
+              fields: ([
+                {name: "host",      value: "localhost"},
+                {name: "port",      value: 9091},
+                {name: "useSsl",    value: false},
+                {name: "urlBase",   value: "/transmission/"},
+                {name: "username",  value: ""},
+                {name: "password",  value: ""},
+                {name: "directory", value: ""},
+                {name: "addPaused", value: false}
+              ] + $appFields),
+              tags: []
+            }')
+
+          local existing
+          existing=$(${pkgs.curl}/bin/curl -fsS -H "X-Api-Key: $apiKey" \
+            "http://127.0.0.1:$port/api/v3/downloadclient" \
+            | ${pkgs.jq}/bin/jq -r \
+                '.[] | select(.implementation=="Transmission") | .id // empty' \
+            | head -n1)
+
+          if [ -n "$existing" ]; then
+            echo "[$service] download client: updating Transmission (id=$existing)"
+            echo "$payload" | ${pkgs.jq}/bin/jq --argjson id "$existing" '. + {id: $id}' \
+              | ${pkgs.curl}/bin/curl -fsS -X PUT \
+                  -H "X-Api-Key: $apiKey" \
+                  -H "Content-Type: application/json" \
+                  --data-binary @- \
+                  "http://127.0.0.1:$port/api/v3/downloadclient/$existing" >/dev/null
+          else
+            echo "[$service] download client: creating Transmission"
+            echo "$payload" | ${pkgs.curl}/bin/curl -fsS -X POST \
+                -H "X-Api-Key: $apiKey" \
+                -H "Content-Type: application/json" \
+                --data-binary @- \
+                "http://127.0.0.1:$port/api/v3/downloadclient" >/dev/null
+          fi
+        }
+
+        # ------------------------------------------------------------------
+        # Main: configure one *arr instance end-to-end.
+        # ------------------------------------------------------------------
+        configure() {
+          local service="$1" port="$2" configFile="$3" appFields="$4"
+          local apiKey
+          apiKey=$(wait_for_api "$service" "$port" "$configFile")
+          upsert_ntfy            "$service" "$port" "$apiKey"
+          upsert_download_client "$service" "$port" "$apiKey" "$appFields"
+        }
+
+        RADARR_FIELDS='[
+          {"name":"movieCategory",       "value":"radarr"},
+          {"name":"recentMoviePriority", "value":0},
+          {"name":"olderMoviePriority",  "value":0}
+        ]'
+        SONARR_FIELDS='[
+          {"name":"tvCategory",        "value":"tv-sonarr"},
+          {"name":"recentTvPriority",  "value":0},
+          {"name":"olderTvPriority",   "value":0}
+        ]'
+
+        configure radarr 7878 /var/lib/nixarr/radarr/config.xml "$RADARR_FIELDS"
+        configure sonarr 8989 /var/lib/nixarr/sonarr/config.xml "$SONARR_FIELDS"
       '';
     in {
-      description = "Configure Radarr/Sonarr ntfy Connect declaratively";
+      description = "Declaratively configure Radarr/Sonarr runtime state (ntfy Connect + Transmission download client)";
       after = ["radarr.service" "sonarr.service"];
       wants = ["radarr.service" "sonarr.service"];
       wantedBy = ["multi-user.target"];
