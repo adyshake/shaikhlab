@@ -145,6 +145,9 @@ in {
           "sonarr.adnanshaikh.com" = serverIP;
           "transmission.adnanshaikh.com" = serverIP;
 
+          # ntfy
+          "ntfy.adnanshaikh.com" = serverIP;
+
           # Home Assistant
           "hass.adnanshaikh.com" = serverIP;
 
