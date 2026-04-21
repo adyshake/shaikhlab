@@ -18,6 +18,9 @@
         format = "binary";
         sopsFile = ./../secrets/wg.conf;
       };
+      # Shared password used by both the ntfy server ("arr" user, see
+      # services/ntfy.nix) and the Radarr/Sonarr Ntfy Connect configured below.
+      "ntfy-secret" = {};
     };
   };
 
@@ -396,5 +399,119 @@
     directories = [
       "/var/lib/nixarr"
     ];
+  };
+
+  # Declaratively upsert a native "Ntfy" Connect entry in Radarr and Sonarr on
+  # every boot. Runs on the host (not inside the VPN namespace) and reaches
+  # the *arr HTTP APIs via the loopback forwarders that nginx also uses.
+  #
+  # Field schema sourced from:
+  #   Radarr: src/NzbDrone.Core/Notifications/Ntfy/NtfySettings.cs
+  #   Sonarr: src/NzbDrone.Core/Notifications/Ntfy/NtfySettings.cs
+  # Both services share the same shape (implementation=Ntfy, configContract=NtfySettings).
+  systemd.services.arr-ntfy-bootstrap = let
+    ntfyServerUrl = "https://ntfy.adnanshaikh.com";
+    ntfyUser = "arr";
+    ntfyTopic = "media";
+    bootstrap = pkgs.writeShellScript "arr-ntfy-bootstrap" ''
+      set -eu
+      PW=$(cat "${config.sops.secrets."ntfy-secret".path}")
+
+      upsert() {
+        local service="$1" port="$2" configFile="$3"
+
+        # Radarr/Sonarr write their ApiKey into config.xml on first launch;
+        # wait for it to exist before we try to authenticate.
+        for _ in $(seq 1 120); do
+          if [ -f "$configFile" ] && ${pkgs.gnugrep}/bin/grep -q '<ApiKey>' "$configFile"; then
+            break
+          fi
+          sleep 1
+        done
+        local apiKey
+        apiKey=$(${pkgs.gnused}/bin/sed -n 's|.*<ApiKey>\(.*\)</ApiKey>.*|\1|p' "$configFile")
+
+        # Wait until the HTTP API actually responds (service may still be starting).
+        for _ in $(seq 1 120); do
+          if ${pkgs.curl}/bin/curl -fsS -H "X-Api-Key: $apiKey" \
+               "http://127.0.0.1:$port/api/v3/system/status" >/dev/null 2>&1; then
+            break
+          fi
+          sleep 1
+        done
+
+        local payload
+        payload=$(${pkgs.jq}/bin/jq -n \
+          --arg url "${ntfyServerUrl}" \
+          --arg user "${ntfyUser}" \
+          --arg pw "$PW" \
+          --arg topic "${ntfyTopic}" \
+          '{
+            name: "ntfy",
+            onGrab: false,
+            onDownload: true,
+            onUpgrade: true,
+            onRename: false,
+            onImportComplete: true,
+            onHealthIssue: false,
+            onHealthRestored: false,
+            onApplicationUpdate: false,
+            onManualInteractionRequired: false,
+            includeHealthWarnings: false,
+            tags: [],
+            fields: [
+              {name: "serverUrl",   value: $url},
+              {name: "accessToken", value: ""},
+              {name: "userName",    value: $user},
+              {name: "password",    value: $pw},
+              {name: "priority",    value: 3},
+              {name: "topics",      value: [$topic]},
+              {name: "tags",        value: []},
+              {name: "clickUrl",    value: ""}
+            ],
+            implementation:     "Ntfy",
+            implementationName: "Ntfy",
+            configContract:     "NtfySettings"
+          }')
+
+        local existing
+        existing=$(${pkgs.curl}/bin/curl -fsS -H "X-Api-Key: $apiKey" \
+          "http://127.0.0.1:$port/api/v3/notification" \
+          | ${pkgs.jq}/bin/jq -r '.[] | select(.name=="ntfy") | .id // empty')
+
+        if [ -n "$existing" ]; then
+          echo "[$service] updating existing ntfy Connect (id=$existing)"
+          echo "$payload" | ${pkgs.jq}/bin/jq --argjson id "$existing" '. + {id: $id}' \
+            | ${pkgs.curl}/bin/curl -fsS -X PUT \
+                -H "X-Api-Key: $apiKey" \
+                -H "Content-Type: application/json" \
+                --data-binary @- \
+                "http://127.0.0.1:$port/api/v3/notification/$existing" >/dev/null
+        else
+          echo "[$service] creating ntfy Connect"
+          echo "$payload" | ${pkgs.curl}/bin/curl -fsS -X POST \
+              -H "X-Api-Key: $apiKey" \
+              -H "Content-Type: application/json" \
+              --data-binary @- \
+              "http://127.0.0.1:$port/api/v3/notification" >/dev/null
+        fi
+      }
+
+      upsert radarr 7878 /var/lib/nixarr/radarr/config.xml
+      upsert sonarr 8989 /var/lib/nixarr/sonarr/config.xml
+    '';
+  in {
+    description = "Configure Radarr/Sonarr ntfy Connect declaratively";
+    after = ["radarr.service" "sonarr.service"];
+    wants = ["radarr.service" "sonarr.service"];
+    wantedBy = ["multi-user.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = bootstrap;
+      # Retry the whole bootstrap a few times if *arr isn't healthy yet.
+      Restart = "on-failure";
+      RestartSec = "30s";
+    };
   };
 }
