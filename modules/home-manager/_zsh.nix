@@ -72,9 +72,29 @@
         "$gs_path" -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dNOPAUSE -dQUIET -dBATCH -sOutputFile="''$2" "''$1"
       }
 
-      # Wi-Fi focus: run `focus` for prompts; `focus lock|unlock` for scripts (see modules/macos/internet-focus.nix)
+      # Wi-Fi focus: `focus` prompts; `focus left` time left; `focus-off` lock now (see modules/macos/internet-focus.nix)
       if [[ $(uname -s) == Darwin ]]; then
         function focus() {
+          if [[ $# -eq 1 ]] && [[ $1 == left ]]; then
+            local statedir="''${XDG_STATE_HOME:-$HOME/.local/state}/shaikhlab/internet-focus"
+            if [[ ! -f "$statedir/timer.until" ]]; then
+              print -r "No focus internet timer is active."
+              return 1
+            fi
+            local end_ts now left m s
+            end_ts="$(<"$statedir/timer.until")"
+            now=$(date +%s)
+            left=$(( end_ts - now ))
+            if [[ "$left" -le 0 ]]; then
+              print -r "Timer has expired (stale state cleared)."
+              rm -f "$statedir/timer.pid" "$statedir/timer.until"
+              return 1
+            fi
+            m=$(( left / 60 ))
+            s=$(( left % 60 ))
+            printf '%s\n' "About $m min $s s left before focus lock."
+            return 0
+          fi
           if [[ $# -gt 0 ]]; then
             command focus "$@"
             return $?
@@ -82,6 +102,14 @@
           if ! whence -p focus &> /dev/null; then
             print -r "focus: focus(1) not in PATH (darwin rebuild?)" >&2
             return 1
+          fi
+          local statedir="''${XDG_STATE_HOME:-$HOME/.local/state}/shaikhlab/internet-focus"
+          local log="$statedir/access.log"
+          if [[ -s "$log" ]]; then
+            print -r ""
+            print -r "Last 5 reasons (access.log):"
+            tail -n 5 "$log"
+            print -r ""
           fi
           local reason minutes defm=''${INET_FOCUS_MINUTES:-45}
           read "reason?Why do you need the internet? "
@@ -96,13 +124,11 @@
             print -r "focus: minutes must be a positive integer" >&2
             return 1
           fi
-          local statedir="''${XDG_STATE_HOME:-$HOME/.local/state}/shaikhlab/internet-focus"
           mkdir -p "$statedir"
-          local log="$statedir/access.log"
           print -r "$(date -Iseconds) ''${minutes}m — $reason" >> "$log"
           if [[ -f "$statedir/timer.pid" ]]; then
             kill "$(<"$statedir/timer.pid")" 2>/dev/null || true
-            rm -f "$statedir/timer.pid"
+            rm -f "$statedir/timer.pid" "$statedir/timer.until"
           fi
           if ! command focus unlock; then
             return 1
@@ -111,9 +137,10 @@
           (
             sleep $((minutes * 60))
             command focus lock
-            rm -f "$statedir/timer.pid"
+            rm -f "$statedir/timer.pid" "$statedir/timer.until"
           ) &
           print -r $! > "$statedir/timer.pid"
+          print -r $(( $(date +%s) + minutes * 60 )) > "$statedir/timer.until"
         }
 
         function focus-off() {
@@ -124,7 +151,7 @@
           local statedir="''${XDG_STATE_HOME:-$HOME/.local/state}/shaikhlab/internet-focus"
           if [[ -f "$statedir/timer.pid" ]]; then
             kill "$(<"$statedir/timer.pid")" 2>/dev/null || true
-            rm -f "$statedir/timer.pid"
+            rm -f "$statedir/timer.pid" "$statedir/timer.until"
           fi
           command focus lock
         }
