@@ -1,35 +1,56 @@
-- set up kopia
-- set up backups for *arr
-- set up backups for home assistant
-- configure home-assistant to be declarative
-- set up splitt (https://github.com/e-v-o-l-v-e/nix-config/blob/c68b2c3ddd761f481633565ba619c22eb2b3c23b/system/services/spliit.nix )
-- set up immich
-- set up pastebin
-- set up google drive
-- set up git config with gpg keys
-- set up mac to be declarative
-  - aerospace
-  - linear mouse settings
-  - terminal + zsh
-  - reset key timings?
-- security
-- move git to local
-- add airgradient to home assistant
-- customize home assisstant interface
-- add sui
-- configure dns to block based on different devices
-- remove watch.adnanshaikh.com binding
-- Add Kagi to the Nix config
-- Add Yomu to list of mas apps in Nix and add it to dock
-- Add hammerspoon to list of apps in Nix
-- Add hammerspoon script as well
-- Install cursor
-- Install betterdisplay
-- Install itsycal
-- vimium keys to exclude
-  # this is to disable the mini player from being triggered
+## Done
+
+- [x] ~~Replace firefox with librewolf~~
+- [x] configure home-assistant to be declarative
+- [x] configure dns to block based on different devices (blocky `clientGroupsBlock`)
+- [x] Add Kagi to the Nix config (librewolf default + Privacy Pass extension)
+- [x] Install betterdisplay
+- [x] Install itsycal
+- [x] Install cursor
+- [x] Install hammerspoon (cask only; script still TODO)
+- [x] Install meetingbar
+- [x] set up mac to be declarative
+  - [x] yabai
+  - [x] terminal + zsh
+  - [x] reset key timings
+
+## In progress
+
+- [ ] set up kopia
+  - [x] nextcloud
+  - [x] scrypted
+  - [x] homebridge
+  - [ ] set up backups for \*arr (stub commented out in `services/nixarr.nix`)
+  - [ ] set up backups for home assistant (stub commented out in `services/homeassistant.nix`)
+- [ ] set up git config with gpg keys (allowed_signers written; signing block still commented out in `modules/home-manager/git.nix`)
+
+## To do — infra / ops
+
+- [ ] daily `flake.lock` bump bot — GitHub Action that runs `nix flake update` and opens a PR (see [eh8/chenglab](https://github.com/eh8/chenglab): "`flake.lock` updated daily via GitHub Action, servers are configured to automatically upgrade daily via `modules/nixos/auto-update.nix`"); pair with a server-side auto-upgrade module
+
+## To do — services
+
+- [ ] set up immich
+- [ ] set up pastebin
+- [ ] set up google drive
+- [ ] move git to local (self-hosted forge)
+- [ ] add airgradient to home assistant
+- [ ] customize home assistant interface
+- [ ] add sui
+- [ ] security (define scope)
+
+## To do — macOS / apps
+
+- [ ] fix `homebrew.masApps` hanging on `darwin-rebuild switch` (block is commented out in `modules/macos/_packages.nix` — candidates queued: Infuse, Tailscale, Yomu EBook Reader; see https://discourse.nixos.org/t/nix-darwin-homebrew-masapps-is-hanging/60828)
+- [ ] Add Yomu to dock (blocked on masApps fix; placeholder comment in `modules/macos/base.nix`)
+- [ ] Add hammerspoon script
+
+## To do — declarative settings for already-installed apps
+
+- [ ] linear mouse settings (cask installed; settings not declared)
+- [ ] vimium keys to exclude (extension installed via librewolf policies; excluded keys not declared)
+  ```
+  # disable the mini player from being triggered
   https?://www.youtube.com/*, i
-- meetingbar app
-- BetterDisplay
-~~Replace firefox with librewolf~~
--There may be a better way to block hackernews
+  ```
+- [ ] better way to block hackernews (currently via blocky `customBlocking`)
