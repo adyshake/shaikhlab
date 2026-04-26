@@ -42,12 +42,11 @@
     doCheck = false;
   };
 
-  # Override fava so the extension is on the same PYTHONPATH the wrapper
-  # script uses. Keeps the existing `fava` binary location (so service
-  # ExecStart still reads naturally) but adds dashboards as a dep.
-  favaWithExtensions = pkgs.fava.overridePythonAttrs (old: {
-    propagatedBuildInputs = (old.propagatedBuildInputs or []) ++ [fava-dashboards];
-  });
+  # Single Python env with both fava and the dashboards extension.
+  # `python3.withPackages` dedupes by store path, so the fava propagated
+  # from fava-dashboards collapses with `ps.fava` here — avoiding the
+  # duplicate-package conflict that `pkgs.fava.overridePythonAttrs` hits.
+  favaEnv = pkgs.python3.withPackages (ps: [ps.fava fava-dashboards]);
 in {
   imports = [
     ./_acme.nix
@@ -114,7 +113,7 @@ in {
     serviceConfig = {
       User = "fava";
       Group = "fava";
-      ExecStart = "${favaWithExtensions}/bin/fava --host 127.0.0.1 --port ${toString httpPort} ${ledgerEntry}";
+      ExecStart = "${favaEnv}/bin/fava --host 127.0.0.1 --port ${toString httpPort} ${ledgerEntry}";
       Restart = "on-failure";
       RestartSec = "10s";
       # Light hardening — fava only needs to read the ledger.
