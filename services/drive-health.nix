@@ -158,10 +158,23 @@
           temp=$(sata_raw "$smart_file" "Temperature_Celsius")
           [ "$temp" = "-" ] && temp=$(sata_raw "$smart_file" "Airflow_Temperature_Cel")
           realloc=$(sata_raw "$smart_file" "Reallocated_Sector_Ct")
+          [ "$realloc" = "-" ] && realloc=$(sata_raw "$smart_file" "Reallocate_NAND_Blk_Cnt")
+          [ "$realloc" = "-" ] && realloc=$(sata_raw "$smart_file" "Reallocated_Event_Count")
           pending=$(sata_raw "$smart_file" "Current_Pending_Sector")
           uncorr=$(sata_raw "$smart_file" "Offline_Uncorrectable")
           [ "$uncorr" = "-" ] && uncorr=$(sata_raw "$smart_file" "Reported_Uncorrect")
-          wear_val=$(sata_val "$smart_file" "Wear_Leveling_Count")
+
+          # Wear indicator: vendor names first, then the universal
+          # Available_Reservd_Space (id 232) whose value column counts down
+          # from 100 — this is what works for SSDs not in smartctl's
+          # database (e.g. WD Blue SA510). value=100 means brand new.
+          wear_val=""
+          for attr in Wear_Leveling_Count Remaining_Lifetime_Perc \
+                      Percent_Lifetime_Remain SSD_Life_Left \
+                      Available_Reservd_Space; do
+            v=$(sata_val "$smart_file" "$attr")
+            if [ -n "$v" ]; then wear_val=$v; break; fi
+          done
           if [ -n "$wear_val" ]; then used=$((100 - wear_val)); else used="-"; fi
 
           if [ "$health" != "PASSED" ]; then status="REPLACE"; fi
