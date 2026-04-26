@@ -52,7 +52,14 @@
     TMP=$(mktemp -d)
     trap 'rm -rf "$TMP"' EXIT
 
-    DISKS=$($LSBLK -dn -o NAME,TYPE | $AWK '$2=="disk"{print "/dev/"$1}')
+    # Filter out kernel-virtual block devices that lsblk reports as "disk"
+    # but that aren't real, SMART-capable hardware:
+    #   zram*  in-RAM compressed swap (zramSwap.enable in modules/nixos/base.nix)
+    #   loop*  loopback-mounted images
+    #   sr*    optical drives (mostly absent on a server)
+    #   md*    md raid arrays (we already iterate $MD_DEVS separately)
+    DISKS=$($LSBLK -dn -o NAME,TYPE \
+      | $AWK '$2=="disk" && $1 !~ /^(zram|loop|sr|md)/ {print "/dev/"$1}')
 
     MD_DEVS=""
     for md in /dev/md[0-9]*; do
@@ -88,11 +95,12 @@
       fi
     }
 
-    # SATA -A column layout:  ID# NAME FLAG VALUE WORST THRESH TYPE WHEN RAW
-    # We take RAW from $10 (first token of the raw value, which handles cases
-    # like Temperature_Celsius "35 (Min/Max 20/45)").
+    # `smartctl -x` ATA attribute table layout:
+    #   $1=ID# $2=NAME $3=FLAGS $4=VALUE $5=WORST $6=THRESH $7=FAIL $8=RAW_VALUE
+    # ($8 is the first whitespace token of RAW; e.g. for
+    #  "Temperature_Celsius ... 31 (Min/Max 16/106)" we get "31".)
     sata_raw() { # $1=file $2=name -> raw or "-"
-      v=$($AWK -v n="$2" '$2==n{print $10; f=1; exit} END{if(!f) print ""}' "$1")
+      v=$($AWK -v n="$2" '$2==n{print $8; f=1; exit} END{if(!f) print ""}' "$1")
       [ -n "$v" ] && echo "$v" || echo "-"
     }
     # Normalized VALUE column (0-100, higher=better).
