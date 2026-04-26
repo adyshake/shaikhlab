@@ -159,6 +159,9 @@ in {
 
           # Forgejo (self-hosted git)
           "git.adnanshaikh.com" = serverIP;
+
+          # Fava (Beancount web UI)
+          "beancount.adnanshaikh.com" = serverIP;
         };
       };
     };

@@ -15,6 +15,7 @@
   - [x] reset key timings
 - [x] drive health monitoring on `svr1shaikh` — `smartd` + `mdadm-notify` + monthly digest via MXroute (see [`services/drive-health.nix`](services/drive-health.nix), runbook at [`docs/disk-replacement.md`](docs/disk-replacement.md))
 - [x] self-host git — Forgejo at `git.adnanshaikh.com` (Tailscale-only, state on `/data`, admin user reconciled from sops on every deploy); see [`services/forgejo.nix`](services/forgejo.nix)
+- [x] self-host beancount UI — Fava at `beancount.adnanshaikh.com` (Tailscale-only, working copy on NVMe synced every 5 min from the Forgejo bare repo); see [`services/fava.nix`](services/fava.nix)
 
 ## In progress
 
@@ -25,6 +26,7 @@
   - [ ] set up backups for \*arr (stub commented out in `services/nixarr.nix`)
   - [ ] set up backups for home assistant (stub commented out in `services/homeassistant.nix`)
   - [ ] set up backups for forgejo (`/data/forgejo` — repos + SQLite DB)
+  - [ ] _no kopia needed for fava_ — `/var/lib/fava/ledger` is a regenerable mirror of the forgejo bare repo above
 - [ ] set up git config with gpg keys (allowed_signers written; signing block still commented out in `modules/home-manager/git.nix`)
 
 ## To do — infra / ops
