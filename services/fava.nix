@@ -21,6 +21,26 @@
   # handled via group membership below.
   forgejoBareRepo = "/data/forgejo/repositories/adnan/beancount.git";
 
+  # beancount_reds_plugins (rename_accounts, capital_gains_classifier, etc.)
+  # is referenced from the ledger via `plugin "beancount_reds_plugins.*"`
+  # directives. Not in nixpkgs; package from PyPI.
+  beancount-reds-plugins = pkgs.python3Packages.buildPythonPackage rec {
+    pname = "beancount_reds_plugins";
+    version = "0.4.0";
+    src = pkgs.fetchPypi {
+      inherit pname version;
+      sha256 = "33ed652d9d08c6c1de472900d92a7695f6b5f864c3ad23812acd68e756ed0565";
+    };
+    format = "setuptools";
+    nativeBuildInputs = with pkgs.python3Packages; [setuptools setuptools-scm];
+    propagatedBuildInputs = with pkgs.python3Packages; [beancount];
+    # Version is normally derived from git tags via setuptools_scm; PyPI
+    # sdists don't carry the .git dir, so spell it out.
+    env.SETUPTOOLS_SCM_PRETEND_VERSION = version;
+    pythonImportsCheck = ["beancount_reds_plugins"];
+    doCheck = false;
+  };
+
   # fava-dashboards isn't in nixpkgs; package straight from PyPI.
   #
   # Pinned to 1.2.0 — last release whose declared lower bound (`fava>=1.26.1`)
@@ -46,7 +66,7 @@
   # `python3.withPackages` dedupes by store path, so the fava propagated
   # from fava-dashboards collapses with `ps.fava` here — avoiding the
   # duplicate-package conflict that `pkgs.fava.overridePythonAttrs` hits.
-  favaEnv = pkgs.python3.withPackages (ps: [ps.fava fava-dashboards]);
+  favaEnv = pkgs.python3.withPackages (ps: [ps.fava fava-dashboards beancount-reds-plugins]);
 in {
   imports = [
     ./_acme.nix
