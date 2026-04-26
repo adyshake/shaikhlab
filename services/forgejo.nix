@@ -67,30 +67,38 @@ in {
   # Idempotent: tries change-password first (covers "user already exists,
   # rotate password to current sops value"); falls back to create on first
   # deploy ever (or after wiping /data/forgejo).
+  #
+  # FORGEJO_WORK_DIR + FORGEJO_CUSTOM mirror what services/forgejo.service sets,
+  # so the CLI discovers app.ini at $FORGEJO_CUSTOM/conf/app.ini without us
+  # hard-coding the path.
   systemd.services.forgejo-admin-bootstrap = {
     description = "Reconcile Forgejo admin user from sops";
     after = ["forgejo.service"];
     requires = ["forgejo.service"];
     wantedBy = ["multi-user.target"];
 
+    environment = {
+      FORGEJO_WORK_DIR = config.services.forgejo.stateDir;
+      FORGEJO_CUSTOM = config.services.forgejo.customDir;
+    };
+
     serviceConfig = {
       Type = "oneshot";
       User = "forgejo";
       Group = "forgejo";
       RemainAfterExit = true;
+      WorkingDirectory = config.services.forgejo.stateDir;
     };
 
     script = let
       forgejoBin = "${config.services.forgejo.package}/bin/forgejo";
-      cfg = "/etc/forgejo/app.ini";
       pwFile = config.sops.secrets."forgejo-admin-password".path;
     in ''
       set -eu
 
-      # Wait for forgejo to finish first-run DB init (migrations on Type=simple
-      # service). Quick poll instead of an arbitrary sleep.
+      # Wait for forgejo to finish first-run DB init (migrations).
       for _ in $(seq 1 60); do
-        if ${forgejoBin} --config ${cfg} admin user list >/dev/null 2>&1; then
+        if ${forgejoBin} admin user list >/dev/null 2>&1; then
           break
         fi
         sleep 1
@@ -98,11 +106,11 @@ in {
 
       PW=$(cat ${pwFile})
 
-      if ${forgejoBin} --config ${cfg} admin user change-password \
+      if ${forgejoBin} admin user change-password \
             --username "${vars.userName}" --password "$PW" >/dev/null 2>&1; then
         echo "forgejo: refreshed password for ${vars.userName}"
       else
-        ${forgejoBin} --config ${cfg} admin user create \
+        ${forgejoBin} admin user create \
           --admin \
           --username "${vars.userName}" \
           --email   "${vars.userEmail}" \
