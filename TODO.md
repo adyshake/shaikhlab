@@ -23,6 +23,7 @@
   - [ ] set up backups for \*arr (stub commented out in `services/nixarr.nix`)
   - [ ] set up backups for home assistant (stub commented out in `services/homeassistant.nix`)
 - [ ] set up git config with gpg keys (allowed_signers written; signing block still commented out in `modules/home-manager/git.nix`)
+- [ ] drive health monitoring — add `mxroute-smtp-password` via `just sops-edit`, then `just deploy svr1shaikh`; see `services/drive-health.nix`
 
 ## To do — infra / ops
 

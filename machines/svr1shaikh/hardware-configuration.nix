@@ -31,11 +31,18 @@
     swraid.enable = true;
   };
 
-  # Configure mdadm to auto-assemble the RAID array
-  # Generated with: mdadm --detail --scan
+  # Configure mdadm to auto-assemble the RAID array.
+  # ARRAY line generated with: mdadm --detail --scan
+  # MAILADDR + MAILFROM: mdmonitor emails via the system sendmail (msmtp,
+  # wired up in services/mail.nix).
+  # PROGRAM: also invoke our own mdadm-notify script on every event, so we
+  # get a rich email (mdstat + detail) regardless of mdadm's sendmail quirks.
+  # See services/drive-health.nix.
   environment.etc."mdadm.conf".text = ''
     ARRAY /dev/md0 metadata=1.2 UUID=e229efd8:ba77234e:59375065:9edda13b
     MAILADDR ${vars.userEmail}
+    MAILFROM ${vars.userEmail}
+    PROGRAM /run/current-system/sw/bin/mdadm-notify
   '';
 
   fileSystems = {

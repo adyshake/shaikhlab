@@ -16,6 +16,7 @@
     ./../../modules/nixos/remote-unlock.nix
 
     # ./../../services/nextcloud.nix  # Requires: nextcloud-adminpassfile, kopia-repository-token, cloudflare-api-key (via _acme.nix)
+    ./../../services/drive-health.nix # Requires: mxroute-smtp-password (imports ./mail.nix)
     ./../../services/nixarr.nix
     ./../../services/ntfy.nix # Requires: ntfy-secret
     ./../../services/tailscale.nix # Requires: tailscale-authkey
