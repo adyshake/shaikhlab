@@ -31,7 +31,7 @@
       sha256 = "bd3a578cac945d399cb9c1133ee2b24020d1741aa98fea41e8e5331de8a8024e";
     };
     format = "pyproject";
-    nativeBuildInputs = with pkgs.python3Packages; [hatchling];
+    nativeBuildInputs = with pkgs.python3Packages; [hatchling hatch-vcs];
     propagatedBuildInputs = with pkgs.python3Packages; [fava];
     pythonImportsCheck = ["fava_dashboards"];
     doCheck = false;
