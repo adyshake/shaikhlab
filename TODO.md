@@ -14,6 +14,7 @@
   - [x] terminal + zsh
   - [x] reset key timings
 - [x] drive health monitoring on `svr1shaikh` — `smartd` + `mdadm-notify` + monthly digest via MXroute (see [`services/drive-health.nix`](services/drive-health.nix), runbook at [`docs/disk-replacement.md`](docs/disk-replacement.md))
+- [x] self-host git — Forgejo at `git.adnanshaikh.com` (Tailscale-only, state on `/data`, admin user reconciled from sops on every deploy); see [`services/forgejo.nix`](services/forgejo.nix)
 
 ## In progress
 
@@ -23,6 +24,7 @@
   - [x] homebridge
   - [ ] set up backups for \*arr (stub commented out in `services/nixarr.nix`)
   - [ ] set up backups for home assistant (stub commented out in `services/homeassistant.nix`)
+  - [ ] set up backups for forgejo (`/data/forgejo` — repos + SQLite DB)
 - [ ] set up git config with gpg keys (allowed_signers written; signing block still commented out in `modules/home-manager/git.nix`)
 
 ## To do — infra / ops
@@ -34,7 +36,6 @@
 - [ ] set up immich
 - [ ] set up pastebin
 - [ ] set up google drive
-- [ ] move git to local (self-hosted forge)
 - [ ] add airgradient to home assistant
 - [ ] customize home assistant interface
 - [ ] add sui

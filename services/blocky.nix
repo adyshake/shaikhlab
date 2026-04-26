@@ -156,6 +156,9 @@ in {
 
           # Grafana
           "grafana.adnanshaikh.com" = serverIP;
+
+          # Forgejo (self-hosted git)
+          "git.adnanshaikh.com" = serverIP;
         };
       };
     };

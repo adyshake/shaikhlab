@@ -24,6 +24,7 @@
     ./../../services/zwave-js-ui.nix
     ./../../services/blocky.nix
     ./../../services/grafana.nix
+    ./../../services/forgejo.nix # Requires: forgejo-admin-password
   ];
 
   home-manager = {
