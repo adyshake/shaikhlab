@@ -115,8 +115,12 @@ in {
 
       PW=$(cat ${pwFile})
 
+      # --must-change-password=false is critical: the default flips it back to
+      # true on every rotation, which then 403s every /api/v1/user/* call with
+      # "You must change your password" until it's cleared via the web UI.
       if ${forgejoBin} admin user change-password \
-            --username "${vars.userName}" --password "$PW" >/dev/null 2>&1; then
+            --username "${vars.userName}" --password "$PW" \
+            --must-change-password=false >/dev/null 2>&1; then
         echo "forgejo: refreshed password for ${vars.userName}"
       else
         ${forgejoBin} admin user create \
