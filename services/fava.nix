@@ -22,14 +22,13 @@
   forgejoBareRepo = "/data/forgejo/repositories/adnan/beancount.git";
 
   # fava-dashboards isn't in nixpkgs; package straight from PyPI.
-  # NOTE: lib.fakeSha256 will fail the first build and report the real hash
-  # to paste back in here. Standard nixpkgs idiom.
+  # 1.2.3 is the latest stable in the 1.x line (2.x is still beta).
   fava-dashboards = pkgs.python3Packages.buildPythonPackage rec {
     pname = "fava_dashboards";
-    version = "1.2.5";
+    version = "1.2.3";
     src = pkgs.fetchPypi {
       inherit pname version;
-      sha256 = lib.fakeSha256;
+      sha256 = "bd3a578cac945d399cb9c1133ee2b24020d1741aa98fea41e8e5331de8a8024e";
     };
     format = "pyproject";
     nativeBuildInputs = with pkgs.python3Packages; [setuptools];
