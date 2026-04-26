@@ -78,7 +78,10 @@
       base=$(basename "$1")
       r=$($AWK -v d="$base" '$1==d{print $2; exit}' "$TMP/role-map")
       if [ -n "$r" ]; then echo "$r"
-      elif mount | grep -qE "^$1[p0-9]*[[:space:]]+on[[:space:]]+/(boot|nix)([[:space:]]|$)"; then
+      # Read /proc/mounts directly so we don't depend on `mount` being on
+      # PATH for the systemd unit. Match either the bare disk or any of its
+      # partitions (nvme0n1 -> nvme0n1p1, sda -> sda1) mounted at /boot or /nix.
+      elif grep -qE "^$1[p0-9]*[[:space:]]+/(boot|nix)[[:space:]]" /proc/mounts; then
         echo "boot"
       else
         echo "-"
