@@ -12,6 +12,11 @@
   # makes this safe; clones look like:
   #   ssh://git@git.adnanshaikh.com:2222/adnan/<repo>.git
   sshPort = 2222;
+
+  # Extra commit-author emails to attach to the admin account so commits
+  # authored as any of these resolve to user `adnan` in the UI. Primary stays
+  # vars.userEmail (used for notifications).
+  secondaryEmails = ["github@adnanshaikh.com"];
 in {
   imports = [
     ./_acme.nix
@@ -93,6 +98,10 @@ in {
     script = let
       forgejoBin = "${config.services.forgejo.package}/bin/forgejo";
       pwFile = config.sops.secrets."forgejo-admin-password".path;
+      curlBin = "${pkgs.curl}/bin/curl";
+      jqBin = "${pkgs.jq}/bin/jq";
+      apiBase = "http://127.0.0.1:${toString httpPort}/api/v1";
+      secondaryEmailsList = builtins.concatStringsSep " " secondaryEmails;
     in ''
       set -eu
 
@@ -118,6 +127,22 @@ in {
           --must-change-password=false
         echo "forgejo: created admin ${vars.userName}"
       fi
+
+      # Reconcile secondary commit-author emails. The forgejo CLI has no
+      # email-management verbs, so we drive the REST API as the admin user.
+      EXISTING=$(${curlBin} -sS --fail -u "${vars.userName}:$PW" \
+        "${apiBase}/user/emails" | ${jqBin} -r '.[].email')
+      for EMAIL in ${secondaryEmailsList}; do
+        if printf '%s\n' "$EXISTING" | grep -qFx "$EMAIL"; then
+          echo "forgejo: secondary email $EMAIL already present"
+        else
+          ${curlBin} -sS --fail -u "${vars.userName}:$PW" \
+            -H 'Content-Type: application/json' \
+            -X POST "${apiBase}/user/emails" \
+            -d "{\"emails\":[\"$EMAIL\"]}" >/dev/null
+          echo "forgejo: added secondary email $EMAIL"
+        fi
+      done
     '';
   };
 

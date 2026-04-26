@@ -240,6 +240,7 @@
       "https://gemini.google.com"
       "https://youtube.com"
       "https://github.com"
+      "https://git.adnanshaikh.com"
       "https://amazon.com"
       "https://kagi.com"
       "https://bitwarden.com"
