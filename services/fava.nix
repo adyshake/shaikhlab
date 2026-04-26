@@ -22,17 +22,22 @@
   forgejoBareRepo = "/data/forgejo/repositories/adnan/beancount.git";
 
   # fava-dashboards isn't in nixpkgs; package straight from PyPI.
-  # 1.2.3 is the latest stable in the 1.x line (2.x is still beta).
+  #
+  # Pinned to 1.2.0 — last release whose declared lower bound (`fava>=1.26.1`)
+  # is satisfied by nixpkgs nixos-25.11's fava 1.30.7. Releases 1.2.1+ bump
+  # the floor to `fava>=1.30.8`, which would force pulling fava from
+  # nixpkgs-unstable or building it ourselves. Revisit when nixos-26.05
+  # ships or if a missing 1.2.x feature is actually needed.
   fava-dashboards = pkgs.python3Packages.buildPythonPackage rec {
     pname = "fava_dashboards";
-    version = "1.2.3";
+    version = "1.2.0";
     src = pkgs.fetchPypi {
       inherit pname version;
-      sha256 = "bd3a578cac945d399cb9c1133ee2b24020d1741aa98fea41e8e5331de8a8024e";
+      sha256 = "86f85f52dd5071ab8e2de4569060a5845e2dc1c3f2b890e0f10cfc5eb4377399";
     };
     format = "pyproject";
     nativeBuildInputs = with pkgs.python3Packages; [hatchling hatch-vcs];
-    propagatedBuildInputs = with pkgs.python3Packages; [fava];
+    propagatedBuildInputs = with pkgs.python3Packages; [fava pyyaml];
     pythonImportsCheck = ["fava_dashboards"];
     doCheck = false;
   };
