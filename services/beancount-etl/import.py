@@ -86,6 +86,26 @@ log = logging.getLogger("beancount-etl")
 # ---------------------------------------------------------------------------
 
 
+def _normalize_last_digits(raw: object) -> str:
+    """Canonical form for matching `Account Last Digits` values.
+
+    Google Sheets silently coerces all-digit strings to numbers even when the
+    cell is formatted as Plain Text (any subsequent manual edit can flip it
+    back), so a cell entered as `0884` round-trips through gspread as the int
+    `884` and a cell entered as `0123` comes back as `123`. Strip leading
+    zeros on both the sheet side AND the YAML side so `884`, `0884`, and
+    `00884` all match the same mapping entry.
+
+    Non-digit strings (e.g. account aliases) are left alone modulo
+    whitespace, so this is a no-op for any caller that doesn't use a numeric
+    last-N convention.
+    """
+    s = str(raw).strip()
+    if s.isdigit():
+        return s.lstrip("0") or "0"
+    return s
+
+
 @dataclass(frozen=True)
 class AccountKey:
     """Identifies a beancount account by (Institution, Last Digits).
@@ -95,6 +115,9 @@ class AccountKey:
     out of the Joint Capital One 360"), so we look up the account by
     institution+last-4 alone and let the row's Payer column flow through
     as plain `payer:` metadata on the rendered entry.
+
+    `last_digits` is normalized via _normalize_last_digits at construction
+    time so sheet/YAML lookup is robust to Sheets' leading-zero stripping.
     """
 
     institution: str
@@ -104,7 +127,7 @@ class AccountKey:
     def from_row(cls, row: dict) -> "AccountKey":
         return cls(
             institution=str(row.get("Institution", "")).strip(),
-            last_digits=str(row.get("Account Last Digits", "")).strip(),
+            last_digits=_normalize_last_digits(row.get("Account Last Digits", "")),
         )
 
 
@@ -139,7 +162,7 @@ class Mapping:
         for entry in data.get("accounts", []):
             key = AccountKey(
                 institution=str(entry["institution"]).strip(),
-                last_digits=str(entry["last_digits"]).strip(),
+                last_digits=_normalize_last_digits(entry["last_digits"]),
             )
             if key in accounts and accounts[key] != entry["account"]:
                 raise ValueError(
