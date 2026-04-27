@@ -271,11 +271,16 @@ def classify_rows(
         renamed = str(row.get("Renamed Transaction Name", "")).strip()
         category = str(row.get("Category", "")).strip()
         original = str(row.get("Original Transaction Name", "")).strip()
+        payer = str(row.get("Payer", "")).strip()
 
         if renamed in mapping.skip_renamed_names:
             out.append(Classified(sheet_row_idx, row, h, "skip_renamed"))
             continue
-        if not renamed or not category:
+        # Original Transaction Name and Payer are populated by the Apps Script
+        # along with Date/Institution/Last Digits/Price; treat them as required
+        # so a row with a blank one signals a script regression rather than
+        # silently importing an entry with a stub payee or no payer metadata.
+        if not renamed or not category or not original or not payer:
             out.append(Classified(sheet_row_idx, row, h, "incomplete"))
             continue
 
@@ -319,7 +324,7 @@ def classify_rows(
 
         rendered = render_entry(
             iso_date=iso_date,
-            payer=str(row.get("Payer", "")).strip(),
+            payer=payer,
             payee=original,
             narration=renamed,
             notes=str(row.get("Notes", "")).strip(),
