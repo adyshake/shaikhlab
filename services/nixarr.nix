@@ -390,9 +390,17 @@
 
         # ------------------------------------------------------------------
         # Mutator 1: ntfy Connect (create or update).
+        #
+        # `triggers` is a JSON object that overrides the per-event flags
+        # (onDownload, onUpgrade, onImportComplete, ...). This is per-service
+        # because Sonarr fires both `onDownload` (once per imported episode
+        # file) and `onImportComplete` (once per release after all episodes
+        # in the grab finish importing) — enabling both produces N+1 ntfy
+        # pushes per release. Radarr has no equivalent split (one movie =
+        # one file), so it just uses `onDownload`.
         # ------------------------------------------------------------------
         upsert_ntfy() {
-          local service="$1" port="$2" apiKey="$3"
+          local service="$1" port="$2" apiKey="$3" triggers="$4"
 
           local payload
           payload=$(${pkgs.jq}/bin/jq -n \
@@ -400,13 +408,14 @@
             --arg user "${ntfyUser}" \
             --arg pw "$PW" \
             --arg topic "${ntfyTopic}" \
-            '{
+            --argjson triggers "$triggers" \
+            '({
               name: "ntfy",
               onGrab: false,
-              onDownload: true,
-              onUpgrade: true,
+              onDownload: false,
+              onUpgrade: false,
               onRename: false,
-              onImportComplete: true,
+              onImportComplete: false,
               onHealthIssue: false,
               onHealthRestored: false,
               onApplicationUpdate: false,
@@ -426,7 +435,7 @@
               implementation:     "Ntfy",
               implementationName: "Ntfy",
               configContract:     "NtfySettings"
-            }')
+            } + $triggers)')
 
           local existing
           existing=$(${pkgs.curl}/bin/curl -fsS -H "X-Api-Key: $apiKey" \
@@ -523,10 +532,10 @@
         # Main: configure one *arr instance end-to-end.
         # ------------------------------------------------------------------
         configure() {
-          local service="$1" port="$2" configFile="$3" appFields="$4"
+          local service="$1" port="$2" configFile="$3" appFields="$4" ntfyTriggers="$5"
           local apiKey
           apiKey=$(wait_for_api "$service" "$port" "$configFile")
-          upsert_ntfy            "$service" "$port" "$apiKey"
+          upsert_ntfy            "$service" "$port" "$apiKey" "$ntfyTriggers"
           upsert_download_client "$service" "$port" "$apiKey" "$appFields"
         }
 
@@ -541,8 +550,17 @@
           {"name":"olderTvPriority",   "value":0}
         ]'
 
-        configure radarr 7878 /var/lib/nixarr/radarr/config.xml "$RADARR_FIELDS"
-        configure sonarr 8989 /var/lib/nixarr/sonarr/config.xml "$SONARR_FIELDS"
+        # Radarr: a movie release is a single file, so onDownload fires
+        # exactly once per import. (onImportComplete is a no-op for Radarr.)
+        RADARR_NTFY='{"onDownload":true,"onUpgrade":true,"onImportComplete":false}'
+        # Sonarr: onImportComplete fires exactly once per release after every
+        # episode in the grab is imported, which is what we actually want for
+        # season packs and single-episode releases alike. onDownload is left
+        # off to avoid the per-episode duplicate notification.
+        SONARR_NTFY='{"onDownload":false,"onUpgrade":false,"onImportComplete":true}'
+
+        configure radarr 7878 /var/lib/nixarr/radarr/config.xml "$RADARR_FIELDS" "$RADARR_NTFY"
+        configure sonarr 8989 /var/lib/nixarr/sonarr/config.xml "$SONARR_FIELDS" "$SONARR_NTFY"
       '';
     in {
       description = "Declaratively configure Radarr/Sonarr runtime state (ntfy Connect + Transmission download client)";
