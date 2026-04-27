@@ -16,7 +16,7 @@
   # Extra commit-author emails to attach to the admin account so commits
   # authored as any of these resolve to user `adnan` in the UI. Primary stays
   # vars.userEmail (used for notifications).
-  secondaryEmails = ["github@adnanshaikh.com"];
+  secondaryEmails = ["github@adnanshaikh.com" "automation@adnanshaikh.com"];
 in {
   imports = [
     ./_acme.nix
