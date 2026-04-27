@@ -493,33 +493,88 @@ def move_rows_to_history(
 ) -> None:
     """Append rows to History (with Imported At) then delete from main.
 
-    Deletions go highest-row-first so earlier indices stay valid. Logs loudly
-    if anything fails — a failed move after a successful push is the one path
-    that can leave the next run double-importing those rows into inbox.
+    Both halves are idempotent so a previous run that crashed mid-cleanup
+    (e.g. a 429 from Sheets' 60-write/min/user quota partway through
+    delete_rows) can be safely re-run without producing duplicates:
+
+      * History append dedupes against rows already in History by
+        recomputing row_hash() on each existing History record (the
+        History tab carries the same columns as Expenses plus an
+        Imported At column, so the hash inputs are identical).
+      * Deletions are coalesced into contiguous range requests and sent
+        as a single batch_update HTTP call rather than ~N individual
+        delete_rows calls. Naive per-row deletion blew the per-minute
+        write quota on the first run with ~170 rows.
     """
     if not rows:
         return
-    timestamp = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    main_header = main_ws.row_values(1)
-    history_rows = []
-    for c in rows:
-        # Preserve column ordering of the main tab; tack Imported At on the end.
-        ordered = [str(c.raw.get(col, "")) for col in main_header]
-        ordered.append(timestamp)
-        history_rows.append(ordered)
+
+    # Idempotency for the append: skip rows whose hash already lives in
+    # History. Cheap one read API call regardless of row count.
+    history_records = history_ws.get_all_records()
+    existing_history_hashes = {row_hash(r) for r in history_records}
+
+    todo = [c for c in rows if c.sheet_row_hash not in existing_history_hashes]
+    if todo:
+        timestamp = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        main_header = main_ws.row_values(1)
+        history_rows = [
+            [str(c.raw.get(col, "")) for col in main_header] + [timestamp]
+            for c in todo
+        ]
+        try:
+            history_ws.append_rows(history_rows, value_input_option="RAW")
+            log.info("appended %d rows to %s", len(history_rows), HISTORY_TAB)
+        except Exception:
+            log.exception(
+                "FAILED to append rows to %s; next run will retry idempotently.",
+                HISTORY_TAB,
+            )
+            raise
+    else:
+        log.info(
+            "all %d ready rows already in %s; skipping append",
+            len(rows), HISTORY_TAB,
+        )
+
+    # Coalesce contiguous main-tab indices into ranges and apply
+    # highest-first so earlier indices stay valid as later ranges shift up.
+    # Single batch_update call regardless of how many ranges.
+    sorted_idx = sorted({c.sheet_row_idx for c in rows})
+    ranges: list[list[int]] = []  # inclusive 1-based [start, end] pairs
+    for idx in sorted_idx:
+        if ranges and idx == ranges[-1][1] + 1:
+            ranges[-1][1] = idx
+        else:
+            ranges.append([idx, idx])
+    ranges.sort(reverse=True)
+    requests = [
+        {
+            "deleteDimension": {
+                "range": {
+                    "sheetId": main_ws.id,
+                    "dimension": "ROWS",
+                    "startIndex": start - 1,  # API uses 0-based half-open
+                    "endIndex": end,
+                }
+            }
+        }
+        for start, end in ranges
+    ]
     try:
-        history_ws.append_rows(history_rows, value_input_option="RAW")
-        log.info("appended %d rows to %s", len(history_rows), HISTORY_TAB)
-        for c in sorted(rows, key=lambda x: x.sheet_row_idx, reverse=True):
-            main_ws.delete_rows(c.sheet_row_idx)
-        log.info("removed %d rows from %s", len(rows), MAIN_TAB)
+        main_ws.spreadsheet.batch_update({"requests": requests})
+        log.info(
+            "removed %d rows from %s in %d range(s) via 1 batch_update call",
+            sum(e - s + 1 for s, e in ranges),
+            MAIN_TAB,
+            len(ranges),
+        )
     except Exception:
         log.exception(
-            "FAILED to move rows from %s to %s after a successful push. "
-            "The next run will likely re-import these rows; clean up the "
-            "duplicate entries in total/inbox.beancount by hand.",
+            "FAILED to delete rows from %s. Those rows will reappear as "
+            "ready next run; inbox hash-dedup + History append idempotency "
+            "above keep the retry safe (no duplicate inbox/History entries).",
             MAIN_TAB,
-            HISTORY_TAB,
         )
         raise
 
