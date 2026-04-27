@@ -102,11 +102,14 @@ in {
   };
 
   systemd.timers.beancount-etl = {
-    description = "Periodic Google Sheet -> Beancount inbox import";
+    description = "Nightly Google Sheet -> Beancount inbox import";
     wantedBy = ["timers.target"];
     timerConfig = {
-      OnBootSec = "5min";
-      OnUnitActiveSec = "30min";
+      # 4am local (America/Los_Angeles per modules/nixos/base.nix). Once a
+      # day keeps the Forgejo commit log readable; rows entered during the
+      # day get picked up the next morning. Persistent=true means a missed
+      # window (host off at 4am) fires on next boot.
+      OnCalendar = "*-*-* 04:00:00";
       Persistent = true;
       Unit = "beancount-etl.service";
     };
