@@ -103,7 +103,7 @@
       entries = [
         {path = "/Applications/LibreWolf.app";}
         {path = "/Applications/Discord.app";}
-        {path = "/Applications/Yomu EBook Reader.app";}
+        {path = "/Applications/Yomu.app";}
         {path = "/Applications/Cursor.app";}
         {path = "/Applications/Alacritty.app";}
         {path = "/Applications/Sublime Text.app";}
