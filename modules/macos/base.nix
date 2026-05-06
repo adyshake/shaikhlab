@@ -7,7 +7,6 @@
     ./_dock.nix
     ./_icons.nix
     ./_packages.nix
-    ./internet-focus.nix
   ];
 
   nixpkgs.config.allowUnfree = true;
