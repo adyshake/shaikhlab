@@ -25,7 +25,6 @@ in {
     inputs.home-manager.darwinModules.home-manager
     ./hardware-configuration.nix
     ./../../modules/macos/base.nix
-    ./../../modules/macos/yabai.nix
   ];
 
   home-manager = {

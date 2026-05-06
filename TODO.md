@@ -10,7 +10,6 @@
 - [x] Install hammerspoon (cask only; script still TODO)
 - [x] Install meetingbar
 - [x] set up mac to be declarative
-  - [x] yabai
   - [x] terminal + zsh
   - [x] reset key timings
 - [x] drive health monitoring on `svr1shaikh` — `smartd` + `mdadm-notify` + monthly digest via MXroute (see [`services/drive-health.nix`](services/drive-health.nix), runbook at [`docs/disk-replacement.md`](docs/disk-replacement.md))
