@@ -48,14 +48,6 @@
         SuggestURLTemplate = "https://kagisuggest.com/api/autosuggest?q={searchTerms}";
       }
       {
-        Name = "@maps";
-        Description = "Google Maps search";
-        URLTemplate = "https://www.google.com/maps/search/{searchTerms}";
-        Method = "GET";
-        IconURL = "https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico";
-        Alias = "@maps";
-      }
-      {
         Name = "@yt";
         Description = "YouTube search";
         URLTemplate = "https://www.youtube.com/results?search_query={searchTerms}";
@@ -187,6 +179,18 @@
     {
       Title = "Google Drive";
       URL = "https://drive.google.com";
+      Placement = "toolbar";
+      Folder = "Quick Access";
+    }
+    {
+      Title = "Google Sheets";
+      URL = "https://sheets.google.com";
+      Placement = "toolbar";
+      Folder = "Quick Access";
+    }
+    {
+      Title = "Google Maps";
+      URL = "https://maps.google.com";
       Placement = "toolbar";
       Folder = "Quick Access";
     }
