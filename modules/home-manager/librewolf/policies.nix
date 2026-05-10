@@ -154,6 +154,12 @@
       installation_mode = "force_installed";
       default_area = "menupanel";
     };
+    # Old Reddit Redirect
+    "{9063c2e9-e07c-4c2c-9646-cfe7ca8d0498}" = {
+      install_url = "https://addons.mozilla.org/firefox/downloads/latest/old-reddit-redirect/latest.xpi";
+      installation_mode = "force_installed";
+      default_area = "menupanel";
+    };
     # SocialFocus
     "{26b4f076-089c-4c69-8497-44b7e5c9faef}" = {
       install_url = "https://addons.mozilla.org/firefox/downloads/latest/socialfocus/latest.xpi";
