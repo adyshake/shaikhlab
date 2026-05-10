@@ -162,6 +162,12 @@
       installation_mode = "force_installed";
       default_area = "menupanel";
     };
+    # SocialFocus
+    "{26b4f076-089c-4c69-8497-44b7e5c9faef}" = {
+      install_url = "https://addons.mozilla.org/firefox/downloads/latest/socialfocus/latest.xpi";
+      installation_mode = "force_installed";
+      default_area = "menupanel";
+    };
   };
 
   # Bookmarks — populate URL bar autocomplete
