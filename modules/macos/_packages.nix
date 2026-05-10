@@ -37,8 +37,6 @@
       "ghostscript"
       "jrnl"
       "zbar"
-      "nixd" # Nix language server (used by Zed)
-      "nil"  # Nix language server, fallback (used by Zed)
     ];
     taps = builtins.attrNames config.nix-homebrew.taps;
     casks = [

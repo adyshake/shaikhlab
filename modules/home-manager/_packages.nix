@@ -52,6 +52,8 @@ in {
           alejandra
           gnupg1
           ffmpeg
+          nil    # Nix language server (Zed)
+          nixd   # Nix language server (Zed)
           nixos-rebuild # need for macOS
           pkgs-unstable.gemini-cli
           statix
