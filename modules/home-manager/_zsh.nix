@@ -58,18 +58,22 @@
         zbarimg -q --raw "''$1"
       }
 
-      # Shrink a PDF file
-      function shrink_pdf() {
+      # Compress a PDF (ebook quality: decent size/quality balance)
+      function compress_pdf() {
         if [ -z "''$1" ] || [ -z "''$2" ]; then
-          echo "Usage: shrink_pdf <input.pdf> <output.pdf>"
+          echo "Usage: compress_pdf <input.pdf> <output.pdf>"
           return 1
         fi
-        local gs_path=$(whence -p gs)
-        if [ -z "$gs_path" ]; then
-          echo "Error: ghostscript (gs) not found in PATH"
+        gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile="''$2" "''$1"
+      }
+
+      # Compress an image (quality 75, strips metadata)
+      function compress_img() {
+        if [ -z "''$1" ] || [ -z "''$2" ]; then
+          echo "Usage: compress_img <input> <output>"
           return 1
         fi
-        "$gs_path" -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dNOPAUSE -dQUIET -dBATCH -sOutputFile="''$2" "''$1"
+        convert "''$1" -quality 75 -strip "''$2"
       }
     '';
     plugins = [
