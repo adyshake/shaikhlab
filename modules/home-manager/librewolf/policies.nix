@@ -15,8 +15,8 @@
   NoDefaultBookmarks = true;
   SkipTermsOfUse = true;
   WebsiteFilter = {
-    Block = ["https://localhost/*"];
-    Exceptions = ["https://localhost/*"];
+    Block = [ "https://localhost/*" ];
+    Exceptions = [ "https://localhost/*" ];
   };
   SupportMenu = {
     Title = "LibreWolf Issue Tracker";
@@ -260,6 +260,7 @@
       "https://amazon.com"
       "https://kagi.com"
       "https://bitwarden.com"
+      "https://www.nytimes.com"
     ];
     Behavior = "reject-tracker-and-partition-foreign";
     Locked = true;
