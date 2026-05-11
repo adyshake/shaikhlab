@@ -207,6 +207,12 @@
       Folder = "Quick Access";
     }
     {
+      Title = "Amazon";
+      URL = "https://amazon.com";
+      Placement = "toolbar";
+      Folder = "Quick Access";
+    }
+    {
       Title = "Radarr";
       URL = "https://radarr.adnanshaikh.com";
       Placement = "toolbar";
@@ -261,6 +267,9 @@
       "https://kagi.com"
       "https://bitwarden.com"
       "https://www.nytimes.com"
+      "https://www.fidelity.com"
+      "https://fidelity.com"
+      "https://digital.fidelity.com"
     ];
     Behavior = "reject-tracker-and-partition-foreign";
     Locked = true;
