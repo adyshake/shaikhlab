@@ -48,6 +48,10 @@
       enable = true;
       vpn.enable = true;
     };
+    lidarr = {
+      enable = true;
+      vpn.enable = true;
+    };
 
     recyclarr = {
       enable = true;
@@ -252,6 +256,15 @@
 
   services.flaresolverr.enable = true;
 
+  services.navidrome = {
+    enable = true;
+    settings = {
+      MusicFolder = "/data/fun/music";
+      Address = "127.0.0.1";
+      Port = 4533;
+    };
+  };
+
   # All systemd service overrides for the nixarr stack live in this single
   # attrset so the `vpnBound` helper can be reused without conflicting with
   # other `systemd.services.*` definitions in the same module.
@@ -330,6 +343,7 @@
     radarr = vpnBound {};
     sonarr = vpnBound {};
     prowlarr = vpnBound {};
+    lidarr = vpnBound {};
     transmission = vpnBound {};
     flaresolverr = vpnBound {
       vpnConfinement = {
@@ -549,6 +563,11 @@
           {"name":"recentTvPriority",  "value":0},
           {"name":"olderTvPriority",   "value":0}
         ]'
+        LIDARR_FIELDS='[
+          {"name":"musicCategory",        "value":"lidarr"},
+          {"name":"recentMusicPriority",  "value":0},
+          {"name":"olderMusicPriority",   "value":0}
+        ]'
 
         # Radarr: a movie release is a single file, so onDownload fires
         # exactly once per import. (onImportComplete is a no-op for Radarr.)
@@ -558,14 +577,17 @@
         # season packs and single-episode releases alike. onDownload is left
         # off to avoid the per-episode duplicate notification.
         SONARR_NTFY='{"onDownload":false,"onUpgrade":false,"onImportComplete":true}'
+        # Lidarr: onDownload fires once per imported album/track release.
+        LIDARR_NTFY='{"onDownload":true,"onUpgrade":true,"onImportComplete":false}'
 
         configure radarr 7878 /var/lib/nixarr/radarr/config.xml "$RADARR_FIELDS" "$RADARR_NTFY"
         configure sonarr 8989 /var/lib/nixarr/sonarr/config.xml "$SONARR_FIELDS" "$SONARR_NTFY"
+        configure lidarr 8686 /var/lib/nixarr/lidarr/config.xml "$LIDARR_FIELDS" "$LIDARR_NTFY"
       '';
     in {
-      description = "Declaratively configure Radarr/Sonarr runtime state (ntfy Connect + Transmission download client)";
-      after = ["radarr.service" "sonarr.service"];
-      wants = ["radarr.service" "sonarr.service"];
+      description = "Declaratively configure Radarr/Sonarr/Lidarr runtime state (ntfy Connect + Transmission download client)";
+      after = ["radarr.service" "sonarr.service" "lidarr.service"];
+      wants = ["radarr.service" "sonarr.service" "lidarr.service"];
       wantedBy = ["multi-user.target"];
       serviceConfig = {
         Type = "oneshot";
@@ -638,6 +660,24 @@
         };
       };
 
+      "lidarr.adnanshaikh.com" = {
+        forceSSL = true;
+        useACMEHost = "adnanshaikh.com";
+        locations."/" = {
+          recommendedProxySettings = true;
+          proxyPass = "http://127.0.0.1:8686";
+        };
+      };
+
+      "music.adnanshaikh.com" = {
+        forceSSL = true;
+        useACMEHost = "adnanshaikh.com";
+        locations."/" = {
+          recommendedProxySettings = true;
+          proxyPass = "http://127.0.0.1:4533";
+        };
+      };
+
       "transmission.adnanshaikh.com" = {
         forceSSL = true;
         useACMEHost = "adnanshaikh.com";
@@ -655,15 +695,19 @@
   users.users.radarr.extraGroups = ["media"];
   users.users.sonarr.extraGroups = ["media"];
   users.users.prowlarr.extraGroups = ["media"];
+  users.users.lidarr.extraGroups = ["media"];
   users.users.transmission.extraGroups = ["media"];
   users.users.jellyfin.extraGroups = ["media"];
+  users.users.navidrome.extraGroups = ["media"];
 
   systemd = {
     tmpfiles.rules = [
       "d /var/lib/nixarr 0755 root root"
+      "d /data/fun/music 2775 navidrome media -"
       "d /data/transmission/downloads 2775 transmission media -"
       "d /data/transmission/downloads/radarr 2775 transmission media -"
       "d /data/transmission/downloads/tv-sonarr 2775 transmission media -"
+      "d /data/transmission/downloads/lidarr 2775 transmission media -"
     ];
 
     #services = {
@@ -694,6 +738,7 @@
   environment.persistence."/nix/persist" = {
     directories = [
       "/var/lib/nixarr"
+      "/var/lib/navidrome"
     ];
   };
 }

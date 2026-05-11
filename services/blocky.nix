@@ -143,7 +143,11 @@ in {
           "prowlarr.adnanshaikh.com" = serverIP;
           "radarr.adnanshaikh.com" = serverIP;
           "sonarr.adnanshaikh.com" = serverIP;
+          "lidarr.adnanshaikh.com" = serverIP;
           "transmission.adnanshaikh.com" = serverIP;
+
+          # Navidrome
+          "music.adnanshaikh.com" = serverIP;
 
           # ntfy
           "ntfy.adnanshaikh.com" = serverIP;
