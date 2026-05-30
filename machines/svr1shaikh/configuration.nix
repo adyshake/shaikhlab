@@ -26,7 +26,6 @@
     ./../../services/grafana.nix
     ./../../services/forgejo.nix # Requires: forgejo-admin-password
     ./../../services/fava.nix
-    ./../../services/beancount-etl.nix # Requires: beancount-etl-service-account (reuses forgejo-admin-password for git auth)
   ];
 
   home-manager = {

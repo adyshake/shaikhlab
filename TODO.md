@@ -15,8 +15,6 @@
 - [x] drive health monitoring on `svr1shaikh` — `smartd` + `mdadm-notify` + monthly digest via MXroute (see [`services/drive-health.nix`](services/drive-health.nix), runbook at [`docs/disk-replacement.md`](docs/disk-replacement.md))
 - [x] self-host git — Forgejo at `git.adnanshaikh.com` (Tailscale-only, state on `/data`, admin user reconciled from sops on every deploy); see [`services/forgejo.nix`](services/forgejo.nix)
 - [x] self-host beancount UI — Fava at `beancount.adnanshaikh.com` (Tailscale-only, working copy on NVMe synced every 5 min from the Forgejo bare repo); see [`services/fava.nix`](services/fava.nix)
-- [x] beancount sheet ETL — every 30 min, complete rows from the Google expenses sheet are rendered into `total/inbox.beancount` and pushed to Forgejo; processed rows move to the sheet's `History` tab; month-end reconciliation moves entries from the inbox file into per-account ledgers manually. See [`services/beancount-etl.nix`](services/beancount-etl.nix); mapping table at [`etl/mapping.yaml`](https://git.adnanshaikh.com/adnan/beancount/src/branch/main/etl/mapping.yaml) in the beancount repo
-
 ## In progress
 
 - [ ] set up kopia
