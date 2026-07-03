@@ -166,6 +166,12 @@
       installation_mode = "force_installed";
       default_area = "menupanel";
     };
+    # Bypass Paywalls Clean
+    "magnolia@12.34" = {
+      install_url = "https://gitflic.ru/project/magnolia1234/bpc_uploads/blob/raw?file=bypass_paywalls_clean-latest.xpi&branch=main";
+      installation_mode = "force_installed";
+      default_area = "menupanel";
+    };
   };
 
   # Bookmarks — populate URL bar autocomplete
