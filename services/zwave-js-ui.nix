@@ -54,8 +54,14 @@ in {
       };
     };
     owner = "root";
-    mode = "0400";
+    # zwave-js-ui runs as a DynamicUser and can't read a root-only 0400 file.
+    # Expose it via a dedicated group (see SupplementaryGroups below) rather than
+    # making the security keys world-readable.
+    group = "zwave-secrets";
+    mode = "0440";
   };
+
+  users.groups.zwave-secrets = {};
 
   services.zwave-js-ui = {
     enable = true;
@@ -73,19 +79,23 @@ in {
   # expose the rendered JSON so ZWAVE_EXTERNAL_SETTINGS is readable inside the chroot.
   systemd.services.zwave-js-ui.serviceConfig = {
     BindReadOnlyPaths = lib.mkAfter [zwaveExternalSettings];
+    # Join zwave-secrets so the DynamicUser can read the rendered settings file.
+    SupplementaryGroups = lib.mkAfter ["zwave-secrets"];
     restartTriggers = [config.sops.secrets."zwave-s0-legacy".sopsFile];
   };
 
   # Persist the store across reboots on this tmpfs-root host. DynamicUser +
   # StateDirectory puts it at /var/lib/private/zwave-js-ui; without this the
   # settings, node database, and connectors are wiped on every reboot.
+  #
+  # NOTE: /var/lib/private must be 0700 or systemd refuses to set up the
+  # StateDirectory. impermanence mirrors the runtime dir's mode from the persist
+  # source, so this required a one-time fix on the host (auto-created at 0755):
+  #   sudo chmod 0700 /nix/persist/var/lib/private
+  # After that every activation syncs /var/lib/private back to 0700 on its own.
   environment.persistence."/nix/persist".directories = [
     "/var/lib/private/zwave-js-ui"
   ];
-
-  # impermanence creates /var/lib/private at 0755 to hold the bind mount above, but
-  # DynamicUser+StateDirectory refuses to start unless it is 0700. Force it back.
-  systemd.tmpfiles.rules = ["d /var/lib/private 0700 root root - -"];
 
   services.nginx.virtualHosts."zwave.adnanshaikh.com" = {
     forceSSL = true;
