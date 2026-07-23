@@ -61,6 +61,13 @@ in {
     restartTriggers = [config.sops.secrets."zwave-s0-legacy".sopsFile];
   };
 
+  # Persist the store across reboots on this tmpfs-root host. DynamicUser +
+  # StateDirectory puts it at /var/lib/private/zwave-js-ui; without this the
+  # settings, node database, and connectors are wiped on every reboot.
+  environment.persistence."/nix/persist".directories = [
+    "/var/lib/private/zwave-js-ui"
+  ];
+
   services.nginx.virtualHosts."zwave.adnanshaikh.com" = {
     forceSSL = true;
     useACMEHost = "adnanshaikh.com";
