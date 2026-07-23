@@ -18,9 +18,6 @@
         format = "binary";
         sopsFile = ./../secrets/wg.conf;
       };
-      # Shared password used by both the ntfy server ("arr" user, see
-      # services/ntfy.nix) and the Radarr/Sonarr Ntfy Connect configured below.
-      "ntfy-secret" = {};
     };
   };
 
@@ -367,18 +364,14 @@
     #     The seed ratio limit itself is configured on the Transmission
     #     service a few dozen lines above (seedRatioLimit = 1.0).
     arr-bootstrap = let
-      ntfyServerUrl = "https://ntfy.adnanshaikh.com";
-      ntfyUser = "arr";
-      ntfyTopic = "media";
       bootstrap = pkgs.writeShellScript "arr-bootstrap" ''
         set -eu
-        PW=$(cat "${config.sops.secrets."ntfy-secret".path}")
 
         # ------------------------------------------------------------------
         # Helpers: wait for an *arr instance to be ready, then return apiKey.
         # ------------------------------------------------------------------
         wait_for_api() {
-          local service="$1" port="$2" configFile="$3"
+          local service="$1" port="$2" configFile="$3" apiVer="$4"
 
           # *arr writes <ApiKey> into config.xml on first launch; wait for it.
           for _ in $(seq 1 120); do
@@ -393,7 +386,7 @@
           # Wait until HTTP API actually responds (service may still be booting).
           for _ in $(seq 1 120); do
             if ${pkgs.curl}/bin/curl -fsS -H "X-Api-Key: $apiKey" \
-                 "http://127.0.0.1:$port/api/v3/system/status" >/dev/null 2>&1; then
+                 "http://127.0.0.1:$port/api/$apiVer/system/status" >/dev/null 2>&1; then
               break
             fi
             sleep 1
@@ -403,79 +396,7 @@
         }
 
         # ------------------------------------------------------------------
-        # Mutator 1: ntfy Connect (create or update).
-        #
-        # `triggers` is a JSON object that overrides the per-event flags
-        # (onDownload, onUpgrade, onImportComplete, ...). This is per-service
-        # because Sonarr fires both `onDownload` (once per imported episode
-        # file) and `onImportComplete` (once per release after all episodes
-        # in the grab finish importing) — enabling both produces N+1 ntfy
-        # pushes per release. Radarr has no equivalent split (one movie =
-        # one file), so it just uses `onDownload`.
-        # ------------------------------------------------------------------
-        upsert_ntfy() {
-          local service="$1" port="$2" apiKey="$3" triggers="$4"
-
-          local payload
-          payload=$(${pkgs.jq}/bin/jq -n \
-            --arg url "${ntfyServerUrl}" \
-            --arg user "${ntfyUser}" \
-            --arg pw "$PW" \
-            --arg topic "${ntfyTopic}" \
-            --argjson triggers "$triggers" \
-            '({
-              name: "ntfy",
-              onGrab: false,
-              onDownload: false,
-              onUpgrade: false,
-              onRename: false,
-              onImportComplete: false,
-              onHealthIssue: false,
-              onHealthRestored: false,
-              onApplicationUpdate: false,
-              onManualInteractionRequired: false,
-              includeHealthWarnings: false,
-              tags: [],
-              fields: [
-                {name: "serverUrl",   value: $url},
-                {name: "accessToken", value: ""},
-                {name: "userName",    value: $user},
-                {name: "password",    value: $pw},
-                {name: "priority",    value: 3},
-                {name: "topics",      value: [$topic]},
-                {name: "tags",        value: []},
-                {name: "clickUrl",    value: ""}
-              ],
-              implementation:     "Ntfy",
-              implementationName: "Ntfy",
-              configContract:     "NtfySettings"
-            } + $triggers)')
-
-          local existing
-          existing=$(${pkgs.curl}/bin/curl -fsS -H "X-Api-Key: $apiKey" \
-            "http://127.0.0.1:$port/api/v3/notification" \
-            | ${pkgs.jq}/bin/jq -r '.[] | select(.name=="ntfy") | .id // empty')
-
-          if [ -n "$existing" ]; then
-            echo "[$service] ntfy: updating existing Connect (id=$existing)"
-            echo "$payload" | ${pkgs.jq}/bin/jq --argjson id "$existing" '. + {id: $id}' \
-              | ${pkgs.curl}/bin/curl -fsS -X PUT \
-                  -H "X-Api-Key: $apiKey" \
-                  -H "Content-Type: application/json" \
-                  --data-binary @- \
-                  "http://127.0.0.1:$port/api/v3/notification/$existing" >/dev/null
-          else
-            echo "[$service] ntfy: creating Connect"
-            echo "$payload" | ${pkgs.curl}/bin/curl -fsS -X POST \
-                -H "X-Api-Key: $apiKey" \
-                -H "Content-Type: application/json" \
-                --data-binary @- \
-                "http://127.0.0.1:$port/api/v3/notification" >/dev/null
-          fi
-        }
-
-        # ------------------------------------------------------------------
-        # Mutator 2: Transmission download client (full declaration).
+        # Mutator: Transmission download client (full declaration).
         # Upserts a named "Transmission" client pointing at localhost:9091
         # (Radarr/Sonarr both run in the wg netns alongside Transmission,
         # so loopback works). `appFields` is a JSON array of app-specific
@@ -489,7 +410,7 @@
         # automated downloads.
         # ------------------------------------------------------------------
         upsert_download_client() {
-          local service="$1" port="$2" apiKey="$3" appFields="$4"
+          local service="$1" port="$2" apiKey="$3" appFields="$4" apiVer="$5"
 
           local payload
           payload=$(${pkgs.jq}/bin/jq -n \
@@ -519,7 +440,7 @@
 
           local existing
           existing=$(${pkgs.curl}/bin/curl -fsS -H "X-Api-Key: $apiKey" \
-            "http://127.0.0.1:$port/api/v3/downloadclient" \
+            "http://127.0.0.1:$port/api/$apiVer/downloadclient" \
             | ${pkgs.jq}/bin/jq -r \
                 '.[] | select(.implementation=="Transmission") | .id // empty' \
             | head -n1)
@@ -531,14 +452,14 @@
                   -H "X-Api-Key: $apiKey" \
                   -H "Content-Type: application/json" \
                   --data-binary @- \
-                  "http://127.0.0.1:$port/api/v3/downloadclient/$existing" >/dev/null
+                  "http://127.0.0.1:$port/api/$apiVer/downloadclient/$existing" >/dev/null
           else
             echo "[$service] download client: creating Transmission"
             echo "$payload" | ${pkgs.curl}/bin/curl -fsS -X POST \
                 -H "X-Api-Key: $apiKey" \
                 -H "Content-Type: application/json" \
                 --data-binary @- \
-                "http://127.0.0.1:$port/api/v3/downloadclient" >/dev/null
+                "http://127.0.0.1:$port/api/$apiVer/downloadclient" >/dev/null
           fi
         }
 
@@ -546,11 +467,10 @@
         # Main: configure one *arr instance end-to-end.
         # ------------------------------------------------------------------
         configure() {
-          local service="$1" port="$2" configFile="$3" appFields="$4" ntfyTriggers="$5"
+          local service="$1" port="$2" configFile="$3" appFields="$4" apiVer="$5"
           local apiKey
-          apiKey=$(wait_for_api "$service" "$port" "$configFile")
-          upsert_ntfy            "$service" "$port" "$apiKey" "$ntfyTriggers"
-          upsert_download_client "$service" "$port" "$apiKey" "$appFields"
+          apiKey=$(wait_for_api "$service" "$port" "$configFile" "$apiVer")
+          upsert_download_client "$service" "$port" "$apiKey" "$appFields" "$apiVer"
         }
 
         RADARR_FIELDS='[
@@ -569,23 +489,13 @@
           {"name":"olderMusicPriority",   "value":0}
         ]'
 
-        # Radarr: a movie release is a single file, so onDownload fires
-        # exactly once per import. (onImportComplete is a no-op for Radarr.)
-        RADARR_NTFY='{"onDownload":true,"onUpgrade":true,"onImportComplete":false}'
-        # Sonarr: onImportComplete fires exactly once per release after every
-        # episode in the grab is imported, which is what we actually want for
-        # season packs and single-episode releases alike. onDownload is left
-        # off to avoid the per-episode duplicate notification.
-        SONARR_NTFY='{"onDownload":false,"onUpgrade":false,"onImportComplete":true}'
-        # Lidarr: onDownload fires once per imported album/track release.
-        LIDARR_NTFY='{"onDownload":true,"onUpgrade":true,"onImportComplete":false}'
-
-        configure radarr 7878 /var/lib/nixarr/radarr/config.xml "$RADARR_FIELDS" "$RADARR_NTFY"
-        configure sonarr 8989 /var/lib/nixarr/sonarr/config.xml "$SONARR_FIELDS" "$SONARR_NTFY"
-        configure lidarr 8686 /var/lib/nixarr/lidarr/config.xml "$LIDARR_FIELDS" "$LIDARR_NTFY"
+        # Radarr/Sonarr expose API v3; Lidarr is still on API v1.
+        configure radarr 7878 /var/lib/nixarr/radarr/config.xml "$RADARR_FIELDS" v3
+        configure sonarr 8989 /var/lib/nixarr/sonarr/config.xml "$SONARR_FIELDS" v3
+        configure lidarr 8686 /var/lib/nixarr/lidarr/config.xml "$LIDARR_FIELDS" v1
       '';
     in {
-      description = "Declaratively configure Radarr/Sonarr/Lidarr runtime state (ntfy Connect + Transmission download client)";
+      description = "Declaratively configure Radarr/Sonarr/Lidarr runtime state (Transmission download client)";
       after = ["radarr.service" "sonarr.service" "lidarr.service"];
       wants = ["radarr.service" "sonarr.service" "lidarr.service"];
       wantedBy = ["multi-user.target"];
