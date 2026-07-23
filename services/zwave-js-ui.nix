@@ -1,10 +1,24 @@
 {
   config,
   lib,
+  pkgs,
+  inputs,
   ...
 }: let
   serialPort = "/dev/serial/by-id/usb-Zooz_800_Z-Wave_Stick_533D004242-if00";
   zwaveExternalSettings = config.sops.templates."zwave-js-settings".path;
+
+  # nixos-25.11 ships zwave-js-ui 11.7.0, which predates ZWAVE_EXTERNAL_SETTINGS
+  # (added in 11.11.0). Without it the declaratively-rendered security keys below
+  # are ignored and must be entered by hand. Pull the package from unstable, which
+  # carries a release new enough to honor the external settings file.
+  #
+  # TODO: remove this override (and the `package =` line below) once we upgrade to
+  # nixos-26.05, which already ships a new-enough zwave-js-ui (11.18.0).
+  pkgs-unstable = import inputs.nixpkgs-unstable {
+    system = pkgs.stdenv.hostPlatform.system;
+    config.allowUnfree = true;
+  };
 in {
   imports = [
     ./_acme.nix
@@ -45,6 +59,7 @@ in {
 
   services.zwave-js-ui = {
     enable = true;
+    package = pkgs-unstable.zwave-js-ui;
     inherit serialPort;
     settings = {
       HOST = "127.0.0.1";
