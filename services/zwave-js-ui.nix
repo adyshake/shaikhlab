@@ -42,6 +42,10 @@ in {
   sops.templates."zwave-js-settings" = {
     content = builtins.toJSON {
       rf = {region = 1;};
+      # Expose the Z-Wave JS websocket server for Home Assistant's zwave_js
+      # integration. Port 3001 because Grafana already owns 3000.
+      serverEnabled = true;
+      serverPort = 3001;
       securityKeys = {
         S0_Legacy = config.sops.placeholder."zwave-s0-legacy";
         S2_Unauthenticated = config.sops.placeholder."zwave-s2-unauthenticated";

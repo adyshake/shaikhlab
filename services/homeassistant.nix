@@ -56,6 +56,9 @@
       "isal"
 
       "roborock"
+
+      # Z-Wave (connects to the zwave-js-ui Z-Wave JS server over websocket)
+      "zwave_js"
     ];
 
     extraPackages = python3Packages:
