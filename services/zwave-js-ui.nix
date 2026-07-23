@@ -68,6 +68,10 @@ in {
     "/var/lib/private/zwave-js-ui"
   ];
 
+  # impermanence creates /var/lib/private at 0755 to hold the bind mount above, but
+  # DynamicUser+StateDirectory refuses to start unless it is 0700. Force it back.
+  systemd.tmpfiles.rules = ["d /var/lib/private 0700 root root - -"];
+
   services.nginx.virtualHosts."zwave.adnanshaikh.com" = {
     forceSSL = true;
     useACMEHost = "adnanshaikh.com";
