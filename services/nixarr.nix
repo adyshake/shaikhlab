@@ -240,8 +240,8 @@
         rpc-whitelist-enabled = false;
         # todo: figure out how to integrate rpc-password into sops-nix
         rpc-password = "{7d827abfb09b77e45fe9e72d97956ab8fb53acafoPNV1MpJ";
-        seedRatioLimit = 1.0;
-        seedRatioLimited = true;
+        ratio-limit = 1.0;
+        ratio-limit-enabled = true;
       };
     };
 
