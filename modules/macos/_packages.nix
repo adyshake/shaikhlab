@@ -40,7 +40,7 @@
     ];
     taps = builtins.attrNames config.nix-homebrew.taps;
     casks = [
-      "alacritty"
+      "iterm2"
       "alt-tab"
       "audacity"
       "betterdisplay"

@@ -20,7 +20,7 @@
       ${vars.userName} = {
         imports = [
           ./../../modules/home-manager/1password.nix
-          ./../../modules/home-manager/alacritty.nix
+          ./../../modules/home-manager/iterm2.nix
           ./../../modules/home-manager/base.nix
           ./../../modules/home-manager/librewolf
           ./../../modules/home-manager/fonts.nix

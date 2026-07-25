@@ -9,7 +9,6 @@
           "org.gnome.Nautilus.desktop"
           "librewolf.desktop"
           "code.desktop"
-          "alacritty.desktop"
         ];
       };
       "org/gnome/desktop/interface" = {

@@ -105,7 +105,7 @@
         {path = "/Applications/Discord.app";}
         {path = "/Applications/Yomu.app";}
         {path = "/Applications/Cursor.app";}
-        {path = "/Applications/Alacritty.app";}
+        {path = "/Applications/iTerm.app";}
         {path = "/Applications/Sublime Text.app";}
         {path = "/System/Applications/Reminders.app";}
         {
