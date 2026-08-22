@@ -46,7 +46,7 @@
 
       # Download an mp4 from a YouTube link
       function download_mp4() {
-        yt-dlp -f 'bv[height=1080][ext=mp4]+ba[ext=m4a]' --merge-output-format mp4 "''$1"
+        yt-dlp -f 'bv[height=1080][ext=mp4]+ba[ext=m4a]/bv[height<=1080]+ba/b' --merge-output-format mp4 "''$1"
       }
 
       # Extract data from a QR code image

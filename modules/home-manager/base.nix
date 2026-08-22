@@ -3,8 +3,16 @@
   pkgs,
   vars,
   osConfig,
+  inputs,
   ...
-}: {
+}: let
+  # YouTube extractors break often; 25.11's yt-dlp trips the 90-day stale
+  # warning. Unstable tracks new releases more closely.
+  pkgs-unstable = import inputs.nixpkgs-unstable {
+    system = pkgs.stdenv.hostPlatform.system;
+    config.allowUnfree = true;
+  };
+in {
   imports = [
     ./_packages.nix
     ./_zsh.nix
@@ -52,7 +60,14 @@
     lsd.enable = true;
     nh.enable = true;
     vim.enable = true;
-    yt-dlp.enable = true;
+    yt-dlp = {
+      enable = true;
+      package = pkgs-unstable.yt-dlp;
+      # 2026.07.04 still defaults to android_vr, whose media URLs 403.
+      # 2026.08.19 drops that client; until nixpkgs ships it, force
+      # web_embedded (high-quality) with android as a progressive fallback.
+      settings.extractor-args = "youtube:player_client=web_embedded,android";
+    };
   };
 
   # Nicely reload system units when changing configs
