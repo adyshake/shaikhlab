@@ -1,14 +1,8 @@
 {
   pkgs,
-  inputs,
   osConfig,
   ...
-}: let
-  pkgs-unstable = import inputs.nixpkgs-unstable {
-    system = pkgs.stdenv.hostPlatform.system;
-    config.allowUnfree = true;
-  };
-in {
+}: {
   home = {
     packages = with pkgs;
       [
@@ -55,8 +49,6 @@ in {
           nil    # Nix language server (Zed)
           nixd   # Nix language server (Zed)
           nixos-rebuild # need for macOS
-          pkgs-unstable.gemini-cli
-          statix
           zola
         ]
         else [

@@ -9,14 +9,11 @@ deploy machine='' ip='':
     elif [ -z "{{ ip }}" ]; then \
       nixos-rebuild switch --sudo --flake ".#{{ machine }}"; \
     else \
-      nixos-rebuild switch --fast --flake ".#{{ machine }}" --sudo --target-host "eh8@{{ ip }}" --build-host "eh8@{{ ip }}"; \
+      nixos-rebuild switch --fast --flake ".#{{ machine }}" --sudo --target-host "adnan@{{ ip }}" --build-host "adnan@{{ ip }}"; \
     fi
 
 up:
     nix flake update
-
-lint:
-    statix check .
 
 fmt:
     nix fmt .     

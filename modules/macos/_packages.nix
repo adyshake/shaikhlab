@@ -29,7 +29,6 @@
     onActivation = {
       autoUpdate = false;
       upgrade = false;
-      cleanup = "zap";
     };
     brews = [
       "trash-cli"
