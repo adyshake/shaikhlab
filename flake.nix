@@ -2,18 +2,18 @@
   description = "shaikhlab";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
     impermanence.url = "github:nix-community/impermanence";
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nix-darwin = {
-      url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
+      url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -47,16 +47,6 @@
     };
 
     nix-darwin-custom-icons.url = "github:ryanccn/nix-darwin-custom-icons";
-
-    nixos-wsl = {
-      url = "github:nix-community/NixOS-WSL/main";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    vscode-server = {
-      url = "github:nix-community/nixos-vscode-server";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
 
     firefox-addons = {
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
@@ -92,23 +82,17 @@
     formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
 
     darwinConfigurations = {
-      mac1chng = mkDarwinConfig ./machines/mac1chng/configuration.nix;
       mac1shaikh = mkDarwinConfig ./machines/mac1shaikh/configuration.nix;
     };
 
     nixosConfigurations = {
-      workchng = mkNixOSConfig ./machines/workchng/configuration.nix;
-      dsk1chng = mkNixOSConfig ./machines/dsk1chng/configuration.nix;
-      svr1chng = mkNixOSConfig ./machines/svr1chng/configuration.nix;
-      svr2chng = mkNixOSConfig ./machines/svr2chng/configuration.nix;
-      svr3chng = mkNixOSConfig ./machines/svr3chng/configuration.nix;
       svr1shaikh = mkNixOSConfig ./machines/svr1shaikh/configuration.nix;
-      iso1chng = nixpkgs.lib.nixosSystem {
+      iso1shaikh = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {inherit inputs outputs vars;};
         modules = [
           (nixpkgs + "/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix")
-          ./machines/iso1chng/configuration.nix
+          ./machines/iso1shaikh/configuration.nix
         ];
       };
     };

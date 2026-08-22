@@ -1,14 +1,7 @@
-{
-  vars,
-  osConfig,
-  ...
-}: {
+{vars, ...}: {
   home = {
     # inspo: https://jeppesen.io/git-commit-sign-nix-home-manager-ssh/
-    file.".ssh/allowed_signers".text =
-      if osConfig.networking.hostName == "workchng"
-      then "* ${vars.sshPublicKeyWork}"
-      else "* ${vars.sshPublicKeyPersonal}";
+    file.".ssh/allowed_signers".text = "* ${vars.sshPublicKeyPersonal}";
   };
 
   programs = {
@@ -24,10 +17,7 @@
       #  commit.gpgsign = true;
       #  gpg.format = "ssh";
       #  gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
-      #  user.signingkey =
-      #    if osConfig.networking.hostName == "workchng"
-      #    then vars.sshPublicKeyWork
-      #    else vars.sshPublicKeyPersonal;
+      #  user.signingkey = vars.sshPublicKeyPersonal;
       #};
     };
   };

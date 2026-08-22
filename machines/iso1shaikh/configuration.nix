@@ -3,5 +3,5 @@
     ./../../modules/nixos/iso.nix
   ];
 
-  networking.hostName = "iso1chng";
+  networking.hostName = "iso1shaikh";
 }

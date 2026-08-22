@@ -63,6 +63,10 @@
         admin_email = vars.userEmail;
         admin_password = "admin"; # TODO: change to sops secret
         cookie_secure = true;
+        # 26.05 dropped the module default. Keep the previous upstream value
+        # so the existing grafana.db can still decrypt stored secrets.
+        # TODO: encrypt this in sops and rotate (see TODO.md).
+        secret_key = "SW2YcwTIb9zpOOhoPsMm";
       };
       users = {
         allow_sign_up = false;

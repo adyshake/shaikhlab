@@ -8,8 +8,11 @@
     enable = true;
     ssh = {
       enable = true;
-      shell = "/bin/cryptsetup-askpass";
-      authorizedKeys = config.users.users.${vars.userName}.openssh.authorizedKeys.keys;
+      # 26.05 defaults to systemd stage 1; cryptsetup-askpass is gone.
+      # Restrict initrd SSH to the password agent. Connect with:
+      #   ssh -o RequestTTY=force root@<host>
+      authorizedKeys = map (key: ''command="systemctl default" ${key}'')
+        config.users.users.${vars.userName}.openssh.authorizedKeys.keys;
       hostKeys = ["/nix/secret/initrd/ssh_host_ed25519_key"];
     };
   };

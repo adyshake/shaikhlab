@@ -221,7 +221,6 @@ Your `/data` directory structure:
 ```
 /data/              - General data drive (7.5TB usable)
 /data/fun/          - Nixarr media directory
-/data/nextcloud/    - Nextcloud backups (if enabled)
 ```
 
 Other applications can create their own directories under `/data` as needed.

@@ -6,7 +6,7 @@
   inputs,
   ...
 }: let
-  # YouTube extractors break often; 25.11's yt-dlp trips the 90-day stale
+  # YouTube extractors break often; stable yt-dlp trips the 90-day stale
   # warning. Unstable tracks new releases more closely.
   pkgs-unstable = import inputs.nixpkgs-unstable {
     system = pkgs.stdenv.hostPlatform.system;

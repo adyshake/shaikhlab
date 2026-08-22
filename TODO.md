@@ -18,9 +18,6 @@
 ## In progress
 
 - [ ] set up kopia
-  - [x] nextcloud
-  - [x] scrypted
-  - [x] homebridge
   - [ ] set up backups for \*arr (stub commented out in `services/nixarr.nix`)
   - [ ] set up backups for home assistant (stub commented out in `services/homeassistant.nix`)
   - [ ] set up backups for forgejo (`/data/forgejo` — repos + SQLite DB)
@@ -33,6 +30,7 @@
 
 ## To do — services
 
+- [ ] encrypt Grafana `secret_key` — still the old public nixpkgs default in `services/grafana.nix`; move it to sops and rotate if `grafana.db` has encrypted secrets
 - [ ] set up immich
 - [ ] set up pastebin
 - [ ] set up google drive

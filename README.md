@@ -1,10 +1,10 @@
-[![nixos 25.11](https://img.shields.io/badge/NixOS-25.11-blue.svg?&logo=NixOS&logoColor=white)](https://nixos.org)
+[![nixos 26.05](https://img.shields.io/badge/NixOS-26.05-blue.svg?&logo=NixOS&logoColor=white)](https://nixos.org)
 
 ## Highlights
 
-This repo contains the Nix configurations for my homelab, AMD Ryzen desktop and M1 MacBook Pro.
+This repo contains the Nix configurations for my homelab and M1 MacBook Pro.
 
-- ❄️ Nix flakes handle upstream dependencies and track latest stable release of Nixpkgs (currently 25.11)
+- ❄️ Nix flakes handle upstream dependencies and track latest stable release of Nixpkgs (currently 26.05)
 - 🏠 [home-manager](https://github.com/nix-community/home-manager) manages
   dotfiles
 - 🍎 [nix-darwin](https://github.com/LnL7/nix-darwin) manages MacBook
@@ -13,7 +13,7 @@ This repo contains the Nix configurations for my homelab, AMD Ryzen desktop and 
 - 🌬️ Root on tmpfs aka
   [impermanence](https://grahamc.com/blog/erase-your-darlings/)
 - 🔒 Automatic Let's Encrypt certificate registration and renewal
-- 🧩 Tailscale, Nextcloud, Jellyfin, Homebridge, Scrypted, among other nice
+- 🧩 Tailscale, Jellyfin, among other nice
   self-hosted applications
 - ⚡️ `.justfile` contains useful aliases for many frequent and atrociously long
   `nix` commands
@@ -23,8 +23,8 @@ This repo contains the Nix configurations for my homelab, AMD Ryzen desktop and 
 - 🧱 Modular architecture promotes readability for me and copy-and-paste-ability
   for you
 - 📦
-  [Custom ready-made tarball and ISO](https://github.com/adyshake/shaikhlab/releases)
-  for installing NixOS-on-WSL and NixOS, respectively
+  [Custom ready-made ISO](https://github.com/adyshake/shaikhlab/releases)
+  for installing NixOS (`iso1shaikh`)
 
 ## Getting started
 
@@ -248,29 +248,37 @@ To edit an existing encrypted file:
 sops secrets/<filename>
 ```
 
-### Windows Subsystem for Linux (WSL)
+## Remote disk unlock (initrd)
 
-1. Enable WSL if you haven't done already:
+On `svr1shaikh`, `/nix` and `/data` are LUKS-encrypted. Until those are unlocked, the real OS is not running: no `adnan` user, no normal `sshd`, no Tailscale. `ssh adnan@svr1shaikh` will fail until after unlock.
 
-```powershell
-wsl --install --no-distribution
+There are two ways to enter the passphrase.
+
+### BMC console (always works)
+
+Open the BMC remote console and type the LUKS password at the on-screen prompt. After boot finishes, SSH in as `adnan` as usual.
+
+### Initrd SSH (LAN)
+
+[`modules/nixos/remote-unlock.nix`](modules/nixos/remote-unlock.nix) starts a tiny SSH server **in initrd**. It uses `ip=dhcp`, so the NIC gets a **LAN address from your router**. Tailscale is not up yet. This is not reachable over the public internet unless you port-forward that DHCP lease (do not do that — it is root SSH with only a key check).
+
+From a machine on the same LAN (or a VPN that already has an L2/L3 path to that LAN, not Tailscale):
+
+```bash
+ssh -o RequestTTY=force root@<initrd-ip>
 ```
 
-1. Download `nixos.wsl` from
-   [the latest release](https://github.com/adyshake/shaikhlab/releases).
+Type the LUKS passphrase when prompted, then wait for the host to finish booting and connect as `adnan`:
 
-2. Either double-click the `nixos.wsl` file once downloaded or import
-   the tarball into WSL:
-
-```powershell
-wsl --install --from-file nixos.wsl
+```bash
+ssh adnan@svr1shaikh
 ```
 
-4. You can now run NixOS:
+**Finding `<initrd-ip>`:** it is whatever DHCP handed out. Check the router’s DHCP lease table for the server NIC’s MAC (same MAC as when the OS is up). A DHCP reservation on that MAC keeps the address stable. After a successful boot you can also look back at `journalctl -b -1` for the initrd address.
 
-```powershell
-wsl -d NixOS
-```
+**`RequestTTY=force`:** systemd’s password agent needs a real terminal. Without a TTY, SSH runs the command but you never get a prompt.
+
+**`command="systemctl default"`:** the authorized key is only allowed to run that one command (the systemd password agent). It cannot open a shell, `scp`, or run anything else in initrd.
 
 ## Useful commands 🛠️
 

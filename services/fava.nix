@@ -43,11 +43,8 @@
 
   # fava-dashboards isn't in nixpkgs; package straight from PyPI.
   #
-  # Pinned to 1.2.0 — last release whose declared lower bound (`fava>=1.26.1`)
-  # is satisfied by nixpkgs nixos-25.11's fava 1.30.7. Releases 1.2.1+ bump
-  # the floor to `fava>=1.30.8`, which would force pulling fava from
-  # nixpkgs-unstable or building it ourselves. Revisit when nixos-26.05
-  # ships or if a missing 1.2.x feature is actually needed.
+  # Pinned to 1.2.0. nixos-26.05 ships fava 1.30.12, which satisfies
+  # 1.2.1+'s `fava>=1.30.8` floor — bump if a newer dashboard feature is needed.
   fava-dashboards = pkgs.python3Packages.buildPythonPackage rec {
     pname = "fava_dashboards";
     version = "1.2.0";
