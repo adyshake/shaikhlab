@@ -268,7 +268,7 @@ From a machine on the same LAN (or a VPN that already has an L2/L3 path to that 
 ssh -o RequestTTY=force root@<initrd-ip>
 ```
 
-Type the LUKS passphrase once (same password for `/nix` and `/data`). The session will print that unlock succeeded, then close — that drop is success, not a failure. Wait for the host to finish booting and connect as `adnan`:
+Type the LUKS passphrase when prompted (same password for `/nix` and `/data`; you may be asked twice). The session will print that unlock succeeded, then close — that drop is success, not a failure. Wait for the host to finish booting and connect as `adnan`:
 
 ```bash
 ssh adnan@svr1shaikh
