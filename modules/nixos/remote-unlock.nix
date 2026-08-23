@@ -23,17 +23,6 @@
     sleep 2
     exit "$status"
   '';
-
-  goodbye = pkgs.writeScript "remote-unlock-goodbye" ''
-    #!/bin/sh
-    msg="Unlock succeeded. Switching to the real OS; this SSH session will disconnect."
-    echo "$msg" >/dev/console 2>/dev/null || true
-    for t in /dev/pts/[0-9]*; do
-      [ -c "$t" ] || continue
-      echo "$msg" >"$t" 2>/dev/null || true
-    done
-    sleep 1
-  '';
 in {
   boot.kernelParams = ["ip=dhcp" "rd.luks.options=password-echo=masked"];
 
@@ -44,21 +33,7 @@ in {
     after = ["systemd-cryptsetup@cryptroot.service"];
   };
 
-  boot.initrd.systemd.extraBin = {
-    remote-unlock = remoteUnlock;
-    remote-unlock-goodbye = goodbye;
-  };
-
-  boot.initrd.systemd.services.remote-unlock-goodbye = {
-    description = "Announce successful unlock before switch-root";
-    wantedBy = ["initrd-switch-root.target"];
-    before = ["initrd-switch-root.service"];
-    unitConfig.DefaultDependencies = false;
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = goodbye;
-    };
-  };
+  boot.initrd.systemd.extraBin.remote-unlock = remoteUnlock;
 
   boot.initrd.network = {
     enable = true;
