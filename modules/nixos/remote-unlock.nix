@@ -3,7 +3,7 @@
   vars,
   ...
 }: {
-  boot.kernelParams = ["ip=dhcp"];
+  boot.kernelParams = ["ip=dhcp" "rd.luks.options=password-echo=masked"];
   boot.initrd.network = {
     enable = true;
     ssh = {
