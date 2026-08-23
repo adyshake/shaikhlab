@@ -7,7 +7,7 @@
   remoteUnlock = pkgs.writeScript "remote-unlock" ''
     #!/bin/sh
     echo
-    echo "Enter the LUKS passphrase. You may be asked twice (same password)."
+    echo "Enter the LUKS passphrase."
     echo "When unlock succeeds this SSH session will close."
     echo
     systemctl default
