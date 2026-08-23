@@ -29,7 +29,10 @@ in {
   # Both cryptsetup units used to start together, so the TTY agent asked twice
   # before the first passphrase could land in the keyring. Unlock cryptroot
   # first; data then reuses the cached password and stays silent.
+  # Drop-in only. A full unit here replaces the generator's cryptsetup
+  # service, so `data` never unlocks and stage 2 dies on /data.
   boot.initrd.systemd.services."systemd-cryptsetup@data" = {
+    overrideStrategy = "asDropin";
     after = ["systemd-cryptsetup@cryptroot.service"];
   };
 
