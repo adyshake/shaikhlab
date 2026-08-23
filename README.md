@@ -268,7 +268,7 @@ From a machine on the same LAN (or a VPN that already has an L2/L3 path to that 
 ssh -o RequestTTY=force root@<initrd-ip>
 ```
 
-Type the LUKS passphrase when prompted, then wait for the host to finish booting and connect as `adnan`:
+Type the LUKS passphrase once (same password for `/nix` and `/data`). The session will print that unlock succeeded, then close — that drop is success, not a failure. Wait for the host to finish booting and connect as `adnan`:
 
 ```bash
 ssh adnan@svr1shaikh
@@ -278,7 +278,7 @@ ssh adnan@svr1shaikh
 
 **`RequestTTY=force`:** systemd’s password agent needs a real terminal. Without a TTY, SSH runs the command but you never get a prompt.
 
-**`command="systemctl default"`:** the authorized key is only allowed to run that one command (the systemd password agent). It cannot open a shell, `scp`, or run anything else in initrd.
+**`command="/bin/remote-unlock"`:** the authorized key can only run the unlock wrapper (password agent, then a “boot succeeded” line). It cannot open a shell, `scp`, or run anything else in initrd.
 
 ## Useful commands 🛠️
 
