@@ -43,14 +43,14 @@
 
   # fava-dashboards isn't in nixpkgs; package straight from PyPI.
   #
-  # Pinned to 1.2.0. nixos-26.05 ships fava 1.30.12, which satisfies
-  # 1.2.1+'s `fava>=1.30.8` floor — bump if a newer dashboard feature is needed.
+  # 1.2.0 imports fava.core.conversion.simple_units, which 26.05's fava
+  # 1.30.12 removed. 1.2.3 still uses dashboards.yaml (2.x is a tsx rewrite).
   fava-dashboards = pkgs.python3Packages.buildPythonPackage rec {
     pname = "fava_dashboards";
-    version = "1.2.0";
+    version = "1.2.3";
     src = pkgs.fetchPypi {
       inherit pname version;
-      sha256 = "86f85f52dd5071ab8e2de4569060a5845e2dc1c3f2b890e0f10cfc5eb4377399";
+      sha256 = "bd3a578cac945d399cb9c1133ee2b24020d1741aa98fea41e8e5331de8a8024e";
     };
     format = "pyproject";
     nativeBuildInputs = with pkgs.python3Packages; [hatchling hatch-vcs];
