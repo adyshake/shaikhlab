@@ -47,8 +47,23 @@
               tokenUri = "https://oauth2.googleapis.com/token";
             };
           }
+          {
+            name = "Infinity";
+            type = "yesoreyeram-infinity-datasource";
+            uid = "infinity";
+            access = "proxy";
+          }
         ];
       };
+      dashboards.settings.providers = [
+        {
+          name = "finance";
+          type = "file";
+          folder = "Finance";
+          allowUiUpdates = true;
+          options.path = ./grafana/dashboards;
+        }
+      ];
     };
 
     settings = {
@@ -79,6 +94,7 @@
     # https://github.com/NixOS/nixpkgs/tree/master/pkgs/servers/monitoring/grafana/plugins
     declarativePlugins = with pkgs.grafanaPlugins; [
       grafana-googlesheets-datasource
+      yesoreyeram-infinity-datasource
     ];
   };
 
