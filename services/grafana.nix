@@ -85,7 +85,9 @@
           name = "finance";
           type = "file";
           folder = "Finance";
-          allowUiUpdates = true;
+          # File is source of truth. UI time-range/refresh edits were
+          # otherwise kept in grafana.db and ignored later provision runs.
+          allowUiUpdates = false;
           options.path = ./grafana/dashboards;
         }
       ];

@@ -10,8 +10,8 @@
   "panels": [
     {
       "datasource": {
-        "type": "datasource",
-        "uid": "-- Dashboard --"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "fmp"
       },
       "fieldConfig": {
         "defaults": {
@@ -46,8 +46,10 @@
         "orientation": "auto",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^price$/",
           "values": false
         },
         "showPercentChange": false,
@@ -57,13 +59,29 @@
       "pluginVersion": "11.6.0",
       "targets": [
         {
+          "columns": [
+            {
+              "selector": "price",
+              "text": "price",
+              "type": "number"
+            }
+          ],
           "datasource": {
-            "type": "datasource",
-            "uid": "-- Dashboard --"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fmp"
           },
-          "panelId": 4,
+          "filters": [],
+          "format": "table",
+          "parser": "backend",
           "refId": "A",
-          "withTransforms": true
+          "root_selector": "$",
+          "source": "url",
+          "type": "json",
+          "url": "https://financialmodelingprep.com/stable/quote?symbol=GCUSD",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
       "title": "Gold (USD / oz)",
@@ -71,8 +89,8 @@
     },
     {
       "datasource": {
-        "type": "datasource",
-        "uid": "-- Dashboard --"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "fmp"
       },
       "fieldConfig": {
         "defaults": {
@@ -107,8 +125,10 @@
         "orientation": "auto",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^price$/",
           "values": false
         },
         "showPercentChange": false,
@@ -118,13 +138,29 @@
       "pluginVersion": "11.6.0",
       "targets": [
         {
+          "columns": [
+            {
+              "selector": "price",
+              "text": "price",
+              "type": "number"
+            }
+          ],
           "datasource": {
-            "type": "datasource",
-            "uid": "-- Dashboard --"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fmp"
           },
-          "panelId": 5,
+          "filters": [],
+          "format": "table",
+          "parser": "backend",
           "refId": "A",
-          "withTransforms": true
+          "root_selector": "$",
+          "source": "url",
+          "type": "json",
+          "url": "https://financialmodelingprep.com/stable/quote?symbol=%5EGSPC",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
       "title": "S&P 500",
@@ -132,10 +168,10 @@
     },
     {
       "datasource": {
-        "type": "datasource",
-        "uid": "-- Dashboard --"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "fmp"
       },
-      "description": "Last value of S&P 500 / gold from the two charts below, same daily buckets.",
+      "description": "S&P 500 quote divided by gold quote. These stats ignore the chart time range so they still work on Last 1 hour.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -169,7 +205,9 @@
         "orientation": "auto",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -180,13 +218,77 @@
       "pluginVersion": "11.6.0",
       "targets": [
         {
+          "columns": [
+            {
+              "selector": "timestamp",
+              "text": "time",
+              "type": "timestamp_epoch_s"
+            },
+            {
+              "selector": "price",
+              "text": "Gold",
+              "type": "number"
+            }
+          ],
           "datasource": {
-            "type": "datasource",
-            "uid": "-- Dashboard --"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fmp"
           },
-          "panelId": 6,
+          "filters": [],
+          "format": "timeseries",
+          "parser": "backend",
           "refId": "A",
-          "withTransforms": false
+          "root_selector": "$",
+          "source": "url",
+          "type": "json",
+          "url": "https://financialmodelingprep.com/stable/quote?symbol=GCUSD",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          },
+          "hide": true
+        },
+        {
+          "columns": [
+            {
+              "selector": "timestamp",
+              "text": "time",
+              "type": "timestamp_epoch_s"
+            },
+            {
+              "selector": "price",
+              "text": "SPX",
+              "type": "number"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fmp"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "parser": "backend",
+          "refId": "B",
+          "root_selector": "$",
+          "source": "url",
+          "type": "json",
+          "url": "https://financialmodelingprep.com/stable/quote?symbol=%5EGSPC",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          },
+          "hide": true
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$B / $A",
+          "hide": false,
+          "refId": "C",
+          "type": "math"
         }
       ],
       "title": "S&P 500 / gold",
@@ -281,10 +383,9 @@
           },
           "filters": [],
           "format": "timeseries",
-          "global_query_id": "",
           "parser": "backend",
           "refId": "A",
-          "root_selector": "",
+          "root_selector": "$",
           "source": "url",
           "type": "json",
           "url": "https://financialmodelingprep.com/stable/historical-price-eod/light?symbol=GCUSD&from=${__from:date:YYYY-MM-DD}&to=${__to:date:YYYY-MM-DD}",
@@ -295,17 +396,8 @@
         }
       ],
       "title": "Gold (GCUSD, USD / oz)",
-      "transformations": [
-        {
-          "id": "resample",
-          "options": {
-            "downsample": "last",
-            "upsample": "pad",
-            "window": "1d"
-          }
-        }
-      ],
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "FMP end-of-day bars. A range shorter than a few days (for example Last 1 hour) will look empty because there is no intraday history on Starter."
     },
     {
       "datasource": {
@@ -396,10 +488,9 @@
           },
           "filters": [],
           "format": "timeseries",
-          "global_query_id": "",
           "parser": "backend",
           "refId": "A",
-          "root_selector": "",
+          "root_selector": "$",
           "source": "url",
           "type": "json",
           "url": "https://financialmodelingprep.com/stable/historical-price-eod/light?symbol=%5EGSPC&from=${__from:date:YYYY-MM-DD}&to=${__to:date:YYYY-MM-DD}",
@@ -410,24 +501,15 @@
         }
       ],
       "title": "S&P 500",
-      "transformations": [
-        {
-          "id": "resample",
-          "options": {
-            "downsample": "last",
-            "upsample": "pad",
-            "window": "1d"
-          }
-        }
-      ],
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "FMP end-of-day bars. A range shorter than a few days (for example Last 1 hour) will look empty because there is no intraday history on Starter."
     },
     {
       "datasource": {
-        "type": "datasource",
-        "uid": "-- Mixed --"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "fmp"
       },
-      "description": "S&P 500 divided by gold, using the two FMP charts above after both are bucketed to UTC days. Change the dashboard time range and all three graphs move together. Starter FMP returns up to about 5,000 daily bars (~20 years).",
+      "description": "S&P 500 / gold from two FMP daily series in this panel. Use a multi-year range; Last 1 hour has no daily bars.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -495,24 +577,66 @@
       "pluginVersion": "11.6.0",
       "targets": [
         {
+          "columns": [
+            {
+              "selector": "date",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "price",
+              "text": "Gold",
+              "type": "number"
+            }
+          ],
           "datasource": {
-            "type": "datasource",
-            "uid": "-- Dashboard --"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fmp"
           },
-          "hide": true,
-          "panelId": 4,
+          "filters": [],
+          "format": "timeseries",
+          "parser": "backend",
           "refId": "A",
-          "withTransforms": true
+          "root_selector": "$",
+          "source": "url",
+          "type": "json",
+          "url": "https://financialmodelingprep.com/stable/historical-price-eod/light?symbol=GCUSD&from=${__from:date:YYYY-MM-DD}&to=${__to:date:YYYY-MM-DD}",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          },
+          "hide": true
         },
         {
+          "columns": [
+            {
+              "selector": "date",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "price",
+              "text": "SPX",
+              "type": "number"
+            }
+          ],
           "datasource": {
-            "type": "datasource",
-            "uid": "-- Dashboard --"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fmp"
           },
-          "hide": true,
-          "panelId": 5,
+          "filters": [],
+          "format": "timeseries",
+          "parser": "backend",
           "refId": "B",
-          "withTransforms": true
+          "root_selector": "$",
+          "source": "url",
+          "type": "json",
+          "url": "https://financialmodelingprep.com/stable/historical-price-eod/light?symbol=%5EGSPC&from=${__from:date:YYYY-MM-DD}&to=${__to:date:YYYY-MM-DD}",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          },
+          "hide": true
         },
         {
           "datasource": {
@@ -567,7 +691,9 @@
         "orientation": "auto",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "/^price$/",
           "values": false
         },
@@ -603,7 +729,7 @@
           "format": "table",
           "parser": "backend",
           "refId": "A",
-          "root_selector": "",
+          "root_selector": "$",
           "source": "url",
           "type": "json",
           "url": "https://financialmodelingprep.com/stable/quote?symbol=${ticker}",
@@ -618,8 +744,8 @@
     },
     {
       "datasource": {
-        "type": "datasource",
-        "uid": "-- Dashboard --"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "fmp"
       },
       "fieldConfig": {
         "defaults": {
@@ -658,7 +784,9 @@
         "orientation": "auto",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "/^changePercentage$/",
           "values": false
         },
@@ -669,13 +797,29 @@
       "pluginVersion": "11.6.0",
       "targets": [
         {
+          "columns": [
+            {
+              "selector": "changePercentage",
+              "text": "changePercentage",
+              "type": "number"
+            }
+          ],
           "datasource": {
-            "type": "datasource",
-            "uid": "-- Dashboard --"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fmp"
           },
-          "panelId": 7,
+          "filters": [],
+          "format": "table",
+          "parser": "backend",
           "refId": "A",
-          "withTransforms": false
+          "root_selector": "$",
+          "source": "url",
+          "type": "json",
+          "url": "https://financialmodelingprep.com/stable/quote?symbol=${ticker}",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
       "title": "${ticker} change",
@@ -683,8 +827,8 @@
     },
     {
       "datasource": {
-        "type": "datasource",
-        "uid": "-- Dashboard --"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "fmp"
       },
       "fieldConfig": {
         "defaults": {
@@ -719,7 +863,9 @@
         "orientation": "auto",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "/^marketCap$/",
           "values": false
         },
@@ -730,13 +876,29 @@
       "pluginVersion": "11.6.0",
       "targets": [
         {
+          "columns": [
+            {
+              "selector": "marketCap",
+              "text": "marketCap",
+              "type": "number"
+            }
+          ],
           "datasource": {
-            "type": "datasource",
-            "uid": "-- Dashboard --"
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fmp"
           },
-          "panelId": 7,
+          "filters": [],
+          "format": "table",
+          "parser": "backend",
           "refId": "A",
-          "withTransforms": false
+          "root_selector": "$",
+          "source": "url",
+          "type": "json",
+          "url": "https://financialmodelingprep.com/stable/quote?symbol=${ticker}",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
       "title": "${ticker} market cap",
@@ -834,7 +996,7 @@
           "format": "timeseries",
           "parser": "backend",
           "refId": "A",
-          "root_selector": "",
+          "root_selector": "$",
           "source": "url",
           "type": "json",
           "url": "https://financialmodelingprep.com/stable/historical-price-eod/light?symbol=${ticker}&from=${__from:date:YYYY-MM-DD}&to=${__to:date:YYYY-MM-DD}",
@@ -845,7 +1007,8 @@
         }
       ],
       "title": "${ticker} history",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Daily bars. Zoom out to at least 7 days; Last 1 hour cannot show EOD data."
     },
     {
       "datasource": {
@@ -895,7 +1058,9 @@
         "footer": {
           "countRows": false,
           "fields": "",
-          "reducer": ["sum"],
+          "reducer": [
+            "sum"
+          ],
           "show": false
         },
         "showHeader": true
@@ -907,7 +1072,7 @@
             {
               "selector": "publishedDate",
               "text": "Time",
-              "type": "timestamp"
+              "type": "string"
             },
             {
               "selector": "title",
@@ -933,7 +1098,7 @@
           "format": "table",
           "parser": "backend",
           "refId": "A",
-          "root_selector": "",
+          "root_selector": "$",
           "source": "url",
           "type": "json",
           "url": "https://financialmodelingprep.com/stable/news/stock?symbols=${ticker}&limit=15",
@@ -949,7 +1114,9 @@
   ],
   "refresh": "15m",
   "schemaVersion": 39,
-  "tags": ["finance"],
+  "tags": [
+    "finance"
+  ],
   "templating": {
     "list": [
       {
@@ -964,18 +1131,66 @@
         "multi": false,
         "name": "ticker",
         "options": [
-          {"selected": true, "text": "AAPL", "value": "AAPL"},
-          {"selected": false, "text": "MSFT", "value": "MSFT"},
-          {"selected": false, "text": "NVDA", "value": "NVDA"},
-          {"selected": false, "text": "GOOGL", "value": "GOOGL"},
-          {"selected": false, "text": "AMZN", "value": "AMZN"},
-          {"selected": false, "text": "META", "value": "META"},
-          {"selected": false, "text": "TSLA", "value": "TSLA"},
-          {"selected": false, "text": "BRK-B", "value": "BRK-B"},
-          {"selected": false, "text": "JPM", "value": "JPM"},
-          {"selected": false, "text": "XOM", "value": "XOM"},
-          {"selected": false, "text": "BTCUSD", "value": "BTCUSD"},
-          {"selected": false, "text": "ETHUSD", "value": "ETHUSD"}
+          {
+            "selected": true,
+            "text": "AAPL",
+            "value": "AAPL"
+          },
+          {
+            "selected": false,
+            "text": "MSFT",
+            "value": "MSFT"
+          },
+          {
+            "selected": false,
+            "text": "NVDA",
+            "value": "NVDA"
+          },
+          {
+            "selected": false,
+            "text": "GOOGL",
+            "value": "GOOGL"
+          },
+          {
+            "selected": false,
+            "text": "AMZN",
+            "value": "AMZN"
+          },
+          {
+            "selected": false,
+            "text": "META",
+            "value": "META"
+          },
+          {
+            "selected": false,
+            "text": "TSLA",
+            "value": "TSLA"
+          },
+          {
+            "selected": false,
+            "text": "BRK-B",
+            "value": "BRK-B"
+          },
+          {
+            "selected": false,
+            "text": "JPM",
+            "value": "JPM"
+          },
+          {
+            "selected": false,
+            "text": "XOM",
+            "value": "XOM"
+          },
+          {
+            "selected": false,
+            "text": "BTCUSD",
+            "value": "BTCUSD"
+          },
+          {
+            "selected": false,
+            "text": "ETHUSD",
+            "value": "ETHUSD"
+          }
         ],
         "query": "AAPL,MSFT,NVDA,GOOGL,AMZN,META,TSLA,BRK-B,JPM,XOM,BTCUSD,ETHUSD",
         "queryValue": "",
@@ -992,6 +1207,7 @@
   "timezone": "utc",
   "title": "Finance",
   "uid": "finance",
-  "version": 3,
-  "weekStart": ""
+  "version": 4,
+  "weekStart": "",
+  "description": "FMP daily prices. Keep the range at weeks or years; Last 1 hour is for quotes only."
 }
