@@ -26,6 +26,14 @@
       owner = "grafana";
       group = "grafana";
     };
+    "fmp-api-key" = {
+      format = "binary";
+      sopsFile = ./../secrets/fmp-api-key;
+      owner = "grafana";
+      group = "grafana";
+      mode = "0440";
+      restartUnits = ["grafana.service"];
+    };
   };
 
   services.grafana = {
@@ -52,6 +60,23 @@
             type = "yesoreyeram-infinity-datasource";
             uid = "infinity";
             access = "proxy";
+          }
+          {
+            name = "FMP";
+            type = "yesoreyeram-infinity-datasource";
+            uid = "fmp";
+            access = "proxy";
+            jsonData = {
+              auth_method = "apiKey";
+              apiKeyKey = "apikey";
+              apiKeyType = "query";
+              allowedHosts = ["https://financialmodelingprep.com"];
+              # Do not enable customHealthCheckUrl: Grafana would hit FMP
+              # on Save & test / connection checks and burn the 300/min quota.
+            };
+            secureJsonData = {
+              apiKeyValue = "$__file{${config.sops.secrets."fmp-api-key".path}}";
+            };
           }
         ];
       };
