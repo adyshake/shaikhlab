@@ -253,12 +253,20 @@
 
   services.flaresolverr.enable = true;
 
+  # Lidarr (VPN-bound, above) is the indexer/downloader. Navidrome only
+  # scans `${mediaDir}/library/music` and streams it over Subsonic to
+  # Amperfy. Host network, same as Jellyfin — no indexer traffic here.
   services.navidrome = {
     enable = true;
     settings = {
-      MusicFolder = "/data/fun/music";
+      MusicFolder = "/data/fun/library/music";
       Address = "127.0.0.1";
       Port = 4533;
+      EnableInsightsCollector = false;
+      Scanner = {
+        Schedule = "@every 1h";
+        ScanOnStartup = true;
+      };
     };
   };
 
@@ -270,10 +278,12 @@
   #    DNS race where wg-up's 5-attempt retry loses to blocky still warming).
   #    If the probe times out we still `exit 0` so systemd's Restart=on-failure
   #    can take over -- this can never block boot forever.
-  # 2) vpnBound units (radarr/sonarr/prowlarr/transmission/flaresolverr):
+  # 2) vpnBound units (radarr/sonarr/prowlarr/lidarr/transmission/flaresolverr):
   #    hard-coupled to wg.service via BindsTo+After. They refuse to start if
   #    wg is down, are force-stopped if wg dies, and retry themselves once
   #    wg recovers. mkDefault on Restart lets nixarr's own tuning (if any) win.
+  # 3) navidrome is NOT vpnBound (host network, like Jellyfin). PrivateUsers
+  #    is forced off so the media supplementary group survives the sandbox.
   systemd.services = let
     vpnBound = extra:
       lib.recursiveUpdate {
@@ -347,6 +357,15 @@
         enable = true;
         vpnNamespace = "wg";
       };
+    };
+
+    navidrome = {
+      unitConfig.RequiresMountsFor = ["/data/fun/library/music"];
+      # NixOS module defaults PrivateUsers=true, which drops supplementary
+      # groups. Lidarr writes into library/music as itself with group
+      # `media`; without the group, Navidrome cannot read those files
+      # when they are not world-readable.
+      serviceConfig.PrivateUsers = lib.mkForce false;
     };
 
     # Declarative configuration of Radarr/Sonarr state that lives in their
@@ -584,7 +603,17 @@
         useACMEHost = "adnanshaikh.com";
         locations."/" = {
           recommendedProxySettings = true;
+          proxyWebsockets = true;
           proxyPass = "http://127.0.0.1:4533";
+          extraConfig = ''
+            # Streaming (Amperfy / Subsonic /rest/stream.view): do not buffer
+            # the ffmpeg transcode, and do not drop a long-running play.
+            proxy_buffering off;
+            proxy_request_buffering off;
+            proxy_read_timeout 86400s;
+            proxy_send_timeout 86400s;
+            client_max_body_size 50M;
+          '';
         };
       };
 
@@ -613,7 +642,6 @@
   systemd = {
     tmpfiles.rules = [
       "d /var/lib/nixarr 0755 root root"
-      "d /data/fun/music 2775 navidrome media -"
       "d /data/transmission/downloads 2775 transmission media -"
       "d /data/transmission/downloads/radarr 2775 transmission media -"
       "d /data/transmission/downloads/tv-sonarr 2775 transmission media -"
