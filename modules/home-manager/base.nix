@@ -66,7 +66,17 @@ in {
       # 2026.07.04 still defaults to android_vr, whose media URLs 403.
       # 2026.08.19 drops that client; until nixpkgs ships it, force
       # web_embedded (high-quality) with android as a progressive fallback.
-      settings.extractor-args = "youtube:player_client=web_embedded,android";
+      settings =
+        {
+          extractor-args = "youtube:player_client=web_embedded,android";
+        }
+        // lib.optionalAttrs pkgs.stdenv.isDarwin {
+          # macOS Gatekeeper quarantines CLI downloads; strip it off the
+          # final file so Finder/QuickTime don't block playback.
+          # Quotes are required: home-manager writes this as a raw line,
+          # and yt-dlp's config parser splits on unquoted spaces.
+          exec = ''"after_move:xattr -c %(filepath)q"'';
+        };
     };
   };
 
