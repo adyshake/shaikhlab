@@ -263,6 +263,16 @@
       Address = "127.0.0.1";
       Port = 4533;
       EnableInsightsCollector = false;
+      # Amperfy "server chooses codec" omits `format` and only sends a
+      # bitrate cap. Without this, Navidrome downsamples to opus (its
+      # default), which iOS often can't play. Bitrate itself is not a
+      # navidrome.json key — it lives per-player in the UI (Settings →
+      # Players → Max. Bit Rate).
+      DefaultDownsamplingFormat = "mp3";
+      # `/download` follows the player's transcoding profile instead of
+      # shipping the original FLAC. Stream still uses the same mp3
+      # profile when the client asks for mp3 (Amperfy cache default).
+      AutoTranscodeDownload = true;
       Scanner = {
         Schedule = "@every 1h";
         ScanOnStartup = true;
