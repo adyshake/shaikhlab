@@ -18,6 +18,8 @@
       settings = {
         # Startup and region
         "browser.startup.homepage" = lib.mkDefault "https://start.adnanshaikh.com";
+        # New tab URL is New Tab Override + 3rdparty policy in policies.nix
+        # (Firefox will not take an arbitrary URL from this pref).
         "browser.search.region" = "US";
         "browser.search.isUS" = true;
         "distribution.searchplugins.defaultLocale" = "en-US";

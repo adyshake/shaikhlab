@@ -58,6 +58,22 @@
     ];
   };
 
+  # New tab / startup — Firefox has no policy for a custom new-tab URL
+  # (Mike Kaply: hijack risk). New Tab Override reads this via storage.managed.
+  Homepage = {
+    URL = "https://start.adnanshaikh.com";
+    StartPage = "homepage";
+  };
+  "3rdparty" = {
+    Extensions = {
+      "newtaboverride@agenedia.com" = {
+        type = "custom_url";
+        url = "https://start.adnanshaikh.com";
+        focus_website = true;
+      };
+    };
+  };
+
   # Extensions — force-installed via Mozilla policy templates
   # Docs: https://mozilla.github.io/policy-templates/#extensionsettings
   #
@@ -75,6 +91,12 @@
   ExtensionSettings = {
     "*" = {
       installation_mode = "blocked";
+    };
+    # New Tab Override — opens start.adnanshaikh.com on every new tab
+    "newtaboverride@agenedia.com" = {
+      install_url = "https://addons.mozilla.org/firefox/downloads/latest/new-tab-override/latest.xpi";
+      installation_mode = "force_installed";
+      default_area = "menupanel";
     };
     # uBlock Origin
     "uBlock0@raymondhill.net" = {
