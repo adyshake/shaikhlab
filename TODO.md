@@ -7,7 +7,7 @@
 - [x] Install betterdisplay
 - [x] Install itsycal
 - [x] Install cursor
-- [x] Install hammerspoon (cask only; script still TODO)
+- [x] Install hammerspoon (cask only)
 - [x] Install meetingbar
 - [x] set up mac to be declarative
   - [x] terminal + zsh
@@ -18,6 +18,8 @@
 - [x] self-host music — Navidrome at `music.adnanshaikh.com` (Tailscale-only, library `/data/fun/library/music` shared with Lidarr); Amperfy on iOS talks Subsonic to it; see [`services/nixarr.nix`](services/nixarr.nix)
 - [x] add airgradient to home assistant — `airgradient` in `extraComponents`; Living Room ONE at `192.168.1.94` added via UI (see [`services/homeassistant.nix`](services/homeassistant.nix))
 - [x] add sui — startpage at `start.adnanshaikh.com` (Tailscale-only, black theme, local services); see [`services/sui.nix`](services/sui.nix)
+- [x] Add Yomu to dock — already present at `/Applications/Yomu.app`, order matches `local.dock.entries` in [`modules/macos/base.nix`](modules/macos/base.nix)
+- [x] linear mouse settings — Rival 3 scheme in [`modules/home-manager/linearmouse.nix`](modules/home-manager/linearmouse.nix)
 ## In progress
 
 - [ ] set up kopia
@@ -44,15 +46,11 @@
 ## To do — macOS / apps
 
 - [ ] fix `homebrew.masApps` hanging on `darwin-rebuild switch` (block is commented out in `modules/macos/_packages.nix` — candidates queued: Infuse, Tailscale, Yomu EBook Reader; see https://discourse.nixos.org/t/nix-darwin-homebrew-masapps-is-hanging/60828)
-- [ ] Add Yomu to dock (blocked on masApps fix; placeholder comment in `modules/macos/base.nix`)
-- [ ] Add hammerspoon script
 
 ## To do — declarative settings for already-installed apps
 
-- [ ] linear mouse settings (cask installed; settings not declared)
 - [ ] vimium keys to exclude (extension installed via librewolf policies; excluded keys not declared)
   ```
   # disable the mini player from being triggered
   https?://www.youtube.com/*, i
   ```
-- [ ] better way to block hackernews (currently via blocky `customBlocking`)

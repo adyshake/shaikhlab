@@ -37,6 +37,7 @@ in {
       ${vars.userName} = {
         imports = [
           ./../../modules/home-manager/iterm2.nix
+          ./../../modules/home-manager/linearmouse.nix
           ./../../modules/home-manager/base.nix
           ./../../modules/home-manager/librewolf/default.nix
           ./../../modules/home-manager/fonts.nix

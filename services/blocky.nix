@@ -108,11 +108,12 @@ in {
           ];
         };
 
-        # Default blocking policy
+        # Applied to every client. Per-IP entries must repeat the lists —
+        # a match replaces default, it does not merge.
         clientGroupsBlock = {
-          default = ["ads"];
-          "100.122.173.69" = ["ads"]; #iphone1shaikh
-          "100.91.170.46" = ["ads"]; #mac1shaikh
+          default = ["ads" "fakenews" "gambling"];
+          "100.122.173.69" = ["ads" "fakenews" "gambling"]; # iphone1shaikh
+          "100.91.170.46" = ["ads" "fakenews" "gambling"]; # mac1shaikh
         };
       };
 
