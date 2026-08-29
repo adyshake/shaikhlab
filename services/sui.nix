@@ -270,22 +270,27 @@
 
         case 'blackboard':""",
     )
-    themer = themer.replace(
-        """    setValueFromLocalStorage('color-background');
-    setValueFromLocalStorage('color-text-pri');
-    setValueFromLocalStorage('color-text-acc');""",
-        """    if (!localStorage.getItem('color-background')) {
-        setTheme({
-            'color-background': '#000000',
-            'color-text-pri': '#f2f2f2',
-            'color-text-acc': '#6e6e6e'
-        });
-    } else {
-        setValueFromLocalStorage('color-background');
-        setValueFromLocalStorage('color-text-pri');
-        setValueFromLocalStorage('color-text-acc');
-    }""",
+    old_theme_init = (
+        "setValueFromLocalStorage('color-background');\n"
+        "    setValueFromLocalStorage('color-text-pri');\n"
+        "    setValueFromLocalStorage('color-text-acc');"
     )
+    new_theme_init = (
+        "if (!localStorage.getItem('color-background')) {\n"
+        "        setTheme({\n"
+        "            'color-background': '#000000',\n"
+        "            'color-text-pri': '#f2f2f2',\n"
+        "            'color-text-acc': '#6e6e6e'\n"
+        "        });\n"
+        "    } else {\n"
+        "        setValueFromLocalStorage('color-background');\n"
+        "        setValueFromLocalStorage('color-text-pri');\n"
+        "        setValueFromLocalStorage('color-text-acc');\n"
+        "    }"
+    )
+    if old_theme_init not in themer:
+        raise SystemExit("themer.js theme init block not found")
+    themer = themer.replace(old_theme_init, new_theme_init)
     (root / "assets/js/themer.js").write_text(themer)
 
     html = (root / "index.html").read_text()
