@@ -262,6 +262,11 @@ in {
             networking.useDHCP = false;
             networking.firewall.enable = false;
             networking.nameservers = [];
+            # Link route to the host only. A default gateway would let a
+            # later `networking.nat.internalInterfaces = [ "ve-+" ]` give
+            # this jail LAN/internet.
+            networking.defaultGateway = lib.mkForce null;
+            networking.defaultGateway6 = lib.mkForce null;
             documentation.enable = false;
             documentation.nixos.enable = false;
           };
@@ -288,16 +293,23 @@ in {
       appendHttpConfig = ''
         limit_req_status 429;
         limit_conn_status 429;
+        # Trust CF-Connecting-IP only from cloudflared (127.0.0.1). Direct
+        # clients can send any value in that header; use their real peer.
+        map $http_cf_connecting_ip $jail_cf_ip {
+          default $http_cf_connecting_ip;
+          ""      $binary_remote_addr;
+        }
+        map $remote_addr $jail_rl_key {
+          127.0.0.1 $jail_cf_ip;
+          ::1       $jail_cf_ip;
+          default   $binary_remote_addr;
+        }
       ''
       + lib.concatStrings (lib.mapAttrsToList (
           name: jail: ''
-            map $http_cf_connecting_ip $jail_${name}_key {
-              default $http_cf_connecting_ip;
-              ""      $binary_remote_addr;
-            }
-            limit_req_zone $jail_${name}_key zone=jail_${name}_req:1m rate=${jail.rateLimit.rate};
+            limit_req_zone $jail_rl_key zone=jail_${name}_req:1m rate=${jail.rateLimit.rate};
             limit_req_zone $server_name zone=jail_${name}_global:1m rate=${jail.rateLimit.globalRate};
-            limit_conn_zone $jail_${name}_key zone=jail_${name}_conn:1m;
+            limit_conn_zone $jail_rl_key zone=jail_${name}_conn:1m;
           ''
         )
         enabledJails);
@@ -306,11 +318,19 @@ in {
           name: jail: let
             j = enrich name jail;
             loc = {"/" = nginxProxy j;};
+            jailServerExtra = ''
+              access_log off;
+              error_log /dev/null crit;
+              client_body_timeout 5s;
+              client_header_timeout 5s;
+              send_timeout 10s;
+            '';
           in
             lib.optionalAttrs (jail.domain != null) {
               ${jail.domain} = {
                 forceSSL = true;
                 useACMEHost = "adnanshaikh.com";
+                extraConfig = jailServerExtra;
                 locations = loc;
               };
               "${name}-jail-origin" = {
@@ -322,6 +342,7 @@ in {
                 ];
                 # Only listener on this port, so Host: paste.* from cloudflared still matches.
                 default = true;
+                extraConfig = jailServerExtra;
                 locations = loc;
               };
             }

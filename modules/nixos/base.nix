@@ -80,6 +80,15 @@
 
   programs.zsh.enable = true;
   security.sudo.wheelNeedsPassword = false;
+
+  # /var/log is persisted. A public flood must not fill the disk.
+  services.journald.extraConfig = ''
+    SystemMaxUse=256M
+    RuntimeMaxUse=64M
+    SystemMaxFileSize=32M
+    RateLimitIntervalSec=30s
+    RateLimitBurst=200
+  '';
   time.timeZone = "America/Los_Angeles";
   zramSwap.enable = true;
 

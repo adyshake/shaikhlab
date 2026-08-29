@@ -52,7 +52,16 @@ in {
     };
 
     systemd.services =
-      lib.mapAttrs' (
+      {
+        "cloudflared-tunnel-${tunnelName}".serviceConfig = {
+          MemoryMax = "256M";
+          MemoryHigh = "192M";
+          MemorySwapMax = "0";
+          CPUQuota = "100%";
+          TasksMax = 64;
+        };
+      }
+      // lib.mapAttrs' (
         hostname: _:
           lib.nameValuePair (routeUnit hostname) {
             description = "Point ${hostname} at the ${tunnelName} tunnel";

@@ -23,7 +23,10 @@
 
   users.users.nginx.extraGroups = ["acme"];
 
-  networking.firewall.allowedTCPPorts = [
+  # ACME is DNS-01, so 80 is not needed on the WAN. nginx 80/443 is for
+  # Tailscale/Blocky hostnames only; public hosts go through cloudflared on
+  # localhost. Opening 80/443 on every interface would let LAN/WAN skip CF.
+  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [
     80
     443
   ];
