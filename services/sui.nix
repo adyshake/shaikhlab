@@ -265,6 +265,11 @@
     (root / "index.html").write_text(html)
 
     search = (root / "assets/js/search.js").read_text()
+    # New tabs keep address-bar focus; don't steal it with the in-page search box.
+    old_search_focus = "document.getElementById('keywords').focus();"
+    if old_search_focus not in search:
+        raise SystemExit("search.js keywords focus() not found")
+    search = search.replace(old_search_focus, "", 1)
     search = search.replace(
         'var sengine = "https://www.google.com/?q=";',
         'var sengine = "https://kagi.com/search?q=";',
@@ -320,6 +325,7 @@
     assert "shaikhlab.css" in html
     assert "kagi.com/search" in search
     assert "case \"k\":" in search
+    assert "document.getElementById('keywords').focus();" not in search
     assert "case 'black':" in themer
     assert "localStorage.getItem('color-background')" in themer
   '';

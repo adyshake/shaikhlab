@@ -69,7 +69,9 @@
       "newtaboverride@agenedia.com" = {
         type = "custom_url";
         url = "https://start.adnanshaikh.com";
-        focus_website = true;
+        # Leave the address bar focused so Cmd+T stays type-to-navigate.
+        # The start page must also skip autofocus (see services/sui.nix).
+        focus_website = false;
       };
     };
   };
