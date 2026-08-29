@@ -57,6 +57,10 @@
 
       "roborock"
 
+      # Local AirGradient ONE (I-9PSL) — config flow + sensors
+      # https://www.home-assistant.io/integrations/airgradient
+      "airgradient"
+
       # Z-Wave (connects to the zwave-js-ui Z-Wave JS server over websocket)
       "zwave_js"
     ];
