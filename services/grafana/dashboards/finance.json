@@ -655,10 +655,10 @@
     },
     {
       "datasource": {
-        "type": "datasource",
-        "uid": "-- Mixed --"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "fmp"
       },
-      "description": "Chart 9-style: S&P 500 in real stuff, not dollars. The Commodities Index is the IMF Primary Commodity Price System all-commodities basket (PALLFNF, 2016 = 100): trade-weighted world spot prices for energy (crude, natural gas, coal; crude is about 29%), industrial and precious metals (copper, aluminum, iron ore, gold, etc.), fertilizers, and agriculture. In the book’s words, the stuff you buy, or the stuff that goes into the stuff you buy. Monthly from 2003; can lag the latest S&P print by a month or two. Use a multi-year range; Last 1 hour has no daily bars.",
+      "description": "Chart 9-style: S&P 500 in real stuff, not dollars. Live series is Invesco DB Commodity (DBC), a daily fund that tracks a broad commodity basket: energy (crude, heating oil, natural gas), industrial and precious metals, and agriculture — the stuff you buy, or that goes into the stuff you buy. Same daily divide as S&P / gold. Use a multi-year range; Last 1 hour has no daily bars.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -669,7 +669,7 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "S&P points per index point",
+            "axisLabel": "S&P points per DBC dollar",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
@@ -728,28 +728,28 @@
         {
           "columns": [
             {
-              "selector": "period",
+              "selector": "date",
               "text": "time",
               "type": "timestamp"
             },
             {
-              "selector": "Monthly – All Countries, excluding the IO – Primary Commodity Prices, All index  – Index (IMF/PCPS/M.W00.PALLFNF.IX)",
-              "text": "index",
+              "selector": "price",
+              "text": "ETF",
               "type": "number"
             }
           ],
           "datasource": {
             "type": "yesoreyeram-infinity-datasource",
-            "uid": "dbnomics"
+            "uid": "fmp"
           },
           "filters": [],
           "format": "timeseries",
           "parser": "backend",
           "refId": "A",
-          "root_selector": "",
+          "root_selector": "$",
           "source": "url",
-          "type": "csv",
-          "url": "https://api.db.nomics.world/v22/series/IMF/PCPS/M.W00.PALLFNF.IX?observations=1&format=csv",
+          "type": "json",
+          "url": "https://financialmodelingprep.com/stable/historical-price-eod/light?symbol=DBC&from=${__from:date:YYYY-MM-DD}&to=${__to:date:YYYY-MM-DD}",
           "url_options": {
             "data": "",
             "method": "GET"
@@ -793,37 +793,9 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$A",
-          "window": "1d",
-          "downsampler": "last",
-          "upsampler": "pad",
-          "hide": true,
-          "refId": "C",
-          "type": "resample"
-        },
-        {
-          "datasource": {
-            "name": "Expression",
-            "type": "__expr__",
-            "uid": "__expr__"
-          },
-          "expression": "$B",
-          "window": "1d",
-          "downsampler": "last",
-          "upsampler": "pad",
-          "hide": true,
-          "refId": "D",
-          "type": "resample"
-        },
-        {
-          "datasource": {
-            "name": "Expression",
-            "type": "__expr__",
-            "uid": "__expr__"
-          },
-          "expression": "$D / $C",
+          "expression": "$B / $A",
           "hide": false,
-          "refId": "E",
+          "refId": "C",
           "type": "math"
         }
       ],
@@ -832,10 +804,10 @@
     },
     {
       "datasource": {
-        "type": "datasource",
-        "uid": "-- Mixed --"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "fmp"
       },
-      "description": "Chart 10-style: S&P 500 in food and fiber. The Agricultural Price Index is the IMF PCPS agriculture basket (PAGRI, 2016 = 100): food and beverages (grains, vegetable oils, meat, sugar, coffee, tea, cocoa, fruit) plus agricultural raw materials (cotton, wool, rubber, hides, timber). In the book’s words, the stuff you eat and wear — not energy or industrial metals. Monthly from 1992. Use a multi-year range; Last 1 hour has no daily bars.",
+      "description": "Chart 10-style: S&P 500 in food and fiber. Live series is Invesco DB Agriculture (DBA): corn, wheat, soybeans, sugar, coffee, cocoa, live cattle, and similar — the stuff you eat and wear, not oil or copper. Use a multi-year range; Last 1 hour has no daily bars.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -846,7 +818,7 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "S&P points per index point",
+            "axisLabel": "S&P points per DBA dollar",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
@@ -905,28 +877,28 @@
         {
           "columns": [
             {
-              "selector": "period",
+              "selector": "date",
               "text": "time",
               "type": "timestamp"
             },
             {
-              "selector": "Monthly – All Countries, excluding the IO – Primary Commodity Prices, Agriculture – Index (IMF/PCPS/M.W00.PAGRI.IX)",
-              "text": "index",
+              "selector": "price",
+              "text": "ETF",
               "type": "number"
             }
           ],
           "datasource": {
             "type": "yesoreyeram-infinity-datasource",
-            "uid": "dbnomics"
+            "uid": "fmp"
           },
           "filters": [],
           "format": "timeseries",
           "parser": "backend",
           "refId": "A",
-          "root_selector": "",
+          "root_selector": "$",
           "source": "url",
-          "type": "csv",
-          "url": "https://api.db.nomics.world/v22/series/IMF/PCPS/M.W00.PAGRI.IX?observations=1&format=csv",
+          "type": "json",
+          "url": "https://financialmodelingprep.com/stable/historical-price-eod/light?symbol=DBA&from=${__from:date:YYYY-MM-DD}&to=${__to:date:YYYY-MM-DD}",
           "url_options": {
             "data": "",
             "method": "GET"
@@ -970,37 +942,9 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$A",
-          "window": "1d",
-          "downsampler": "last",
-          "upsampler": "pad",
-          "hide": true,
-          "refId": "C",
-          "type": "resample"
-        },
-        {
-          "datasource": {
-            "name": "Expression",
-            "type": "__expr__",
-            "uid": "__expr__"
-          },
-          "expression": "$B",
-          "window": "1d",
-          "downsampler": "last",
-          "upsampler": "pad",
-          "hide": true,
-          "refId": "D",
-          "type": "resample"
-        },
-        {
-          "datasource": {
-            "name": "Expression",
-            "type": "__expr__",
-            "uid": "__expr__"
-          },
-          "expression": "$D / $C",
+          "expression": "$B / $A",
           "hide": false,
-          "refId": "E",
+          "refId": "C",
           "type": "math"
         }
       ],
@@ -1009,10 +953,10 @@
     },
     {
       "datasource": {
-        "type": "datasource",
-        "uid": "-- Mixed --"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "fmp"
       },
-      "description": "Chart 12-style: S&P 500 in industrial metals, not dollars. The index is the IMF PCPS base-metals basket (PMETA, 2016 = 100): copper, aluminum, iron ore, nickel, zinc, lead, tin, molybdenum, and uranium — the steel, zinc, copper, and lead the book uses as the automakers’ cost basket. Not gold or silver (those are Chart 13). Monthly from 1992; can lag the S&P by a month or two. Use a multi-year range; Last 1 hour has no daily bars.",
+      "description": "Chart 12-style: S&P 500 in industrial metals. Live series is Invesco DB Base Metals (DBB): aluminum, copper, and zinc — the steel / copper / zinc basket the book uses for automakers’ costs. Not gold or silver. Use a multi-year range; Last 1 hour has no daily bars.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1023,7 +967,7 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "S&P points per index point",
+            "axisLabel": "S&P points per DBB dollar",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
@@ -1082,28 +1026,28 @@
         {
           "columns": [
             {
-              "selector": "period",
+              "selector": "date",
               "text": "time",
               "type": "timestamp"
             },
             {
-              "selector": "Monthly – All Countries, excluding the IO – Primary Commodity Prices, Metal index  – Index (IMF/PCPS/M.W00.PMETA.IX)",
-              "text": "index",
+              "selector": "price",
+              "text": "ETF",
               "type": "number"
             }
           ],
           "datasource": {
             "type": "yesoreyeram-infinity-datasource",
-            "uid": "dbnomics"
+            "uid": "fmp"
           },
           "filters": [],
           "format": "timeseries",
           "parser": "backend",
           "refId": "A",
-          "root_selector": "",
+          "root_selector": "$",
           "source": "url",
-          "type": "csv",
-          "url": "https://api.db.nomics.world/v22/series/IMF/PCPS/M.W00.PMETA.IX?observations=1&format=csv",
+          "type": "json",
+          "url": "https://financialmodelingprep.com/stable/historical-price-eod/light?symbol=DBB&from=${__from:date:YYYY-MM-DD}&to=${__to:date:YYYY-MM-DD}",
           "url_options": {
             "data": "",
             "method": "GET"
@@ -1147,37 +1091,9 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$A",
-          "window": "1d",
-          "downsampler": "last",
-          "upsampler": "pad",
-          "hide": true,
-          "refId": "C",
-          "type": "resample"
-        },
-        {
-          "datasource": {
-            "name": "Expression",
-            "type": "__expr__",
-            "uid": "__expr__"
-          },
-          "expression": "$B",
-          "window": "1d",
-          "downsampler": "last",
-          "upsampler": "pad",
-          "hide": true,
-          "refId": "D",
-          "type": "resample"
-        },
-        {
-          "datasource": {
-            "name": "Expression",
-            "type": "__expr__",
-            "uid": "__expr__"
-          },
-          "expression": "$D / $C",
+          "expression": "$B / $A",
           "hide": false,
-          "refId": "E",
+          "refId": "C",
           "type": "math"
         }
       ],
@@ -1600,7 +1516,7 @@
         "type": "yesoreyeram-infinity-datasource",
         "uid": "dbnomics"
       },
-      "description": "Chart 14-style yearly change. The gray line is official CPI-U inflation (IMF IFS, same concept as BLS all-items, 12-month percent change). The bright line is a ShadowStats-style 1980-method estimate: official CPI plus 7 percentage points. John Williams’ ShadowStats series is subscriber-only; his published method adds back about 7 pp of BLS changes since 1980 (owner’s equivalent rent, substitution, hedonics). That additive gap is fully in by the 2000s, so this matches the book’s late-period spread (~4% official vs ~11–12% alternate around 2007) but sits a bit high in the early 1980s, when the add-on was still phasing in. Not a licensed ShadowStats download.",
+      "description": "Chart 16-style cumulative price rise from the left edge of the dashboard range (both lines start at 0%). Official is the IMF/BLS CPI-U index divided by its first print in this range. The 1980-method line compounds that official monthly change plus an extra 7 percentage points per year (Williams’ published ShadowStats add-back for OER, substitution, and hedonics). Set 1980 to now to see the long compounding gap. Not a licensed ShadowStats file.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1610,7 +1526,7 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "yearly change",
+            "axisLabel": "cumulative rise from start of range",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
@@ -1640,7 +1556,7 @@
             }
           },
           "decimals": 2,
-          "unit": "percent"
+          "unit": "percentunit"
         },
         "overrides": [
           {
@@ -1723,8 +1639,8 @@
               "type": "timestamp"
             },
             {
-              "selector": "Monthly – United States – Prices, Consumer Price Index, All items, Percentage change, Corresponding period previous year, Percent (IMF/IFS/M.US.PCPI_PC_CP_A_PT)",
-              "text": "cpi_yoy",
+              "selector": "Monthly – United States – Prices, Consumer Price Index, All items, Index (IMF/IFS/M.US.PCPI_IX)",
+              "text": "cpi",
               "type": "number"
             }
           ],
@@ -1739,7 +1655,39 @@
           "root_selector": "",
           "source": "url",
           "type": "csv",
-          "url": "https://api.db.nomics.world/v22/series/IMF/IFS/M.US.PCPI_PC_CP_A_PT?observations=1&format=csv",
+          "url": "https://api.db.nomics.world/v22/series/IMF/IFS/M.US.PCPI_IX?observations=1&format=csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          },
+          "hide": true
+        },
+        {
+          "columns": [
+            {
+              "selector": "period",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "cpi",
+              "text": "cpi",
+              "type": "number"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "dbnomics"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "parser": "uql",
+          "uql": "parse-csv\n| project period, cpi=tonumber(\"Monthly – United States – Prices, Consumer Price Index, All items, Index (IMF/IFS/M.US.PCPI_IX)\")\n| where period >= \"${__from:date:YYYY-MM}\"\n| limit 1",
+          "refId": "B",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "url": "https://api.db.nomics.world/v22/series/IMF/IFS/M.US.PCPI_IX?observations=1&format=csv",
           "url_options": {
             "data": "",
             "method": "GET"
@@ -1752,10 +1700,14 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$A",
-          "hide": false,
-          "refId": "Official",
-          "type": "math"
+          "expression": "B",
+          "hide": true,
+          "refId": "C",
+          "reducer": "last",
+          "settings": {
+            "mode": "dropNN"
+          },
+          "type": "reduce"
         },
         {
           "datasource": {
@@ -1763,14 +1715,120 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$A + 7",
+          "expression": "$A / $C - 1",
           "hide": false,
-          "refId": "Alternate",
+          "refId": "Official",
           "type": "math"
         }
       ],
-      "title": "CPI vs 1980-method alternate (ShadowStats-style)",
-      "type": "timeseries"
+      "title": "Cumulative inflation: official CPI vs 1980-method",
+      "type": "timeseries",
+      "transformations": [
+        {
+          "id": "filterByRefId",
+          "options": {
+            "include": "Official"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "fieldName": "Official",
+                "config": {
+                  "id": "greaterOrEqual",
+                  "options": {
+                    "value": -0.002
+                  }
+                }
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "month_i",
+            "mode": "index",
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "extra",
+            "mode": "binary",
+            "binary": {
+              "left": "month_i",
+              "operator": "*",
+              "right": "0.005638647"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "mult",
+            "mode": "unary",
+            "unary": {
+              "fieldName": "extra",
+              "operator": "exp"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "off1",
+            "mode": "binary",
+            "binary": {
+              "left": "Official",
+              "operator": "+",
+              "right": "1"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "alt_level",
+            "mode": "binary",
+            "binary": {
+              "left": "off1",
+              "operator": "*",
+              "right": "mult"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Alternate",
+            "mode": "binary",
+            "binary": {
+              "left": "alt_level",
+              "operator": "-",
+              "right": "1"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "pattern": "/^(Time|Official|Alternate)$/"
+            }
+          }
+        }
+      ]
     },
     {
       "datasource": {
@@ -2951,7 +3009,7 @@
   "timezone": "utc",
   "title": "Finance",
   "uid": "finance",
-  "version": 12,
+  "version": 13,
   "weekStart": "",
   "description": "FMP daily prices plus Fed/IMF monetary-base vs gold and S&P measured in gold, commodities, agriculture, and industrial metals. Keep the range at weeks or years; Last 1 hour is for quotes only; official CPI vs a 1980-method (ShadowStats-style) alternate."
 }
