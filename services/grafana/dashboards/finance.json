@@ -707,13 +707,13 @@
         {
           "columns": [
             {
-              "selector": "time",
+              "selector": "period",
               "text": "time",
               "type": "timestamp"
             },
             {
-              "selector": "Monetary Base",
-              "text": "Monetary Base",
+              "selector": "Monthly \u2013 Not seasonally adjusted (FED/H6_H6_MBASE/RESMO14A_N.M)",
+              "text": "base_billions",
               "type": "number"
             }
           ],
@@ -723,17 +723,28 @@
           },
           "filters": [],
           "format": "timeseries",
-          "parser": "uql",
-          "uql": "parse-json\n| jsonata \"$zip(series.docs[0].period, series.docs[0].value).{'time': $[0], 'Monetary Base': $[1] * 1000000000}\"",
+          "parser": "backend",
           "refId": "A",
           "root_selector": "",
           "source": "url",
-          "type": "json",
-          "url": "https://api.db.nomics.world/v22/series/FED/H6_H6_MBASE/RESMO14A_N.M?observations=1",
+          "type": "csv",
+          "url": "https://api.db.nomics.world/v22/series/FED/H6_H6_MBASE/RESMO14A_N.M?observations=1&format=csv",
           "url_options": {
             "data": "",
             "method": "GET"
-          }
+          },
+          "hide": true
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$A * 1000000000",
+          "hide": false,
+          "refId": "BaseUSD",
+          "type": "math"
         }
       ],
       "timeFrom": "now-5y",
@@ -794,13 +805,13 @@
         {
           "columns": [
             {
-              "selector": "time",
+              "selector": "period",
               "text": "time",
               "type": "timestamp"
             },
             {
-              "selector": "Gold Reserves at Market Price",
-              "text": "Gold Reserves at Market Price",
+              "selector": "Monthly \u2013 United States \u2013 International Reserves, Official Reserve Assets, Gold at Market Price, US Dollars, Millions (IMF/IFS/M.US.RAFAGOLDM_USD)",
+              "text": "gold_millions",
               "type": "number"
             }
           ],
@@ -810,17 +821,28 @@
           },
           "filters": [],
           "format": "timeseries",
-          "parser": "uql",
-          "uql": "parse-json\n| jsonata \"$zip(series.docs[0].period, series.docs[0].value).{'time': $length($[0])=7 ? $[0] & '-01' : $[0], 'Gold Reserves at Market Price': $[1] * 1000000}\"",
+          "parser": "backend",
           "refId": "A",
           "root_selector": "",
           "source": "url",
-          "type": "json",
-          "url": "https://api.db.nomics.world/v22/series/IMF/IFS/M.US.RAFAGOLDM_USD?observations=1",
+          "type": "csv",
+          "url": "https://api.db.nomics.world/v22/series/IMF/IFS/M.US.RAFAGOLDM_USD?observations=1&format=csv",
           "url_options": {
             "data": "",
             "method": "GET"
-          }
+          },
+          "hide": true
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$A * 1000000",
+          "hide": false,
+          "refId": "GoldUSD",
+          "type": "math"
         }
       ],
       "timeFrom": "now-5y",
@@ -881,13 +903,13 @@
         {
           "columns": [
             {
-              "selector": "time",
+              "selector": "period",
               "text": "time",
               "type": "timestamp"
             },
             {
-              "selector": "Monetary Base",
-              "text": "Monetary Base",
+              "selector": "Monthly \u2013 Not seasonally adjusted (FED/H6_H6_MBASE/RESMO14A_N.M)",
+              "text": "base_billions",
               "type": "number"
             }
           ],
@@ -897,13 +919,12 @@
           },
           "filters": [],
           "format": "timeseries",
-          "parser": "uql",
-          "uql": "parse-json\n| jsonata \"$zip(series.docs[0].period, series.docs[0].value).{'time': $[0], 'Monetary Base': $[1] * 1000000000}\"",
+          "parser": "backend",
           "refId": "A",
           "root_selector": "",
           "source": "url",
-          "type": "json",
-          "url": "https://api.db.nomics.world/v22/series/FED/H6_H6_MBASE/RESMO14A_N.M?observations=1",
+          "type": "csv",
+          "url": "https://api.db.nomics.world/v22/series/FED/H6_H6_MBASE/RESMO14A_N.M?observations=1&format=csv",
           "url_options": {
             "data": "",
             "method": "GET"
@@ -913,13 +934,13 @@
         {
           "columns": [
             {
-              "selector": "time",
+              "selector": "period",
               "text": "time",
               "type": "timestamp"
             },
             {
-              "selector": "Gold Reserves at Market Price",
-              "text": "Gold Reserves at Market Price",
+              "selector": "Monthly \u2013 United States \u2013 International Reserves, Official Reserve Assets, Gold at Market Price, US Dollars, Millions (IMF/IFS/M.US.RAFAGOLDM_USD)",
+              "text": "gold_millions",
               "type": "number"
             }
           ],
@@ -929,13 +950,12 @@
           },
           "filters": [],
           "format": "timeseries",
-          "parser": "uql",
-          "uql": "parse-json\n| jsonata \"$zip(series.docs[0].period, series.docs[0].value).{'time': $length($[0])=7 ? $[0] & '-01' : $[0], 'Gold Reserves at Market Price': $[1] * 1000000}\"",
+          "parser": "backend",
           "refId": "B",
           "root_selector": "",
           "source": "url",
-          "type": "json",
-          "url": "https://api.db.nomics.world/v22/series/IMF/IFS/M.US.RAFAGOLDM_USD?observations=1",
+          "type": "csv",
+          "url": "https://api.db.nomics.world/v22/series/IMF/IFS/M.US.RAFAGOLDM_USD?observations=1&format=csv",
           "url_options": {
             "data": "",
             "method": "GET"
@@ -972,7 +992,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$B_last / $A_last",
+          "expression": "($B_last * 1000000) / ($A_last * 1000000000)",
           "hide": false,
           "refId": "C",
           "type": "math"
@@ -1032,10 +1052,14 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "Monetary Base"
+              "id": "byFrameRefID",
+              "options": "BaseUSD"
             },
             "properties": [
+              {
+                "id": "displayName",
+                "value": "Monetary Base"
+              },
               {
                 "id": "color",
                 "value": {
@@ -1051,10 +1075,14 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Gold Reserves at Market Price"
+              "id": "byFrameRefID",
+              "options": "GoldUSD"
             },
             "properties": [
+              {
+                "id": "displayName",
+                "value": "Gold Reserves at Market Price"
+              },
               {
                 "id": "color",
                 "value": {
@@ -1097,13 +1125,13 @@
         {
           "columns": [
             {
-              "selector": "time",
+              "selector": "period",
               "text": "time",
               "type": "timestamp"
             },
             {
-              "selector": "Monetary Base",
-              "text": "Monetary Base",
+              "selector": "Monthly \u2013 Not seasonally adjusted (FED/H6_H6_MBASE/RESMO14A_N.M)",
+              "text": "base_billions",
               "type": "number"
             }
           ],
@@ -1113,28 +1141,28 @@
           },
           "filters": [],
           "format": "timeseries",
-          "parser": "uql",
-          "uql": "parse-json\n| jsonata \"$zip(series.docs[0].period, series.docs[0].value).{'time': $[0], 'Monetary Base': $[1] * 1000000000}\"",
+          "parser": "backend",
           "refId": "A",
           "root_selector": "",
           "source": "url",
-          "type": "json",
-          "url": "https://api.db.nomics.world/v22/series/FED/H6_H6_MBASE/RESMO14A_N.M?observations=1",
+          "type": "csv",
+          "url": "https://api.db.nomics.world/v22/series/FED/H6_H6_MBASE/RESMO14A_N.M?observations=1&format=csv",
           "url_options": {
             "data": "",
             "method": "GET"
-          }
+          },
+          "hide": true
         },
         {
           "columns": [
             {
-              "selector": "time",
+              "selector": "period",
               "text": "time",
               "type": "timestamp"
             },
             {
-              "selector": "Gold Reserves at Market Price",
-              "text": "Gold Reserves at Market Price",
+              "selector": "Monthly \u2013 United States \u2013 International Reserves, Official Reserve Assets, Gold at Market Price, US Dollars, Millions (IMF/IFS/M.US.RAFAGOLDM_USD)",
+              "text": "gold_millions",
               "type": "number"
             }
           ],
@@ -1144,17 +1172,39 @@
           },
           "filters": [],
           "format": "timeseries",
-          "parser": "uql",
-          "uql": "parse-json\n| jsonata \"$zip(series.docs[0].period, series.docs[0].value).{'time': $length($[0])=7 ? $[0] & '-01' : $[0], 'Gold Reserves at Market Price': $[1] * 1000000}\"",
+          "parser": "backend",
           "refId": "B",
           "root_selector": "",
           "source": "url",
-          "type": "json",
-          "url": "https://api.db.nomics.world/v22/series/IMF/IFS/M.US.RAFAGOLDM_USD?observations=1",
+          "type": "csv",
+          "url": "https://api.db.nomics.world/v22/series/IMF/IFS/M.US.RAFAGOLDM_USD?observations=1&format=csv",
           "url_options": {
             "data": "",
             "method": "GET"
-          }
+          },
+          "hide": true
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$A * 1000000000",
+          "hide": false,
+          "refId": "BaseUSD",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$B * 1000000",
+          "hide": false,
+          "refId": "GoldUSD",
+          "type": "math"
         }
       ],
       "timeFrom": "now-70y",
@@ -1715,7 +1765,7 @@
   "timezone": "utc",
   "title": "Finance",
   "uid": "finance",
-  "version": 5,
+  "version": 6,
   "weekStart": "",
   "description": "FMP daily prices plus Fed/IMF monetary-base vs gold. Keep the range at weeks or years; Last 1 hour is for quotes only."
 }
