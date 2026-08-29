@@ -27,6 +27,7 @@
     ./../../services/fava.nix
     ./../../services/sui.nix
     ./../../services/wastebin.nix
+    ./../../services/immich.nix
   ];
 
   home-manager = {

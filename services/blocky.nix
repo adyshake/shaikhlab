@@ -173,6 +173,9 @@ in {
 
           # SUI startpage
           "start.adnanshaikh.com" = serverIP;
+
+          # Immich (Tailscale-only)
+          "photos.adnanshaikh.com" = serverIP;
         };
       };
     };

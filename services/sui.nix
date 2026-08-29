@@ -82,6 +82,11 @@
         url = "paste.adnanshaikh.com";
         icon = "content-paste";
       }
+      {
+        name = "Photos";
+        url = "photos.adnanshaikh.com";
+        icon = "image";
+      }
     ];
   });
 
@@ -134,6 +139,10 @@
           {
             name = "ntfy";
             url = "https://ntfy.adnanshaikh.com";
+          }
+          {
+            name = "Photos";
+            url = "https://photos.adnanshaikh.com";
           }
         ];
       }
