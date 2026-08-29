@@ -282,21 +282,35 @@ ssh adnan@svr1shaikh
 
 ## Useful commands 🛠️
 
-Install `just` to access the simple aliases below
+Install `just` to access the simple aliases below.
 
-### Locally deploy changes
+### Apply NixOS changes to `svr1shaikh`
+
+This is the default loop for server config (Grafana, services, modules). Do not stop at a local `just deploy` from the Mac — that cannot switch the Linux host.
+
+1. Commit and push from this checkout.
+2. SSH in, pull, and switch from the server clone:
+
+```bash
+ssh adnan@svr1shaikh
+cd /home/adnan/shaikhlab
+git pull
+just deploy
+```
+
+`just deploy` on the server is `nixos-rebuild switch --sudo --flake .` against that checkout.
+
+### Apply macOS changes
+
+On the Mac itself:
 
 ```bash
 just deploy macos
 ```
 
-```bash
-just deploy MACHINE
-```
+### Remote rebuild without pulling on the host
 
-### Remote deployment
-
-To remotely deploy `MACHINE`, which has an IP address of `10.0.10.2`
+To build on the target over SSH (IP example `10.0.10.2`):
 
 ```bash
 just deploy MACHINE 10.0.10.2

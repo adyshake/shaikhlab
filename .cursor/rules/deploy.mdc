@@ -1,0 +1,23 @@
+---
+description: How to apply shaikhlab changes to svr1shaikh
+alwaysApply: true
+---
+
+# Deploy to svr1shaikh
+
+When asked to deploy, ship, or apply NixOS / Grafana / service changes to the server, do this loop. Do not only rebuild from the Mac.
+
+1. Commit if the user asked (follow the git commit protocol).
+2. `git push` to `origin` on the current branch (usually `main`).
+3. SSH in, pull the server clone, and switch:
+
+```bash
+ssh adnan@svr1shaikh
+cd /home/adnan/shaikhlab
+git pull
+just deploy
+```
+
+Host: `adnan@svr1shaikh`. Checkout: `/home/adnan/shaikhlab`. On the server, `just deploy` is `nixos-rebuild switch --sudo --flake .`.
+
+macOS is separate: `just deploy macos` on the Mac. Do not use that for `svr1shaikh`.

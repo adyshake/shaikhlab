@@ -656,6 +656,514 @@
     {
       "datasource": {
         "type": "yesoreyeram-infinity-datasource",
+        "uid": "dbnomics"
+      },
+      "description": "Fed H.6 monetary base (currency in circulation plus reserve balances). Latest monthly print. This panel ignores a short dashboard range such as Last 1 hour.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 0,
+        "y": 29
+      },
+      "id": 12,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "time",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "Monetary Base",
+              "text": "Monetary Base",
+              "type": "number"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "dbnomics"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "parser": "uql",
+          "uql": "parse-json\n| jsonata \"$zip(series.docs[0].period, series.docs[0].value).{'time': $[0], 'Monetary Base': $[1] * 1000000000}\"",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://api.db.nomics.world/v22/series/FED/H6_H6_MBASE/RESMO14A_N.M?observations=1",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "timeFrom": "now-5y",
+      "title": "Monetary base",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "dbnomics"
+      },
+      "description": "IMF official reserve assets, gold at market price (Treasury gold holdings times the market price). Can lag the latest H.6 print by a month or two.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#d4af37",
+                "value": null
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 8,
+        "y": 29
+      },
+      "id": 13,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "time",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "Gold Reserves at Market Price",
+              "text": "Gold Reserves at Market Price",
+              "type": "number"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "dbnomics"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "parser": "uql",
+          "uql": "parse-json\n| jsonata \"$zip(series.docs[0].period, series.docs[0].value).{'time': $length($[0])=7 ? $[0] & '-01' : $[0], 'Gold Reserves at Market Price': $[1] * 1000000}\"",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://api.db.nomics.world/v22/series/IMF/IFS/M.US.RAFAGOLDM_USD?observations=1",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "timeFrom": "now-5y",
+      "title": "Gold reserves at market",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "dbnomics"
+      },
+      "description": "Gold reserves at market price divided by the monetary base. Reduce-then-divide so the two monthly series do not need matching timestamps.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "purple",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 16,
+        "y": 29
+      },
+      "id": 14,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "time",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "Monetary Base",
+              "text": "Monetary Base",
+              "type": "number"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "dbnomics"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "parser": "uql",
+          "uql": "parse-json\n| jsonata \"$zip(series.docs[0].period, series.docs[0].value).{'time': $[0], 'Monetary Base': $[1] * 1000000000}\"",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://api.db.nomics.world/v22/series/FED/H6_H6_MBASE/RESMO14A_N.M?observations=1",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          },
+          "hide": true
+        },
+        {
+          "columns": [
+            {
+              "selector": "time",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "Gold Reserves at Market Price",
+              "text": "Gold Reserves at Market Price",
+              "type": "number"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "dbnomics"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "parser": "uql",
+          "uql": "parse-json\n| jsonata \"$zip(series.docs[0].period, series.docs[0].value).{'time': $length($[0])=7 ? $[0] & '-01' : $[0], 'Gold Reserves at Market Price': $[1] * 1000000}\"",
+          "refId": "B",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://api.db.nomics.world/v22/series/IMF/IFS/M.US.RAFAGOLDM_USD?observations=1",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          },
+          "hide": true
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "A",
+          "hide": true,
+          "refId": "A_last",
+          "reducer": "lastNotNull",
+          "type": "reduce"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "B",
+          "hide": true,
+          "refId": "B_last",
+          "reducer": "lastNotNull",
+          "type": "reduce"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$B_last / $A_last",
+          "hide": false,
+          "refId": "C",
+          "type": "math"
+        }
+      ],
+      "timeFrom": "now-5y",
+      "title": "Gold cover",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "dbnomics"
+      },
+      "description": "Fed H.6 monetary base (monthly, via DBnomics) against IMF official U.S. gold reserves valued at market price. Gold ounces have been roughly flat since the early 1970s, so that line mostly follows the gold price after 1971. The 1958\u20131971 decline is the last gold drain before Nixon closed the gold window. This panel stays on a 70-year window so it reads like the classic chart even when the dashboard picker is Last 1 hour or 10 years.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "unit": "currencyUSD"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Monetary Base"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#9aa0a6",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Gold Reserves at Market Price"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#d4af37",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 3
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 24,
+        "x": 0,
+        "y": 34
+      },
+      "id": 15,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "time",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "Monetary Base",
+              "text": "Monetary Base",
+              "type": "number"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "dbnomics"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "parser": "uql",
+          "uql": "parse-json\n| jsonata \"$zip(series.docs[0].period, series.docs[0].value).{'time': $[0], 'Monetary Base': $[1] * 1000000000}\"",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://api.db.nomics.world/v22/series/FED/H6_H6_MBASE/RESMO14A_N.M?observations=1",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [
+            {
+              "selector": "time",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "Gold Reserves at Market Price",
+              "text": "Gold Reserves at Market Price",
+              "type": "number"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "dbnomics"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "parser": "uql",
+          "uql": "parse-json\n| jsonata \"$zip(series.docs[0].period, series.docs[0].value).{'time': $length($[0])=7 ? $[0] & '-01' : $[0], 'Gold Reserves at Market Price': $[1] * 1000000}\"",
+          "refId": "B",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "url": "https://api.db.nomics.world/v22/series/IMF/IFS/M.US.RAFAGOLDM_USD?observations=1",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "timeFrom": "now-70y",
+      "title": "U.S. monetary base vs gold reserves at market price",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
         "uid": "fmp"
       },
       "fieldConfig": {
@@ -681,7 +1189,7 @@
         "h": 5,
         "w": 8,
         "x": 0,
-        "y": 29
+        "y": 48
       },
       "id": 7,
       "options": {
@@ -774,7 +1282,7 @@
         "h": 5,
         "w": 8,
         "x": 8,
-        "y": 29
+        "y": 48
       },
       "id": 8,
       "options": {
@@ -853,7 +1361,7 @@
         "h": 5,
         "w": 8,
         "x": 16,
-        "y": 29
+        "y": 48
       },
       "id": 9,
       "options": {
@@ -957,7 +1465,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 34
+        "y": 53
       },
       "id": 10,
       "options": {
@@ -1050,7 +1558,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 46
+        "y": 65
       },
       "id": 11,
       "options": {
@@ -1207,7 +1715,7 @@
   "timezone": "utc",
   "title": "Finance",
   "uid": "finance",
-  "version": 4,
+  "version": 5,
   "weekStart": "",
-  "description": "FMP daily prices. Keep the range at weeks or years; Last 1 hour is for quotes only."
+  "description": "FMP daily prices plus Fed/IMF monetary-base vs gold. Keep the range at weeks or years; Last 1 hour is for quotes only."
 }

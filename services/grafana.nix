@@ -70,6 +70,15 @@
             access = "proxy";
           }
           {
+            name = "DBnomics";
+            type = "yesoreyeram-infinity-datasource";
+            uid = "dbnomics";
+            access = "proxy";
+            jsonData = {
+              allowedHosts = ["https://api.db.nomics.world"];
+            };
+          }
+          {
             name = "FMP";
             type = "yesoreyeram-infinity-datasource";
             uid = "fmp";
