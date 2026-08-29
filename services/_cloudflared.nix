@@ -11,8 +11,7 @@
 in {
   # Hostnames that must be reachable from the public internet.
   # Everything else on *.adnanshaikh.com stays LAN/Tailscale-only via blocky.
-  # Jails set this via shaikhlab.publicJails.<name>.public; ntfy sets it directly
-  # until it is moved into a jail.
+  # Jails set this via shaikhlab.publicJails.<name>.public.
   options.shaikhlab.publicIngress = mkOption {
     type = types.attrsOf (types.submodule {
       options.service = mkOption {

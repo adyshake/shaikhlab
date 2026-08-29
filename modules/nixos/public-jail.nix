@@ -110,6 +110,37 @@
         description = "Extra nginx config inside the location / block.";
       };
 
+      proxyWebsockets = mkOption {
+        type = types.bool;
+        default = false;
+      };
+
+      proxyReadTimeout = mkOption {
+        type = types.str;
+        default = "15s";
+      };
+
+      proxySendTimeout = mkOption {
+        type = types.str;
+        default = "15s";
+      };
+
+      sendTimeout = mkOption {
+        type = types.str;
+        default = "10s";
+        description = "nginx send_timeout on the jail vhosts.";
+      };
+
+      allowEgress = mkOption {
+        type = types.bool;
+        default = false;
+        description = ''
+          Give the jail a default route and NAT, for HTTPS/DNS only.
+          RFC1918, link-local, and Tailscale CGNAT stay blocked.
+          wastebin stays false; ntfy needs this for ntfy.sh (iOS).
+        '';
+      };
+
       bindMounts = mkOption {
         type = types.attrs;
         default = {};
@@ -130,14 +161,19 @@
   nginxProxy = jail: {
     recommendedProxySettings = true;
     proxyPass = "http://${jail.localAddress}:${toString jail.guestPort}";
+    proxyWebsockets = jail.proxyWebsockets;
     extraConfig = ''
       limit_req zone=jail_${jail.name}_req burst=${toString jail.rateLimit.burst} nodelay;
       limit_req zone=jail_${jail.name}_global burst=${toString jail.rateLimit.globalBurst} nodelay;
       limit_conn jail_${jail.name}_conn ${toString jail.rateLimit.connections};
       client_max_body_size ${jail.maxBodySize};
-      proxy_read_timeout 15s;
-      proxy_send_timeout 15s;
+      proxy_read_timeout ${jail.proxyReadTimeout};
+      proxy_send_timeout ${jail.proxySendTimeout};
       proxy_connect_timeout 5s;
+      ${lib.optionalString jail.proxyWebsockets ''
+        proxy_buffering off;
+        proxy_request_buffering off;
+      ''}
       add_header X-Content-Type-Options nosniff always;
       add_header X-Frame-Options DENY always;
       add_header Referrer-Policy no-referrer always;
@@ -164,17 +200,7 @@ in {
       enters only via host nginx (rate limits, body cap), optionally
       through the Cloudflare tunnel.
 
-      Example (ntfy later):
-
-        shaikhlab.publicJails.ntfy = {
-          enable = true;
-          id = 11;
-          guestPort = 2586;
-          proxyPort = 12586;
-          domain = "ntfy.adnanshaikh.com";
-          public = true;
-          guest = { ... }: { services.ntfy-sh.enable = true; ... };
-        };
+      ntfy lives in shaikhlab.publicJails.ntfy (allowEgress for ntfy.sh).
     '';
   };
 
@@ -205,29 +231,61 @@ in {
       extraCommands = lib.concatStrings (lib.mapAttrsToList (
           name: jail: let
             j = enrich name jail;
-          in ''
-            # ${name}: host may talk to the guest; guest may not start connections to the host or LAN.
-            iptables -w -I nixos-fw 1 -i ${j.iface} -m conntrack --ctstate ESTABLISHED,RELATED -j nixos-fw-accept
-            iptables -w -I nixos-fw 2 -i ${j.iface} -j nixos-fw-refuse
-            ip6tables -w -I nixos-fw 1 -i ${j.iface} -m conntrack --ctstate ESTABLISHED,RELATED -j nixos-fw-accept
-            ip6tables -w -I nixos-fw 2 -i ${j.iface} -j nixos-fw-refuse
-            iptables -w -I FORWARD 1 -i ${j.iface} -j DROP
-            iptables -w -I FORWARD 2 -o ${j.iface} -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
-            iptables -w -I FORWARD 3 -o ${j.iface} -j DROP
-          ''
+            chain = "jail-${name}-fwd";
+            input = ''
+              # ${name}: guest may not open new connections to the host.
+              iptables -w -I nixos-fw 1 -i ${j.iface} -m conntrack --ctstate ESTABLISHED,RELATED -j nixos-fw-accept
+              iptables -w -I nixos-fw 2 -i ${j.iface} -j nixos-fw-refuse
+              ip6tables -w -I nixos-fw 1 -i ${j.iface} -m conntrack --ctstate ESTABLISHED,RELATED -j nixos-fw-accept
+              ip6tables -w -I nixos-fw 2 -i ${j.iface} -j nixos-fw-refuse
+            '';
+          in
+            input
+            + (
+              if jail.allowEgress
+              then ''
+                iptables -w -N ${chain} 2>/dev/null || iptables -w -F ${chain}
+                iptables -w -A ${chain} -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+                iptables -w -A ${chain} -d 10.0.0.0/8 -j DROP
+                iptables -w -A ${chain} -d 172.16.0.0/12 -j DROP
+                iptables -w -A ${chain} -d 192.168.0.0/16 -j DROP
+                iptables -w -A ${chain} -d 100.64.0.0/10 -j DROP
+                iptables -w -A ${chain} -d 169.254.0.0/16 -j DROP
+                iptables -w -A ${chain} -d 127.0.0.0/8 -j DROP
+                iptables -w -A ${chain} -p tcp --dport 443 -j ACCEPT
+                iptables -w -A ${chain} -p udp --dport 53 -j ACCEPT
+                iptables -w -A ${chain} -p tcp --dport 53 -j ACCEPT
+                iptables -w -A ${chain} -j DROP
+                iptables -w -I FORWARD 1 -i ${j.iface} -j ${chain}
+                iptables -w -I FORWARD 2 -o ${j.iface} -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+                iptables -w -I FORWARD 3 -o ${j.iface} -j DROP
+                iptables -w -t nat -C POSTROUTING -s ${j.localAddress}/32 ! -d ${j.hostAddress}/32 -j MASQUERADE 2>/dev/null \
+                  || iptables -w -t nat -A POSTROUTING -s ${j.localAddress}/32 ! -d ${j.hostAddress}/32 -j MASQUERADE
+              ''
+              else ''
+                iptables -w -I FORWARD 1 -i ${j.iface} -j DROP
+                iptables -w -I FORWARD 2 -o ${j.iface} -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+                iptables -w -I FORWARD 3 -o ${j.iface} -j DROP
+              ''
+            )
         )
         enabledJails);
       extraStopCommands = lib.concatStrings (lib.mapAttrsToList (
           name: jail: let
             j = enrich name jail;
+            chain = "jail-${name}-fwd";
           in ''
             iptables -w -D nixos-fw -i ${j.iface} -m conntrack --ctstate ESTABLISHED,RELATED -j nixos-fw-accept 2>/dev/null || true
             iptables -w -D nixos-fw -i ${j.iface} -j nixos-fw-refuse 2>/dev/null || true
             ip6tables -w -D nixos-fw -i ${j.iface} -m conntrack --ctstate ESTABLISHED,RELATED -j nixos-fw-accept 2>/dev/null || true
             ip6tables -w -D nixos-fw -i ${j.iface} -j nixos-fw-refuse 2>/dev/null || true
             iptables -w -D FORWARD -i ${j.iface} -j DROP 2>/dev/null || true
+            iptables -w -D FORWARD -i ${j.iface} -j ${chain} 2>/dev/null || true
             iptables -w -D FORWARD -o ${j.iface} -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT 2>/dev/null || true
             iptables -w -D FORWARD -o ${j.iface} -j DROP 2>/dev/null || true
+            iptables -w -F ${chain} 2>/dev/null || true
+            iptables -w -X ${chain} 2>/dev/null || true
+            iptables -w -t nat -D POSTROUTING -s ${j.localAddress}/32 ! -d ${j.hostAddress}/32 -j MASQUERADE 2>/dev/null || true
           ''
         )
         enabledJails);
@@ -261,11 +319,21 @@ in {
             networking.useHostResolvConf = lib.mkForce false;
             networking.useDHCP = false;
             networking.firewall.enable = false;
-            networking.nameservers = [];
-            # Link route to the host only. A default gateway would let a
-            # later `networking.nat.internalInterfaces = [ "ve-+" ]` give
-            # this jail LAN/internet.
-            networking.defaultGateway = lib.mkForce null;
+            networking.nameservers =
+              if jail.allowEgress
+              then ["1.1.1.1" "9.9.9.9"]
+              else [];
+            # No default route unless this jail is allowed HTTPS/DNS egress
+            # (ntfy → ntfy.sh). Private ranges stay firewalled on the host.
+            networking.defaultGateway =
+              lib.mkForce (
+                if jail.allowEgress
+                then {
+                  address = j.hostAddress;
+                  interface = "eth0";
+                }
+                else null
+              );
             networking.defaultGateway6 = lib.mkForce null;
             documentation.enable = false;
             documentation.nixos.enable = false;
@@ -323,7 +391,7 @@ in {
               error_log /dev/null crit;
               client_body_timeout 5s;
               client_header_timeout 5s;
-              send_timeout 10s;
+              send_timeout ${jail.sendTimeout};
             '';
           in
             lib.optionalAttrs (jail.domain != null) {
