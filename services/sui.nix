@@ -77,6 +77,11 @@
         url = "beancount.adnanshaikh.com";
         icon = "calculator-variant";
       }
+      {
+        name = "Paste";
+        url = "paste.adnanshaikh.com";
+        icon = "content-paste";
+      }
     ];
   });
 
@@ -146,6 +151,10 @@
           {
             name = "Beancount";
             url = "https://beancount.adnanshaikh.com";
+          }
+          {
+            name = "Paste";
+            url = "https://paste.adnanshaikh.com";
           }
         ];
       }

@@ -153,6 +153,9 @@ in {
           # ntfy
           "ntfy.adnanshaikh.com" = serverIP;
 
+          # wastebin (public jail; nginx on the host, app in the container)
+          "paste.adnanshaikh.com" = serverIP;
+
           # Home Assistant
           "hass.adnanshaikh.com" = serverIP;
 

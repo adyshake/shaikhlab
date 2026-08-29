@@ -38,7 +38,7 @@
 ## To do — services
 
 - [ ] set up immich
-- [ ] set up pastebin
+- [x] set up pastebin — wastebin in a public jail at `paste.adnanshaikh.com` (nspawn, tmpfs + cgroup cap, nginx rate limits, Cloudflare tunnel); reusable via [`modules/nixos/public-jail.nix`](modules/nixos/public-jail.nix) / [`services/wastebin.nix`](services/wastebin.nix)
 - [ ] set up google drive
 - [ ] customize home assistant interface
 - [ ] security (define scope)

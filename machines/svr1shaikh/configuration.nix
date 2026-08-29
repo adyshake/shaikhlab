@@ -26,6 +26,7 @@
     ./../../services/forgejo.nix # Requires: forgejo-admin-password
     ./../../services/fava.nix
     ./../../services/sui.nix
+    ./../../services/wastebin.nix
   ];
 
   home-manager = {

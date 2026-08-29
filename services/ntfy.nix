@@ -11,12 +11,15 @@
   # publish to (configured in services/nixarr.nix).
   ntfyTopic = "media";
 in {
-  # Public exposure of ntfy.adnanshaikh.com is configured centrally in
-  # services/_cloudflared.nix (which is imported by services/nixarr.nix).
+  # Public hostname goes through the Cloudflare tunnel. Move this service into
+  # shaikhlab.publicJails.ntfy when ready (see modules/nixos/public-jail.nix).
   imports = [
     ./_acme.nix
     ./_nginx.nix
+    ./_cloudflared.nix
   ];
+
+  shaikhlab.publicIngress."${domain}".service = "http://127.0.0.1:2586";
 
   sops.secrets."ntfy-secret" = {};
 
