@@ -970,8 +970,11 @@
           },
           "expression": "A",
           "hide": true,
-          "refId": "A_last",
-          "reducer": "lastNotNull",
+          "refId": "C",
+          "reducer": "last",
+          "settings": {
+            "mode": "dropNN"
+          },
           "type": "reduce"
         },
         {
@@ -982,8 +985,11 @@
           },
           "expression": "B",
           "hide": true,
-          "refId": "B_last",
-          "reducer": "lastNotNull",
+          "refId": "D",
+          "reducer": "last",
+          "settings": {
+            "mode": "dropNN"
+          },
           "type": "reduce"
         },
         {
@@ -992,9 +998,9 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "($B_last * 1000000) / ($A_last * 1000000000)",
+          "expression": "($D * 1000000) / ($C * 1000000000)",
           "hide": false,
-          "refId": "C",
+          "refId": "E",
           "type": "math"
         }
       ],
