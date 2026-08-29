@@ -655,6 +655,360 @@
     },
     {
       "datasource": {
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "Chart 9-style: S&P 500 in real stuff, not dollars. The Commodities Index is the IMF Primary Commodity Price System all-commodities basket (PALLFNF, 2016 = 100): trade-weighted world spot prices for energy (crude, natural gas, coal; crude is about 29%), industrial and precious metals (copper, aluminum, iron ore, gold, etc.), fertilizers, and agriculture. In the book’s words, the stuff you buy, or the stuff that goes into the stuff you buy. Monthly from 2003; can lag the latest S&P print by a month or two. Use a multi-year range; Last 1 hour has no daily bars.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#c4783a",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "S&P points per index point",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 0,
+        "y": 29
+      },
+      "id": 17,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "period",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "Monthly – All Countries, excluding the IO – Primary Commodity Prices, All index  – Index (IMF/PCPS/M.W00.PALLFNF.IX)",
+              "text": "index",
+              "type": "number"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "dbnomics"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "url": "https://api.db.nomics.world/v22/series/IMF/PCPS/M.W00.PALLFNF.IX?observations=1&format=csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          },
+          "hide": true
+        },
+        {
+          "columns": [
+            {
+              "selector": "date",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "price",
+              "text": "SPX",
+              "type": "number"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fmp"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "parser": "backend",
+          "refId": "B",
+          "root_selector": "$",
+          "source": "url",
+          "type": "json",
+          "url": "https://financialmodelingprep.com/stable/historical-price-eod/light?symbol=%5EGSPC&from=${__from:date:YYYY-MM-DD}&to=${__to:date:YYYY-MM-DD}",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          },
+          "hide": true
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$A",
+          "window": "1d",
+          "downsampler": "last",
+          "upsampler": "pad",
+          "hide": true,
+          "refId": "C",
+          "type": "resample"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$B",
+          "window": "1d",
+          "downsampler": "last",
+          "upsampler": "pad",
+          "hide": true,
+          "refId": "D",
+          "type": "resample"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$D / $C",
+          "hide": false,
+          "refId": "E",
+          "type": "math"
+        }
+      ],
+      "title": "S&P 500 / commodities",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "Chart 10-style: S&P 500 in food and fiber. The Agricultural Price Index is the IMF PCPS agriculture basket (PAGRI, 2016 = 100): food and beverages (grains, vegetable oils, meat, sugar, coffee, tea, cocoa, fruit) plus agricultural raw materials (cotton, wool, rubber, hides, timber). In the book’s words, the stuff you eat and wear — not energy or industrial metals. Monthly from 1992. Use a multi-year range; Last 1 hour has no daily bars.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#6b8f4e",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "S&P points per index point",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 12,
+        "y": 29
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "period",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "Monthly – All Countries, excluding the IO – Primary Commodity Prices, Agriculture – Index (IMF/PCPS/M.W00.PAGRI.IX)",
+              "text": "index",
+              "type": "number"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "dbnomics"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "url": "https://api.db.nomics.world/v22/series/IMF/PCPS/M.W00.PAGRI.IX?observations=1&format=csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          },
+          "hide": true
+        },
+        {
+          "columns": [
+            {
+              "selector": "date",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "price",
+              "text": "SPX",
+              "type": "number"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "fmp"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "parser": "backend",
+          "refId": "B",
+          "root_selector": "$",
+          "source": "url",
+          "type": "json",
+          "url": "https://financialmodelingprep.com/stable/historical-price-eod/light?symbol=%5EGSPC&from=${__from:date:YYYY-MM-DD}&to=${__to:date:YYYY-MM-DD}",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          },
+          "hide": true
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$A",
+          "window": "1d",
+          "downsampler": "last",
+          "upsampler": "pad",
+          "hide": true,
+          "refId": "C",
+          "type": "resample"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$B",
+          "window": "1d",
+          "downsampler": "last",
+          "upsampler": "pad",
+          "hide": true,
+          "refId": "D",
+          "type": "resample"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$D / $C",
+          "hide": false,
+          "refId": "E",
+          "type": "math"
+        }
+      ],
+      "title": "S&P 500 / agricultural index",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
         "type": "yesoreyeram-infinity-datasource",
         "uid": "dbnomics"
       },
@@ -682,7 +1036,7 @@
         "h": 5,
         "w": 6,
         "x": 0,
-        "y": 29
+        "y": 41
       },
       "id": 12,
       "options": {
@@ -712,7 +1066,7 @@
               "type": "timestamp"
             },
             {
-              "selector": "Monthly \u2013 Not seasonally adjusted (FED/H6_H6_MBASE/RESMO14A_N.M)",
+              "selector": "Monthly – Not seasonally adjusted (FED/H6_H6_MBASE/RESMO14A_N.M)",
               "text": "base_billions",
               "type": "number"
             }
@@ -780,7 +1134,7 @@
         "h": 5,
         "w": 6,
         "x": 6,
-        "y": 29
+        "y": 41
       },
       "id": 13,
       "options": {
@@ -810,7 +1164,7 @@
               "type": "timestamp"
             },
             {
-              "selector": "Monthly \u2013 United States \u2013 International Reserves, Official Reserve Assets, Gold at Market Price, US Dollars, Millions (IMF/IFS/M.US.RAFAGOLDM_USD)",
+              "selector": "Monthly – United States – International Reserves, Official Reserve Assets, Gold at Market Price, US Dollars, Millions (IMF/IFS/M.US.RAFAGOLDM_USD)",
               "text": "gold_millions",
               "type": "number"
             }
@@ -878,7 +1232,7 @@
         "h": 5,
         "w": 6,
         "x": 12,
-        "y": 29
+        "y": 41
       },
       "id": 16,
       "options": {
@@ -908,7 +1262,7 @@
               "type": "timestamp"
             },
             {
-              "selector": "Quarterly \u2013 Level, not seasonally adjusted (NSA) \u2013 Households and nonprofit organizations (S14+S15) \u2013 Revolving consumer credit; liability \u2013 Input series with seasonal factor (FED/Z1/FL153166100.Q)",
+              "selector": "Quarterly – Level, not seasonally adjusted (NSA) – Households and nonprofit organizations (S14+S15) – Revolving consumer credit; liability – Input series with seasonal factor (FED/Z1/FL153166100.Q)",
               "text": "credit_millions",
               "type": "number"
             }
@@ -976,7 +1330,7 @@
         "h": 5,
         "w": 6,
         "x": 18,
-        "y": 29
+        "y": 41
       },
       "id": 14,
       "options": {
@@ -1006,7 +1360,7 @@
               "type": "timestamp"
             },
             {
-              "selector": "Monthly \u2013 Not seasonally adjusted (FED/H6_H6_MBASE/RESMO14A_N.M)",
+              "selector": "Monthly – Not seasonally adjusted (FED/H6_H6_MBASE/RESMO14A_N.M)",
               "text": "base_billions",
               "type": "number"
             }
@@ -1037,7 +1391,7 @@
               "type": "timestamp"
             },
             {
-              "selector": "Monthly \u2013 United States \u2013 International Reserves, Official Reserve Assets, Gold at Market Price, US Dollars, Millions (IMF/IFS/M.US.RAFAGOLDM_USD)",
+              "selector": "Monthly – United States – International Reserves, Official Reserve Assets, Gold at Market Price, US Dollars, Millions (IMF/IFS/M.US.RAFAGOLDM_USD)",
               "text": "gold_millions",
               "type": "number"
             }
@@ -1111,7 +1465,7 @@
         "type": "yesoreyeram-infinity-datasource",
         "uid": "dbnomics"
       },
-      "description": "Fed H.6 monetary base and IMF official gold at market price, plus Fed Z.1 household revolving consumer credit outstanding (the Chart 4 'credit dollars' line: unpaid credit-card and other revolving balances). Revolving credit is near zero until 1968, then grows as its own series \u2014 not added on top of the base.",
+      "description": "Fed H.6 monetary base and IMF official gold at market price, plus Fed Z.1 household revolving consumer credit outstanding (the Chart 4 'credit dollars' line: unpaid credit-card and other revolving balances). Revolving credit is near zero until 1968, then grows as its own series — not added on top of the base.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1229,7 +1583,7 @@
         "h": 14,
         "w": 24,
         "x": 0,
-        "y": 34
+        "y": 46
       },
       "id": 15,
       "options": {
@@ -1257,7 +1611,7 @@
               "type": "timestamp"
             },
             {
-              "selector": "Monthly \u2013 Not seasonally adjusted (FED/H6_H6_MBASE/RESMO14A_N.M)",
+              "selector": "Monthly – Not seasonally adjusted (FED/H6_H6_MBASE/RESMO14A_N.M)",
               "text": "base_billions",
               "type": "number"
             }
@@ -1288,7 +1642,7 @@
               "type": "timestamp"
             },
             {
-              "selector": "Monthly \u2013 United States \u2013 International Reserves, Official Reserve Assets, Gold at Market Price, US Dollars, Millions (IMF/IFS/M.US.RAFAGOLDM_USD)",
+              "selector": "Monthly – United States – International Reserves, Official Reserve Assets, Gold at Market Price, US Dollars, Millions (IMF/IFS/M.US.RAFAGOLDM_USD)",
               "text": "gold_millions",
               "type": "number"
             }
@@ -1341,7 +1695,7 @@
               "type": "timestamp"
             },
             {
-              "selector": "Quarterly \u2013 Level, not seasonally adjusted (NSA) \u2013 Households and nonprofit organizations (S14+S15) \u2013 Revolving consumer credit; liability \u2013 Input series with seasonal factor (FED/Z1/FL153166100.Q)",
+              "selector": "Quarterly – Level, not seasonally adjusted (NSA) – Households and nonprofit organizations (S14+S15) – Revolving consumer credit; liability – Input series with seasonal factor (FED/Z1/FL153166100.Q)",
               "text": "credit_millions",
               "type": "number"
             }
@@ -1407,7 +1761,7 @@
         "h": 5,
         "w": 8,
         "x": 0,
-        "y": 48
+        "y": 60
       },
       "id": 7,
       "options": {
@@ -1500,7 +1854,7 @@
         "h": 5,
         "w": 8,
         "x": 8,
-        "y": 48
+        "y": 60
       },
       "id": 8,
       "options": {
@@ -1579,7 +1933,7 @@
         "h": 5,
         "w": 8,
         "x": 16,
-        "y": 48
+        "y": 60
       },
       "id": 9,
       "options": {
@@ -1683,7 +2037,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 53
+        "y": 65
       },
       "id": 10,
       "options": {
@@ -1832,7 +2186,7 @@
   "timezone": "utc",
   "title": "Finance",
   "uid": "finance",
-  "version": 9,
+  "version": 10,
   "weekStart": "",
-  "description": "FMP daily prices plus Fed/IMF monetary-base vs gold. Keep the range at weeks or years; Last 1 hour is for quotes only."
+  "description": "FMP daily prices plus Fed/IMF monetary-base vs gold and S&P measured in gold, commodities, and agriculture. Keep the range at weeks or years; Last 1 hour is for quotes only."
 }
