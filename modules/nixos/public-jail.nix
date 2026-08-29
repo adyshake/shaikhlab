@@ -242,8 +242,10 @@ in {
           ephemeral = true;
           privateNetwork = true;
           privateUsers = "pick";
-          hostAddress = "${j.hostAddress}/32";
-          localAddress = "${j.localAddress}/32";
+          # Bare IPs: nixos-containers defaults these to /32. A CIDR suffix
+          # makes the guest `ip route` setup fail ("any valid address is expected").
+          hostAddress = j.hostAddress;
+          localAddress = j.localAddress;
           bindMounts = jail.bindMounts;
           tmpfs = [
             "/var:size=${jail.tmpfsSize},mode=0755"
