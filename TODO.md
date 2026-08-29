@@ -20,6 +20,7 @@
 - [x] add sui — startpage at `start.adnanshaikh.com` (Tailscale-only, black theme, local services); see [`services/sui.nix`](services/sui.nix)
 - [x] Add Yomu to dock — already present at `/Applications/Yomu.app`, order matches `local.dock.entries` in [`modules/macos/base.nix`](modules/macos/base.nix)
 - [x] linear mouse settings — Rival 3 scheme in [`modules/home-manager/linearmouse.nix`](modules/home-manager/linearmouse.nix)
+- [x] encrypt Grafana `secret_key` — rotated off the public nixpkgs default into sops (`secrets/grafana-secret-key`); provisioned datasources use `$__file` so `grafana.db` stays intact
 ## In progress
 
 - [ ] set up kopia
@@ -36,7 +37,6 @@
 
 ## To do — services
 
-- [ ] encrypt Grafana `secret_key` — still the old public nixpkgs default in `services/grafana.nix`; move it to sops and rotate if `grafana.db` has encrypted secrets
 - [ ] set up immich
 - [ ] set up pastebin
 - [ ] set up google drive

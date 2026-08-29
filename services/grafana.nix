@@ -34,6 +34,14 @@
       mode = "0440";
       restartUnits = ["grafana.service"];
     };
+    "grafana-secret-key" = {
+      format = "binary";
+      sopsFile = ./../secrets/grafana-secret-key;
+      owner = "grafana";
+      group = "grafana";
+      mode = "0440";
+      restartUnits = ["grafana.service"];
+    };
   };
 
   services.grafana = {
@@ -105,10 +113,7 @@
         admin_email = vars.userEmail;
         admin_password = "admin"; # TODO: change to sops secret
         cookie_secure = true;
-        # 26.05 dropped the module default. Keep the previous upstream value
-        # so the existing grafana.db can still decrypt stored secrets.
-        # TODO: encrypt this in sops and rotate (see TODO.md).
-        secret_key = "SW2YcwTIb9zpOOhoPsMm";
+        secret_key = "$__file{${config.sops.secrets."grafana-secret-key".path}}";
       };
       users = {
         allow_sign_up = false;
