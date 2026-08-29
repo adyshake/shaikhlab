@@ -680,7 +680,7 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 8,
+        "w": 6,
         "x": 0,
         "y": 29
       },
@@ -778,8 +778,8 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 8,
-        "x": 8,
+        "w": 6,
+        "x": 6,
         "y": 29
       },
       "id": 13,
@@ -854,6 +854,104 @@
         "type": "yesoreyeram-infinity-datasource",
         "uid": "dbnomics"
       },
+      "description": "Fed Z.1 household revolving consumer credit outstanding (credit cards and other revolving plans). The series is essentially zero until 1968, then the unpaid balances that Chart 4 treats as extra 'credit dollars' in the currency supply.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#6b8cae",
+                "value": null
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 29
+      },
+      "id": 16,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "columns": [
+            {
+              "selector": "period",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "Quarterly \u2013 Level, not seasonally adjusted (NSA) \u2013 Households and nonprofit organizations (S14+S15) \u2013 Revolving consumer credit; liability \u2013 Input series with seasonal factor (FED/Z1/FL153166100.Q)",
+              "text": "credit_millions",
+              "type": "number"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "dbnomics"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "url": "https://api.db.nomics.world/v22/series/FED/Z1/FL153166100.Q?observations=1&format=csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          },
+          "hide": true
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$A * 1000000",
+          "hide": false,
+          "refId": "CreditUSD",
+          "type": "math"
+        }
+      ],
+      "timeFrom": "now-5y",
+      "title": "Revolving credit",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "dbnomics"
+      },
       "description": "Gold reserves at market price divided by the monetary base. Reduce-then-divide so the two monthly series do not need matching timestamps.",
       "fieldConfig": {
         "defaults": {
@@ -876,8 +974,8 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 8,
-        "x": 16,
+        "w": 6,
+        "x": 18,
         "y": 29
       },
       "id": 14,
@@ -1013,7 +1111,7 @@
         "type": "yesoreyeram-infinity-datasource",
         "uid": "dbnomics"
       },
-      "description": "Fed H.6 monetary base (monthly, via DBnomics) against IMF official U.S. gold reserves valued at market price. Gold ounces have been roughly flat since the early 1970s, so that line mostly follows the gold price after 1971. The 1958\u20131971 decline is the last gold drain before Nixon closed the gold window. This panel stays on a 70-year window so it reads like the classic chart even when the dashboard picker is Last 1 hour or 10 years.",
+      "description": "Fed H.6 monetary base and IMF official gold at market price, plus Fed Z.1 household revolving consumer credit outstanding (the Chart 4 'credit dollars' line: unpaid credit-card and other revolving balances). Revolving credit is near zero until 1968, then grows as its own series \u2014 not added on top of the base.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1099,6 +1197,29 @@
               {
                 "id": "custom.lineWidth",
                 "value": 3
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "CreditUSD"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Revolving Credit (credit dollars)"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#6b8cae",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 2
               }
             ]
           }
@@ -1211,10 +1332,52 @@
           "hide": false,
           "refId": "GoldUSD",
           "type": "math"
+        },
+        {
+          "columns": [
+            {
+              "selector": "period",
+              "text": "time",
+              "type": "timestamp"
+            },
+            {
+              "selector": "Quarterly \u2013 Level, not seasonally adjusted (NSA) \u2013 Households and nonprofit organizations (S14+S15) \u2013 Revolving consumer credit; liability \u2013 Input series with seasonal factor (FED/Z1/FL153166100.Q)",
+              "text": "credit_millions",
+              "type": "number"
+            }
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "dbnomics"
+          },
+          "filters": [],
+          "format": "timeseries",
+          "parser": "backend",
+          "refId": "F",
+          "root_selector": "",
+          "source": "url",
+          "type": "csv",
+          "url": "https://api.db.nomics.world/v22/series/FED/Z1/FL153166100.Q?observations=1&format=csv",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          },
+          "hide": true
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$F * 1000000",
+          "hide": false,
+          "refId": "CreditUSD",
+          "type": "math"
         }
       ],
       "timeFrom": "now-70y",
-      "title": "U.S. monetary base vs gold reserves at market price",
+      "title": "U.S. monetary base, revolving credit, and gold reserves",
       "type": "timeseries"
     },
     {
@@ -1771,7 +1934,7 @@
   "timezone": "utc",
   "title": "Finance",
   "uid": "finance",
-  "version": 6,
+  "version": 7,
   "weekStart": "",
   "description": "FMP daily prices plus Fed/IMF monetary-base vs gold. Keep the range at weeks or years; Last 1 hour is for quotes only."
 }
