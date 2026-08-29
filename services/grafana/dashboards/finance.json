@@ -1736,107 +1736,6 @@
       "title": "${ticker} history",
       "type": "timeseries",
       "description": "Daily bars. Zoom out to at least 7 days; Last 1 hour cannot show EOD data."
-    },
-    {
-      "datasource": {
-        "type": "yesoreyeram-infinity-datasource",
-        "uid": "fmp"
-      },
-      "description": "Latest FMP stock news for the selected ticker. Click a URL to open the article.",
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "URL"
-            },
-            "properties": [
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "title": "Open",
-                    "url": "${__value.text}"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 12,
-        "w": 24,
-        "x": 0,
-        "y": 65
-      },
-      "id": 11,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
-        "showHeader": true
-      },
-      "pluginVersion": "11.6.0",
-      "targets": [
-        {
-          "columns": [
-            {
-              "selector": "publishedDate",
-              "text": "Time",
-              "type": "string"
-            },
-            {
-              "selector": "title",
-              "text": "Title",
-              "type": "string"
-            },
-            {
-              "selector": "publisher",
-              "text": "Source",
-              "type": "string"
-            },
-            {
-              "selector": "url",
-              "text": "URL",
-              "type": "string"
-            }
-          ],
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "fmp"
-          },
-          "filters": [],
-          "format": "table",
-          "parser": "backend",
-          "refId": "A",
-          "root_selector": "$",
-          "source": "url",
-          "type": "json",
-          "url": "https://financialmodelingprep.com/stable/news/stock?symbols=${ticker}&limit=15",
-          "url_options": {
-            "data": "",
-            "method": "GET"
-          }
-        }
-      ],
-      "title": "${ticker} news",
-      "type": "table"
     }
   ],
   "refresh": "15m",
@@ -1934,7 +1833,7 @@
   "timezone": "utc",
   "title": "Finance",
   "uid": "finance",
-  "version": 7,
+  "version": 8,
   "weekStart": "",
   "description": "FMP daily prices plus Fed/IMF monetary-base vs gold. Keep the range at weeks or years; Last 1 hour is for quotes only."
 }
