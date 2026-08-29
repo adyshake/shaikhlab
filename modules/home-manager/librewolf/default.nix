@@ -17,7 +17,7 @@
       isDefault = true;
       settings = {
         # Startup and region
-        "browser.startup.homepage" = lib.mkDefault "about:blank";
+        "browser.startup.homepage" = lib.mkDefault "https://start.adnanshaikh.com";
         "browser.search.region" = "US";
         "browser.search.isUS" = true;
         "distribution.searchplugins.defaultLocale" = "en-US";
@@ -80,7 +80,6 @@
               "_446900e4-71c2-419f-a6a7-df9c091e268b_-browser-action" # Bitwarden
               "toggle-native-tab_bar_irvinm_addons_mozilla_org-browser-action" # Toggle Native Tab Bar
               "jid0-3GUEt1r69sQNSrca5p8kx9Ezc3U_jetpack-browser-action" # Terms of Service; Didn't Read
-              
             ];
             toolbar-menubar = ["menubar-items"];
             TabsToolbar = ["tabbrowser-tabs"];

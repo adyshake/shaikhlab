@@ -25,6 +25,7 @@
     ./../../services/grafana.nix
     ./../../services/forgejo.nix # Requires: forgejo-admin-password
     ./../../services/fava.nix
+    ./../../services/sui.nix
   ];
 
   home-manager = {

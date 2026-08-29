@@ -16,6 +16,8 @@
 - [x] self-host git — Forgejo at `git.adnanshaikh.com` (Tailscale-only, state on `/data`, admin user reconciled from sops on every deploy); see [`services/forgejo.nix`](services/forgejo.nix)
 - [x] self-host beancount UI — Fava at `beancount.adnanshaikh.com` (Tailscale-only, working copy on NVMe synced every 5 min from the Forgejo bare repo); see [`services/fava.nix`](services/fava.nix)
 - [x] self-host music — Navidrome at `music.adnanshaikh.com` (Tailscale-only, library `/data/fun/library/music` shared with Lidarr); Amperfy on iOS talks Subsonic to it; see [`services/nixarr.nix`](services/nixarr.nix)
+- [x] add airgradient to home assistant — `airgradient` in `extraComponents`; Living Room ONE at `192.168.1.94` added via UI (see [`services/homeassistant.nix`](services/homeassistant.nix))
+- [x] add sui — startpage at `start.adnanshaikh.com` (Tailscale-only, black theme, local services); see [`services/sui.nix`](services/sui.nix)
 ## In progress
 
 - [ ] set up kopia
@@ -36,9 +38,7 @@
 - [ ] set up immich
 - [ ] set up pastebin
 - [ ] set up google drive
-- [ ] add airgradient to home assistant
 - [ ] customize home assistant interface
-- [ ] add sui
 - [ ] security (define scope)
 
 ## To do — macOS / apps

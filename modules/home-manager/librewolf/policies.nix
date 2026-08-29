@@ -15,8 +15,8 @@
   NoDefaultBookmarks = true;
   SkipTermsOfUse = true;
   WebsiteFilter = {
-    Block = [ "https://localhost/*" ];
-    Exceptions = [ "https://localhost/*" ];
+    Block = ["https://localhost/*"];
+    Exceptions = ["https://localhost/*"];
   };
   SupportMenu = {
     Title = "LibreWolf Issue Tracker";
@@ -219,6 +219,12 @@
       Folder = "Quick Access";
     }
     {
+      Title = "Start";
+      URL = "https://start.adnanshaikh.com";
+      Placement = "toolbar";
+      Folder = "Homelab";
+    }
+    {
       Title = "Radarr";
       URL = "https://radarr.adnanshaikh.com";
       Placement = "toolbar";
@@ -269,6 +275,7 @@
       "https://youtube.com"
       "https://github.com"
       "https://git.adnanshaikh.com"
+      "https://start.adnanshaikh.com"
       "https://amazon.com"
       "https://kagi.com"
       "https://bitwarden.com"

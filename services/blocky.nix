@@ -166,6 +166,9 @@ in {
 
           # Fava (Beancount web UI)
           "beancount.adnanshaikh.com" = serverIP;
+
+          # SUI startpage
+          "start.adnanshaikh.com" = serverIP;
         };
       };
     };
