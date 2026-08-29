@@ -15,7 +15,7 @@
       {
         name = "Watch";
         url = "watch.adnanshaikh.com";
-        icon = "jellyfin";
+        icon = "television";
       }
       {
         name = "Music";
