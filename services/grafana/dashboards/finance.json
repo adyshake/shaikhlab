@@ -1376,7 +1376,6 @@
           "type": "math"
         }
       ],
-      "timeFrom": "now-70y",
       "title": "U.S. monetary base, revolving credit, and gold reserves",
       "type": "timeseries"
     },
@@ -1833,7 +1832,7 @@
   "timezone": "utc",
   "title": "Finance",
   "uid": "finance",
-  "version": 8,
+  "version": 9,
   "weekStart": "",
   "description": "FMP daily prices plus Fed/IMF monetary-base vs gold. Keep the range at weeks or years; Last 1 hour is for quotes only."
 }
