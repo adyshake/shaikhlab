@@ -2,7 +2,58 @@
   pkgs,
   vars,
   ...
-}: {
+}: let
+  urlbarSelectJs = ../home-manager/librewolf/urlbar-select.js;
+  autoconfigSandboxPref = pkgs.writeText "shaikhlab-autoconfig.js" ''
+    pref("general.config.sandbox_enabled", false);
+  '';
+  urlbarSelectStub = pkgs.writeText "shaikhlab-urlbar-stub.js" ''
+    // SHAIKHLAB_URLBAR_SELECT_BEGIN
+    try {
+      const loader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(
+        Components.interfaces.mozIJSSubScriptLoader
+      );
+      loader.loadSubScript(
+        "file:///Applications/LibreWolf.app/Contents/Resources/shaikhlab-urlbar-select.js"
+      );
+    } catch (e) {
+      try {
+        const {Services} = ChromeUtils.importESModule(
+          "resource://gre/modules/Services.sys.mjs"
+        );
+        Services.scriptloader.loadSubScript(
+          "file:///Applications/LibreWolf.app/Contents/Resources/shaikhlab-urlbar-select.js"
+        );
+      } catch (e2) {}
+    }
+    // SHAIKHLAB_URLBAR_SELECT_END
+  '';
+  patchLibrewolfCfg = pkgs.writeText "patch-librewolf-cfg.py" ''
+    from pathlib import Path
+    import sys
+
+    cfg = Path(sys.argv[1])
+    stub = Path(sys.argv[2]).read_text()
+    begin = "// SHAIKHLAB_URLBAR_SELECT_BEGIN"
+    end = "// SHAIKHLAB_URLBAR_SELECT_END"
+    if not cfg.is_file():
+        raise SystemExit(0)
+    text = cfg.read_text()
+    if begin in text:
+        pre, rest = text.split(begin, 1)
+        _, post = rest.split(end, 1)
+        text = pre.rstrip() + "\n" + stub
+        if post.strip():
+            text += post if post.startswith("\n") else "\n" + post
+    else:
+        if not text.endswith("\n"):
+            text += "\n"
+        text += stub
+    if not text.endswith("\n"):
+        text += "\n"
+    cfg.write_text(text)
+  '';
+in {
   imports = [
     ./_dock.nix
     ./_icons.nix
@@ -126,10 +177,15 @@
     xattr -r -d com.apple.quarantine /Applications/LibreWolf.app 2>/dev/null || true
 
     echo >&2 "Writing LibreWolf policies..."
-    policyDir="/Applications/LibreWolf.app/Contents/Resources/distribution"
+    resources="/Applications/LibreWolf.app/Contents/Resources"
     if [ -d "/Applications/LibreWolf.app" ]; then
-      mkdir -p "$policyDir"
-      echo '${policies}' > "$policyDir/policies.json"
+      mkdir -p "$resources/distribution" "$resources/defaults/pref"
+      echo '${policies}' > "$resources/distribution/policies.json"
+
+      echo >&2 "Installing LibreWolf start-page URL-bar select..."
+      cp ${autoconfigSandboxPref} "$resources/defaults/pref/shaikhlab.js"
+      cp ${urlbarSelectJs} "$resources/shaikhlab-urlbar-select.js"
+      ${pkgs.python3}/bin/python3 ${patchLibrewolfCfg} "$resources/librewolf.cfg" ${urlbarSelectStub}
     fi
   '';
 

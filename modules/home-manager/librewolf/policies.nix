@@ -70,6 +70,7 @@
         type = "custom_url";
         url = "https://start.adnanshaikh.com";
         # Leave the address bar focused so Cmd+T stays type-to-navigate.
+        # Extensions cannot select the URL; see urlbar-select.js + macos/base.nix.
         # The start page must also skip autofocus (see services/sui.nix).
         focus_website = false;
       };

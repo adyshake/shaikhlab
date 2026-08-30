@@ -5,6 +5,12 @@
   vars,
   ...
 }: {
+  # Chrome script that selects the URL bar on start.adnanshaikh.com.
+  # macOS loads it from the app bundle via modules/macos/base.nix (AutoConfig).
+  home.file.".librewolf/urlbar-select.js" = {
+    source = ./urlbar-select.js;
+  };
+
   programs.librewolf = {
     enable = true;
     # On macOS, LibreWolf is installed via Homebrew Cask
