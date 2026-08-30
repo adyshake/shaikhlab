@@ -167,6 +167,15 @@
           }
         ];
       }
+      {
+        category = "Web";
+        links = [
+          {
+            name = "Kagi Assistant";
+            url = "https://assistant.kagi.com";
+          }
+        ];
+      }
     ];
   });
 
