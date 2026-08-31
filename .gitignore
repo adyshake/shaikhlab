@@ -1,3 +1,5 @@
 .DS_Store
 Brewfile
 result/
+__pycache__/
+*.pyc
