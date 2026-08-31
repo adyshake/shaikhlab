@@ -1,0 +1,52 @@
+{
+  "updated": "2026-08-30T00:00:00Z",
+  "window_start": "2026-07-31",
+  "window_end": "2026-08-30",
+  "lede": "A month of housing law, coastal flood protection, local stormwater projects, balcony solar, northern New England wind, and a large private infrastructure commitment.",
+  "items": [
+    {
+      "headline": "Congress enacts the 21st Century ROAD to Housing Act",
+      "summary": "The most significant federal housing package in three decades became law on July 11. It combines sixty provisions aimed at adding supply: zoning-reform guidance for cities, a broader definition of manufactured housing, and faster environmental review for small infill projects.",
+      "date": "2026-07-11",
+      "source_title": "Holland & Knight",
+      "source_url": "https://www.hklaw.com/en/insights/publications/2026/08/congress-passes-21st-century-road-to-housing-act"
+    },
+    {
+      "headline": "Boston's coastal plan qualifies for a 65% federal cost share",
+      "summary": "A U.S. Army Corps feasibility study opened the door to federal funding for Boston's roughly $10 billion coastal-resilience program. More than twenty projects along sixteen miles of shoreline are estimated to prevent $41 billion in flood damage.",
+      "date": "2026-08-01",
+      "source_title": "Construction Dive",
+      "source_url": "https://www.constructiondive.com/news/boston-10b-coastal-resilience-infrastructure-plan-usace/826700/"
+    },
+    {
+      "headline": "Queens turns roadway medians into stormwater sponges",
+      "summary": "New York is spending $8.4 million to convert medians in Whitestone, Forest Hills, and Queens Village into planted green infrastructure. Together they are designed to capture about five million gallons of stormwater a year and cut combined-sewer overflows into nearby bays.",
+      "date": "2026-08-01",
+      "source_title": "6sqft",
+      "source_url": "https://www.6sqft.com/three-queens-medians-to-become-green-sponges-to-help-curb-flooding/"
+    },
+    {
+      "headline": "California legislature legalizes plug-in balcony solar",
+      "summary": "Lawmakers passed a bill that lets renters and owners install certified plug-in solar up to 1,200 watts in a standard outlet, without a rooftop rebuild. A few hundred watts can cover a fridge and modem; a full kit can run a window air conditioner on hot days.",
+      "date": "2026-08-01",
+      "source_title": "LAist",
+      "source_url": "https://laist.com/news/climate-environment/california-lawmakers-greenlight-solar-panels-you-can-plug-into-the-wall"
+    },
+    {
+      "headline": "Maine advances a 1,200 MW line and 800 MW of onshore wind",
+      "summary": "After years of delay, the Maine Public Utilities Commission selected Avangrid for a 1,200 MW transmission project that reuses existing corridors and Clearway for an 800 MW wind farm. Maine would take about 600 MW, with leftover capacity opened to later bids.",
+      "date": "2026-08-25",
+      "source_title": "Maine Public Utilities Commission",
+      "source_url": "https://www.bangordailynews.com/2026/08/25/aroostook/aroostook-business/regulators-choose-cmp-new-northern-maine-transmission-line-project/"
+    },
+    {
+      "headline": "Bank of America commits $250 billion to U.S. infrastructure finance",
+      "summary": "On August 12 the bank launched an 18-month Critical Infrastructure Finance Initiative covering digital, energy, and core infrastructure through July 4, 2027. The headline is financing and advisory activity rather than a single grant, but it adds another large pool of private capital to grid, transport, and supply-chain buildout.",
+      "date": "2026-08-12",
+      "source_title": "Bank of America",
+      "source_url": "https://www.prnewswire.com/news-releases/bank-of-america-launches-250-billion-18-month-critical-infrastructure-finance-initiative-in-honor-of-americas-250th-anniversary-302849153.html"
+    }
+  ],
+  "references": [],
+  "source": "bootstrap"
+}
