@@ -23,13 +23,14 @@ SEARCH_URL = "https://kagi.com/api/v1/search"
 WINDOW_DAYS = 30
 MAX_ITEMS = 8
 PER_QUERY_LIMIT = 8
+PER_QUERY_KEEP = 2
 SUMMARY_CHARS = 220
 
 QUERIES = (
-    "2026 United States infrastructure upgrade transit water housing announced",
-    "2026 US climate resilience flood protection project funded",
-    "2026 United States housing climate energy law passed",
-    "2026 US infrastructure investment capital grid manufacturing",
+    "2026 US transit water roads ports infrastructure project announced",
+    "2026 US climate resilience flood heat wildfire adaptation funded",
+    "2026 United States housing supply zoning law enacted",
+    "2026 US clean energy grid transmission solar wind investment",
 )
 
 SKIP_HOSTS = (
@@ -184,9 +185,40 @@ def clean_headline(title: str) -> str:
     return title
 
 
-def story_key(title: str) -> str:
-    words = re.sub(r"[^a-z0-9]+", " ", title.lower()).split()
-    return " ".join(words[:6])
+TOPIC_PATTERNS = (
+    (re.compile(r"road to housing|housing act|housing bill"), "housing-act"),
+    (re.compile(r"infrastructure report card|\bearns [a-d]\b"), "infra-report-card"),
+    (re.compile(r"federal infrastructure bill"), "federal-infra-bill"),
+    (re.compile(r"flood mitigation"), "flood-mitigation"),
+    (re.compile(r"week in tod|transit.oriented"), "tod-roundup"),
+)
+
+STOP_WORDS = frozenset(
+    {
+        "a",
+        "an",
+        "and",
+        "for",
+        "in",
+        "of",
+        "on",
+        "the",
+        "to",
+        "us",
+        "united",
+        "states",
+        "2026",
+    }
+)
+
+
+def topic_key(title: str, summary: str) -> str:
+    blob = f"{title} {summary}".lower()
+    for pattern, key in TOPIC_PATTERNS:
+        if pattern.search(blob):
+            return key
+    words = [w for w in re.findall(r"[a-z0-9]+", blob) if w not in STOP_WORDS]
+    return " ".join(words[:5])
 
 
 def is_homepage(url: str) -> bool:
@@ -238,13 +270,14 @@ def score_result(title: str, snippet: str) -> int:
 
 def collect(token: str, start: date, end: date) -> list[dict]:
     seen_urls: set[str] = set()
-    seen_stories: set[str] = set()
+    seen_topics: set[str] = set()
     collected: list[dict] = []
 
     for query in QUERIES:
         raw = search(token, query, start, end)
         if raw.get("error"):
             print(f"search warning for {query!r}: {raw['error']}", file=sys.stderr)
+        batch: list[dict] = []
         for item in iter_result_buckets(raw.get("data") or {}):
             url = str(item.get("url") or "").strip()
             headline = clean_headline(str(item.get("title") or ""))
@@ -253,12 +286,10 @@ def collect(token: str, start: date, end: date) -> list[dict]:
                 continue
             if not summary:
                 continue
-            key = story_key(headline)
-            if key in seen_stories:
+            topic = topic_key(headline, summary)
+            if topic in seen_topics:
                 continue
-            seen_urls.add(url)
-            seen_stories.add(key)
-            collected.append(
+            batch.append(
                 {
                     "headline": headline,
                     "summary": summary,
@@ -266,10 +297,22 @@ def collect(token: str, start: date, end: date) -> list[dict]:
                     "source_title": host_of(url).removeprefix("www.") or url,
                     "source_url": url,
                     "_score": score_result(headline, summary),
+                    "_topic": topic,
+                    "_url": url,
                 }
             )
+        batch.sort(key=lambda item: item["_score"], reverse=True)
+        kept = 0
+        for item in batch:
+            if item["_topic"] in seen_topics or item["_url"] in seen_urls:
+                continue
+            seen_topics.add(item["_topic"])
+            seen_urls.add(item["_url"])
+            collected.append(item)
+            kept += 1
+            if kept >= PER_QUERY_KEEP:
+                break
 
-    collected.sort(key=lambda item: item["_score"], reverse=True)
     return collected[:MAX_ITEMS]
 
 
@@ -283,7 +326,7 @@ def digest_from_items(items: list[dict], start: date, end: date) -> dict:
         "updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "window_start": start.isoformat(),
         "window_end": end.isoformat(),
-        "lede": "Infrastructure, climate, housing, and investment.",
+        "lede": "Transit and water, climate resilience, housing, and energy.",
         "items": cleaned,
         "references": [
             {"title": item["source_title"], "url": item["source_url"]}

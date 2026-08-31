@@ -264,17 +264,18 @@
     }
 
     #good-news {
-      padding-bottom: var(--module-spacing);
+      padding-bottom: 6vh;
     }
 
     #good-news h3 {
-      margin-bottom: 0.35em;
+      height: auto;
+      margin-bottom: 0.55em;
     }
 
     .good-news-meta {
       color: var(--color-text-acc);
       font-size: 0.8em;
-      margin: 0 0 0.4em 0;
+      margin: 0 0 0.55em 0;
       text-transform: uppercase;
     }
 
@@ -282,7 +283,7 @@
       color: var(--color-text-acc);
       font-size: 0.9em;
       line-height: 1.4;
-      margin: 0 0 1.4em 0;
+      margin: 0 0 2.6em 0;
     }
 
     #good-news-items {
