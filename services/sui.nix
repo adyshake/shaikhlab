@@ -332,20 +332,18 @@
         '<button data-theme="blackboard"',
         '<button data-theme="black" class="theme-button theme-black">Black</button>\n                <button data-theme="blackboard"',
     )
+    if "</main>" not in html:
+        raise SystemExit("index.html </main> not found")
     html = html.replace(
-        """            </script>
-        </section>
-    </main>""",
-        """            </script>
-        </section>
-
-        <section id="good-news">
+        "</main>",
+        """<section id="good-news">
             <h3>Good news</h3>
             <p class="good-news-meta" id="good-news-meta"></p>
             <p class="good-news-lede" id="good-news-lede"></p>
             <div id="good-news-items"></div>
         </section>
     </main>""",
+        1,
     )
     html = html.replace(
         '<script src="./assets/js/search.js" type="text/javascript"></script>',
