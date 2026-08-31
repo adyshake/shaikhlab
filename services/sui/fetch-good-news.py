@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """Refresh the startpage good-news digest via Kagi Search API v1.
 
-v1 exposes search and extract (not FastGPT). Several targeted US queries
-are run with a last-30-days filter, then titles and snippets are turned
-into a digest. A failed run leaves the previous file in place.
+Several targeted US queries run with a last-30-days filter. Search
+snippets are cleaned into short cards. A failed run leaves the previous
+file in place.
 """
 
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import os
 import re
@@ -19,10 +20,10 @@ import urllib.request
 from datetime import date, datetime, timedelta, timezone
 
 SEARCH_URL = "https://kagi.com/api/v1/search"
-EXTRACT_URL = "https://kagi.com/api/v1/extract"
 WINDOW_DAYS = 30
 MAX_ITEMS = 8
 PER_QUERY_LIMIT = 8
+SUMMARY_CHARS = 220
 
 QUERIES = (
     "2026 United States infrastructure upgrade transit water housing announced",
@@ -40,6 +41,19 @@ SKIP_HOSTS = (
     "x.com",
     "twitter.com",
     "reddit.com",
+)
+
+SKIP_SUFFIXES = (".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx")
+
+JUNK_MARKERS = (
+    "pdfformatversion",
+    "islinearized",
+    "isacroformpresent",
+    "xmp:modifydate",
+    "facebook.com/sharer",
+    "twitter.com/intent",
+    "linkedin.com/share",
+    "reddit.com/submit",
 )
 
 SKIP_WORDS = (
@@ -137,49 +151,47 @@ def search(token: str, query: str, start: date, end: date) -> dict:
     )
 
 
-def extract_pages(token: str, urls: list[str]) -> dict[str, str]:
-    if not urls:
-        return {}
-    pages = [{"url": url} for url in urls[:10]]
-    try:
-        raw = request_json(
-            EXTRACT_URL,
-            token,
-            {"pages": pages, "timeout": 20},
-            timeout=60,
-        )
-    except SystemExit as err:
-        print(f"extract skipped: {err}", file=sys.stderr)
-        return {}
+def clean_text(text: str) -> str:
+    cleaned = html.unescape(text or "")
+    cleaned = re.sub(r"(?is)<script\b.*?</script>", " ", cleaned)
+    cleaned = re.sub(r"(?is)<style\b.*?</style>", " ", cleaned)
+    cleaned = re.sub(r"!\[.*?\]\(.*?\)", " ", cleaned)
+    cleaned = re.sub(r"\[([^\]]*)\]\([^)]+\)", r"\1", cleaned)
+    cleaned = re.sub(r"<[^>]+>", " ", cleaned)
+    cleaned = re.sub(r"https?://\S+", " ", cleaned)
+    cleaned = re.sub(r"[#*_>`|]+", " ", cleaned)
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    if any(marker in cleaned.lower() for marker in JUNK_MARKERS):
+        return ""
+    return cleaned
 
-    found: dict[str, str] = {}
-    data = raw.get("data") or raw
-    candidates = []
-    if isinstance(data, list):
-        candidates = data
-    elif isinstance(data, dict):
-        for key in ("pages", "results", "extract"):
-            value = data.get(key)
-            if isinstance(value, list):
-                candidates = value
-                break
-        if not candidates:
-            candidates = [data]
 
-    for item in candidates:
-        if not isinstance(item, dict):
-            continue
-        url = str(item.get("url") or item.get("requested_url") or "").strip()
-        markdown = str(
-            item.get("markdown")
-            or item.get("content")
-            or item.get("text")
-            or item.get("output")
-            or ""
-        ).strip()
-        if url and markdown:
-            found[url] = markdown
-    return found
+def clip_summary(text: str) -> str:
+    cleaned = clean_text(text)
+    if not cleaned:
+        return ""
+    parts = re.split(r"(?<=[.!?])\s+", cleaned)
+    clipped = " ".join(parts[:2]).strip()
+    if len(clipped) > SUMMARY_CHARS:
+        clipped = clipped[: SUMMARY_CHARS - 1].rsplit(" ", 1)[0].rstrip(".,;:") + "…"
+    return clipped
+
+
+def clean_headline(title: str) -> str:
+    title = clean_text(title)
+    title = re.sub(r"\s+\.\.\.$", "", title)
+    title = re.sub(r"\s+…$", "", title)
+    return title
+
+
+def story_key(title: str) -> str:
+    words = re.sub(r"[^a-z0-9]+", " ", title.lower()).split()
+    return " ".join(words[:6])
+
+
+def is_homepage(url: str) -> bool:
+    parsed = urllib.parse.urlparse(url)
+    return parsed.path in ("", "/") and not parsed.query
 
 
 def iter_result_buckets(data: dict) -> list[dict]:
@@ -199,11 +211,19 @@ def iter_result_buckets(data: dict) -> list[dict]:
 def keep_result(title: str, snippet: str, url: str) -> bool:
     if not title or not url.startswith("http"):
         return False
-    host = host_of(url).lower().removeprefix("www.")
+    parsed = urllib.parse.urlparse(url)
+    host = (parsed.hostname or "").lower().removeprefix("www.")
+    path = (parsed.path or "").lower()
     if any(host == skip or host.endswith("." + skip) for skip in SKIP_HOSTS):
+        return False
+    if any(path.endswith(suffix) for suffix in SKIP_SUFFIXES):
+        return False
+    if is_homepage(url):
         return False
     blob = f"{title} {snippet}".lower()
     if any(word in blob for word in SKIP_WORDS):
+        return False
+    if any(marker in blob for marker in JUNK_MARKERS):
         return False
     return True
 
@@ -216,18 +236,9 @@ def score_result(title: str, snippet: str) -> int:
     return score
 
 
-def first_sentences(text: str, limit: int = 2) -> str:
-    cleaned = re.sub(r"```.*?```", " ", text, flags=re.S)
-    cleaned = re.sub(r"[#*_>`]+", " ", cleaned)
-    cleaned = re.sub(r"\s+", " ", cleaned).strip()
-    if not cleaned:
-        return ""
-    parts = re.split(r"(?<=[.!?])\s+", cleaned)
-    return " ".join(parts[:limit]).strip()
-
-
 def collect(token: str, start: date, end: date) -> list[dict]:
-    seen: set[str] = set()
+    seen_urls: set[str] = set()
+    seen_stories: set[str] = set()
     collected: list[dict] = []
 
     for query in QUERIES:
@@ -235,20 +246,26 @@ def collect(token: str, start: date, end: date) -> list[dict]:
         if raw.get("error"):
             print(f"search warning for {query!r}: {raw['error']}", file=sys.stderr)
         for item in iter_result_buckets(raw.get("data") or {}):
-            title = str(item.get("title") or "").strip()
             url = str(item.get("url") or "").strip()
-            snippet = str(item.get("snippet") or "").strip()
-            if url in seen or not keep_result(title, snippet, url):
+            headline = clean_headline(str(item.get("title") or ""))
+            summary = clip_summary(str(item.get("snippet") or ""))
+            if url in seen_urls or not keep_result(headline, summary, url):
                 continue
-            seen.add(url)
+            if not summary:
+                continue
+            key = story_key(headline)
+            if key in seen_stories:
+                continue
+            seen_urls.add(url)
+            seen_stories.add(key)
             collected.append(
                 {
-                    "headline": title,
-                    "summary": snippet,
+                    "headline": headline,
+                    "summary": summary,
                     "date": normalize_time(str(item.get("time") or "")),
                     "source_title": host_of(url).removeprefix("www.") or url,
                     "source_url": url,
-                    "_score": score_result(title, snippet),
+                    "_score": score_result(headline, summary),
                 }
             )
 
@@ -256,43 +273,17 @@ def collect(token: str, start: date, end: date) -> list[dict]:
     return collected[:MAX_ITEMS]
 
 
-def enrich_summaries(token: str, items: list[dict]) -> None:
-    extracted = extract_pages(token, [item["source_url"] for item in items])
-    if not extracted:
-        return
-    for item in items:
-        markdown = extracted.get(item["source_url"])
-        if not markdown:
-            continue
-        sentences = first_sentences(markdown, 3)
-        if len(sentences) > len(item["summary"]):
-            item["summary"] = sentences
-
-
 def digest_from_items(items: list[dict], start: date, end: date) -> dict:
     if not items:
         raise SystemExit("Kagi search returned no usable stories")
 
-    cleaned = []
-    for item in items:
-        row = {k: v for k, v in item.items() if not k.startswith("_")}
-        if not row["summary"]:
-            row["summary"] = row["headline"]
-        cleaned.append(row)
-
-    heads = [item["headline"] for item in cleaned[:3]]
-    lede = f"{len(cleaned)} constructive US stories from the last month"
-    if heads:
-        lede += f", including {heads[0].rstrip('.')}"
-        if len(heads) > 1:
-            lede += f" and {heads[1].rstrip('.')}"
-        lede += "."
+    cleaned = [{k: v for k, v in item.items() if not k.startswith("_")} for item in items]
 
     return {
         "updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "window_start": start.isoformat(),
         "window_end": end.isoformat(),
-        "lede": lede,
+        "lede": "Infrastructure, climate, housing, and investment.",
         "items": cleaned,
         "references": [
             {"title": item["source_title"], "url": item["source_url"]}
@@ -335,7 +326,6 @@ def main() -> int:
     today = datetime.now(timezone.utc).date()
     start, end = window(today)
     items = collect(token, start, end)
-    enrich_summaries(token, items)
     digest = digest_from_items(items, start, end)
 
     os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)

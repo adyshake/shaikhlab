@@ -20,6 +20,18 @@ function goodNewsSourceHost(url) {
   }
 }
 
+function cleanGoodNewsText(value) {
+  const raw = String(value || "");
+  const node = document.createElement("div");
+  node.innerHTML = raw
+    .replace(/!\[.*?\]\(.*?\)/g, " ")
+    .replace(/\[([^\]]*)\]\([^)]+\)/g, "$1");
+  return (node.textContent || "")
+    .replace(/https?:\/\/\S+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function renderGoodNews(data) {
   const meta = document.getElementById("good-news-meta");
   const lede = document.getElementById("good-news-lede");
@@ -34,25 +46,36 @@ function renderGoodNews(data) {
 
   list.innerHTML = "";
   data.items.forEach((item) => {
+    const headline = cleanGoodNewsText(item.headline);
+    const summary = cleanGoodNewsText(item.summary);
+    if (!headline) return;
+
     const article = document.createElement("article");
     article.className = "good-news-item";
 
     const heading = document.createElement("h4");
-    heading.textContent = item.headline || "";
+    if (item.source_url) {
+      const link = document.createElement("a");
+      link.href = item.source_url;
+      link.rel = "noopener noreferrer";
+      link.textContent = headline;
+      heading.appendChild(link);
+    } else {
+      heading.textContent = headline;
+    }
     article.appendChild(heading);
 
-    const summary = document.createElement("p");
-    summary.textContent = item.summary || "";
-    article.appendChild(summary);
-
-    if (item.source_url) {
-      const source = document.createElement("a");
-      source.href = item.source_url;
-      source.rel = "noopener noreferrer";
-      const label = item.source_title || goodNewsSourceHost(item.source_url);
-      source.textContent = item.date ? `${label} · ${item.date}` : label;
-      article.appendChild(source);
+    if (summary) {
+      const body = document.createElement("p");
+      body.textContent = summary;
+      article.appendChild(body);
     }
+
+    const source = document.createElement("div");
+    source.className = "good-news-source";
+    const label = item.source_title || goodNewsSourceHost(item.source_url || "");
+    source.textContent = item.date ? `${label} · ${item.date}` : label;
+    article.appendChild(source);
 
     list.appendChild(article);
   });
