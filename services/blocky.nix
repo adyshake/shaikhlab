@@ -168,9 +168,6 @@ in {
           # Forgejo (self-hosted git)
           "git.adnanshaikh.com" = serverIP;
 
-          # Fava (Beancount web UI)
-          "beancount.adnanshaikh.com" = serverIP;
-
           # SUI startpage
           "start.adnanshaikh.com" = serverIP;
 

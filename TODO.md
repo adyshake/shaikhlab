@@ -14,7 +14,7 @@
   - [x] reset key timings
 - [x] drive health monitoring on `svr1shaikh` — `smartd` + `mdadm-notify` + monthly digest via MXroute (see [`services/drive-health.nix`](services/drive-health.nix), runbook at [`docs/disk-replacement.md`](docs/disk-replacement.md))
 - [x] self-host git — Forgejo at `git.adnanshaikh.com` (Tailscale-only, state on `/data`, admin user reconciled from sops on every deploy); see [`services/forgejo.nix`](services/forgejo.nix)
-- [x] self-host beancount UI — Fava at `beancount.adnanshaikh.com` (Tailscale-only, working copy on NVMe synced every 5 min from the Forgejo bare repo); see [`services/fava.nix`](services/fava.nix)
+- [x] self-host beancount UI — removed; ledger stays in Forgejo `adnan/beancount`
 - [x] self-host music — Navidrome at `music.adnanshaikh.com` (Tailscale-only, library `/data/fun/library/music` shared with Lidarr); Amperfy on iOS talks Subsonic to it; see [`services/nixarr.nix`](services/nixarr.nix)
 - [x] add airgradient to home assistant — `airgradient` in `extraComponents`; Living Room ONE at `192.168.1.94` added via UI (see [`services/homeassistant.nix`](services/homeassistant.nix))
 - [x] add sui — startpage at `start.adnanshaikh.com` (Tailscale-only, black theme, local services); see [`services/sui.nix`](services/sui.nix)
@@ -31,7 +31,6 @@
   - [ ] set up backups for forgejo (`/data/forgejo` — repos + SQLite DB)
   - [ ] set up backups for navidrome (`/var/lib/navidrome` — SQLite DB, playlists, ratings; library files themselves live under `/data/fun/library/music`)
   - [ ] set up backups for immich (`/data/immich` library + `/data/postgresql` — photos are not a backup until this exists)
-  - [ ] _no kopia needed for fava_ — `/var/lib/fava/ledger` is a regenerable mirror of the forgejo bare repo above
 
 ## To do — infra / ops
 

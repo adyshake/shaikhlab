@@ -83,11 +83,6 @@
         icon = "git";
       }
       {
-        name = "Beancount";
-        url = "beancount.adnanshaikh.com";
-        icon = "calculator-variant";
-      }
-      {
         name = "Paste";
         url = "paste.adnanshaikh.com";
         icon = "content-paste";
@@ -166,10 +161,6 @@
           {
             name = "Git";
             url = "https://git.adnanshaikh.com";
-          }
-          {
-            name = "Beancount";
-            url = "https://beancount.adnanshaikh.com";
           }
           {
             name = "Paste";

@@ -24,7 +24,6 @@
     ./../../services/blocky.nix
     ./../../services/grafana.nix # Requires: grafana-admin-password
     ./../../services/forgejo.nix # Requires: forgejo-admin-password
-    ./../../services/fava.nix
     ./../../services/sui.nix
     ./../../services/wastebin.nix
     ./../../services/immich.nix
