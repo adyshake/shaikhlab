@@ -16,7 +16,7 @@
     ./../../modules/nixos/remote-unlock.nix
 
     ./../../services/drive-health.nix # Requires: mxroute-smtp-password (imports ./mail.nix)
-    ./../../services/nixarr.nix
+    ./../../services/nixarr.nix # Requires: wg.conf, transmission-rpc-credentials
     ./../../services/ntfy.nix # Requires: ntfy-secret
     ./../../services/tailscale.nix # Requires: tailscale-authkey
     ./../../services/homeassistant.nix

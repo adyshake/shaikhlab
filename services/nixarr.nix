@@ -18,6 +18,14 @@
         format = "binary";
         sopsFile = ./../secrets/wg.conf;
       };
+      "transmission-rpc-credentials" = {
+        format = "binary";
+        sopsFile = ./../secrets/transmission-rpc-credentials;
+        mode = "0440";
+        owner = "root";
+        group = "transmission";
+        restartUnits = ["transmission.service" "arr-bootstrap.service"];
+      };
     };
   };
 
@@ -224,6 +232,7 @@
       peerPort = 46634;
       vpn.enable = true;
       extraAllowedIps = ["100.64.0.0/10"];
+      credentialsFile = config.sops.secrets."transmission-rpc-credentials".path;
       extraSettings = {
         peer-limit-global = 500;
         cache-size-mb = 256;
@@ -235,11 +244,9 @@
         speed-limit-up = 500;
         speed-limit-up-enabled = true;
         rpc-bind-address = "0.0.0.0";
-        rpc-authentication-required = false;
+        rpc-authentication-required = true;
         rpc-username = vars.userName;
         rpc-whitelist-enabled = false;
-        # todo: figure out how to integrate rpc-password into sops-nix
-        rpc-password = "{7d827abfb09b77e45fe9e72d97956ab8fb53acafoPNV1MpJ";
         ratio-limit = 1.0;
         ratio-limit-enabled = true;
       };
@@ -396,6 +403,9 @@
       bootstrap = pkgs.writeShellScript "arr-bootstrap" ''
         set -eu
 
+        TRANSMISSION_USER=${lib.escapeShellArg vars.userName}
+        TRANSMISSION_PASSWORD=$(${pkgs.jq}/bin/jq -r '."rpc-password"' ${config.sops.secrets."transmission-rpc-credentials".path})
+
         # ------------------------------------------------------------------
         # Helpers: wait for an *arr instance to be ready, then return apiKey.
         # ------------------------------------------------------------------
@@ -444,6 +454,8 @@
           local payload
           payload=$(${pkgs.jq}/bin/jq -n \
             --argjson appFields "$appFields" \
+            --arg username "$TRANSMISSION_USER" \
+            --arg password "$TRANSMISSION_PASSWORD" \
             '{
               name: "Transmission",
               enable: true,
@@ -459,8 +471,8 @@
                 {name: "port",      value: 9091},
                 {name: "useSsl",    value: false},
                 {name: "urlBase",   value: "/transmission/"},
-                {name: "username",  value: ""},
-                {name: "password",  value: ""},
+                {name: "username",  value: $username},
+                {name: "password",  value: $password},
                 {name: "directory", value: ""},
                 {name: "addPaused", value: false}
               ] + $appFields),
