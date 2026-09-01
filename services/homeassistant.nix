@@ -104,8 +104,9 @@
     };
   };
 
-  # Allow access to the Home Assistant web interface (default port 8123)
-  networking.firewall.allowedTCPPorts = [8123];
+  # Companion apps / raw :8123. HTTPS UI is nginx on tailscale0 (80/443).
+  # Do not open this on every NIC — that was a LAN/WAN hole.
+  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [8123];
 
   services.nginx = {
     virtualHosts = {

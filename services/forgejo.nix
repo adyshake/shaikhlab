@@ -166,7 +166,7 @@ in {
     };
   };
 
-  # Built-in SSH server for git push/pull. 80/443 are already opened by
-  # services/_acme.nix.
-  networking.firewall.allowedTCPPorts = [sshPort];
+  # Built-in SSH for git push/pull. Host sshd/initrd stay on :22 (WAN unlock).
+  # 80/443 are already opened on tailscale0 by services/_acme.nix.
+  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [sshPort];
 }
