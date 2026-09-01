@@ -21,9 +21,7 @@
       "transmission-rpc-credentials" = {
         format = "binary";
         sopsFile = ./../secrets/transmission-rpc-credentials;
-        mode = "0440";
-        owner = "root";
-        group = "transmission";
+        mode = "0400";
         restartUnits = ["transmission.service" "arr-bootstrap.service"];
       };
     };
