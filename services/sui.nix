@@ -92,6 +92,11 @@
         url = "photos.adnanshaikh.com";
         icon = "image";
       }
+      {
+        name = "Drive";
+        url = "drive.adnanshaikh.com";
+        icon = "folder";
+      }
     ];
   });
 
@@ -148,6 +153,10 @@
           {
             name = "Photos";
             url = "https://photos.adnanshaikh.com";
+          }
+          {
+            name = "Drive";
+            url = "https://drive.adnanshaikh.com";
           }
         ];
       }

@@ -40,6 +40,6 @@
 
 - [x] set up immich — Tailscale-only at `photos.adnanshaikh.com` (localhost + nginx, library + Postgres on `/data`); see [`services/immich.nix`](services/immich.nix). Not in a public jail; not on the Cloudflare tunnel.
 - [x] set up pastebin — wastebin in a public jail at `paste.adnanshaikh.com` (nspawn, tmpfs + cgroup cap, nginx rate limits, Cloudflare tunnel); reusable via [`modules/nixos/public-jail.nix`](modules/nixos/public-jail.nix) / [`services/wastebin.nix`](services/wastebin.nix)
-- [ ] set up google drive
+- [x] set up google drive — Nextcloud at `drive.adnanshaikh.com` (Tailscale-only, files on `/data/nextcloud`, Postgres shared with Immich); see [`services/nextcloud.nix`](services/nextcloud.nix). No Collabora/Talk; phone camera roll stays on Immich.
 - [ ] customize home assistant interface
 - [ ] security (define scope)

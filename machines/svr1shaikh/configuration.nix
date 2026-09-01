@@ -27,6 +27,7 @@
     ./../../services/sui.nix
     ./../../services/wastebin.nix
     ./../../services/immich.nix
+    ./../../services/nextcloud.nix # Requires: nextcloud-admin-password
   ];
 
   home-manager = {

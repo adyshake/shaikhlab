@@ -173,6 +173,9 @@ in {
 
           # Immich (Tailscale-only)
           "photos.adnanshaikh.com" = serverIP;
+
+          # Nextcloud (Tailscale-only Drive)
+          "drive.adnanshaikh.com" = serverIP;
         };
       };
     };
