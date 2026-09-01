@@ -42,6 +42,14 @@
       mode = "0440";
       restartUnits = ["grafana.service"];
     };
+    "grafana-admin-password" = {
+      format = "binary";
+      sopsFile = ./../secrets/grafana-admin-password;
+      owner = "grafana";
+      group = "grafana";
+      mode = "0440";
+      restartUnits = ["grafana.service"];
+    };
   };
 
   services.grafana = {
@@ -118,9 +126,9 @@
         domain = "grafana.adnanshaikh.com";
       };
       security = {
-        admin_user = "admin"; # TODO: change to sops secret
+        admin_user = "admin";
         admin_email = vars.userEmail;
-        admin_password = "admin"; # TODO: change to sops secret
+        admin_password = "$__file{${config.sops.secrets."grafana-admin-password".path}}";
         cookie_secure = true;
         secret_key = "$__file{${config.sops.secrets."grafana-secret-key".path}}";
       };
@@ -137,6 +145,29 @@
       grafana-googlesheets-datasource
       yesoreyeram-infinity-datasource
     ];
+  };
+
+  # grafana.db already has user `admin` from the old plaintext default.
+  # settings.security.admin_password only applies on first create, so
+  # reconcile from sops on every activation (same idea as Forgejo).
+  systemd.services.grafana-admin-password = {
+    description = "Reset Grafana admin password from sops";
+    after = ["grafana.service"];
+    requires = ["grafana.service"];
+    wantedBy = ["multi-user.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      User = "grafana";
+      Group = "grafana";
+      RemainAfterExit = true;
+    };
+    script = ''
+      set -eu
+      PW=$(cat ${config.sops.secrets."grafana-admin-password".path})
+      ${config.services.grafana.package}/bin/grafana cli \
+        --homepath ${config.services.grafana.dataDir} \
+        admin reset-admin-password "$PW"
+    '';
   };
 
   services.nginx = {

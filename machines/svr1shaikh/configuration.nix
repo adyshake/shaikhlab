@@ -22,7 +22,7 @@
     ./../../services/homeassistant.nix
     ./../../services/zwave-js-ui.nix
     ./../../services/blocky.nix
-    ./../../services/grafana.nix
+    ./../../services/grafana.nix # Requires: grafana-admin-password
     ./../../services/forgejo.nix # Requires: forgejo-admin-password
     ./../../services/fava.nix
     ./../../services/sui.nix
