@@ -268,6 +268,12 @@
       Folder = "Homelab";
     }
     {
+      Title = "Listen";
+      URL = "https://listen.adnanshaikh.com";
+      Placement = "toolbar";
+      Folder = "Homelab";
+    }
+    {
       Title = "Home Assistant";
       URL = "https://ha.adnanshaikh.com";
       Placement = "toolbar";

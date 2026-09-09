@@ -33,6 +33,11 @@
         icon = "music";
       }
       {
+        name = "Listen";
+        url = "listen.adnanshaikh.com";
+        icon = "headphones";
+      }
+      {
         name = "Radarr";
         url = "radarr.adnanshaikh.com";
         icon = "filmstrip";
@@ -112,6 +117,10 @@
           {
             name = "Music";
             url = "https://music.adnanshaikh.com";
+          }
+          {
+            name = "Listen";
+            url = "https://listen.adnanshaikh.com";
           }
           {
             name = "Radarr";

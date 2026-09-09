@@ -16,6 +16,7 @@
 - [x] self-host git — Forgejo at `git.adnanshaikh.com` (Tailscale-only, state on `/data`, admin user reconciled from sops on every deploy); see [`services/forgejo.nix`](services/forgejo.nix)
 - [x] self-host beancount UI — removed; ledger stays in Forgejo `adnan/beancount`
 - [x] self-host music — Navidrome at `music.adnanshaikh.com` (Tailscale-only, library `/data/fun/library/music` shared with Lidarr); Amperfy on iOS talks Subsonic to it; see [`services/nixarr.nix`](services/nixarr.nix)
+- [x] self-host audiobooks — Audiobookshelf at `listen.adnanshaikh.com` (Tailscale-only, library `/data/fun/library/audiobooks`); Transmission torrents tagged `audiobook` (or `podcast`) are hardlinked in on completion; see [`services/nixarr.nix`](services/nixarr.nix)
 - [x] add airgradient to home assistant — `airgradient` in `extraComponents`; Living Room ONE at `192.168.1.94` added via UI (see [`services/homeassistant.nix`](services/homeassistant.nix))
 - [x] add sui — startpage at `start.adnanshaikh.com` (Tailscale-only, black theme, local services); see [`services/sui.nix`](services/sui.nix)
 - [x] Add Yomu to dock — already present at `/Applications/Yomu.app`, order matches `local.dock.entries` in [`modules/macos/base.nix`](modules/macos/base.nix)
@@ -30,6 +31,7 @@
   - [ ] set up backups for home assistant (stub commented out in `services/homeassistant.nix`)
   - [ ] set up backups for forgejo (`/data/forgejo` — repos + SQLite DB)
   - [ ] set up backups for navidrome (`/var/lib/navidrome` — SQLite DB, playlists, ratings; library files themselves live under `/data/fun/library/music`)
+  - [ ] set up backups for audiobookshelf (`/var/lib/nixarr/audiobookshelf` — library files live under `/data/fun/library/audiobooks`)
   - [ ] set up backups for immich (`/data/immich` library + `/data/postgresql` — photos are not a backup until this exists)
 
 ## To do — infra / ops

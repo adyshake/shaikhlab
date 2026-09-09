@@ -4,7 +4,25 @@
   vars,
   lib,
   ...
-}: {
+}: let
+  absAudiobooks = "${config.nixarr.mediaDir}/library/audiobooks";
+  absPodcasts = "${config.nixarr.mediaDir}/library/podcasts";
+
+  # Tag a torrent `audiobook` or `podcast` in Transmission. On completion
+  # (and every minute for torrents tagged after they finished) this
+  # hardlinks the files into the matching Audiobookshelf library.
+  transmissionToAbs = pkgs.writeShellApplication {
+    name = "transmission-to-abs";
+    runtimeInputs = [pkgs.curl pkgs.jq pkgs.coreutils pkgs.gawk pkgs.gnugrep];
+    text = ''
+      export ABS_AUDIOBOOKS=${lib.escapeShellArg absAudiobooks}
+      export ABS_PODCASTS=${lib.escapeShellArg absPodcasts}
+      export TRANSMISSION_USER=${lib.escapeShellArg vars.userName}
+      export TRANSMISSION_RPC_URL="http://127.0.0.1:9091/transmission/rpc"
+      ${pkgs.bash}/bin/bash ${./nixarr/transmission-to-abs.sh}
+    '';
+  };
+in {
   imports = [
     ./_acme.nix
     ./_nginx.nix
@@ -38,7 +56,19 @@
     mediaDir = "/data/fun";
     stateDir = "/var/lib/nixarr";
 
+    # Jellyfin 12.0 (from 10.11.11): wait for nixpkgs (server + web + ffmpeg
+    # 8.1 + .NET 10). Before first 12.0 start: stop jellyfin, copy
+    # /var/lib/nixarr/jellyfin (DB rewrite is not rollback-able from a
+    # generation), drop third-party plugins, update Infuse/InfuseSync
+    # (>=1.5.3). After: full library scan, then reinstall official plugins.
+    # Add proxyWebsockets on watch.adnanshaikh.com when shipping. Pin the
+    # package so autoUpgrade cannot migrate the DB on a lock bump.
     jellyfin.enable = true;
+    # Player (host network, like Jellyfin / Navidrome). First visit
+    # listen.adnanshaikh.com, create the admin user, add a library
+    # pointing at /data/fun/library/audiobooks. Tag Transmission
+    # torrents `audiobook` (or `podcast`) to hardlink them in.
+    audiobookshelf.enable = true;
     prowlarr = {
       enable = true;
       vpn.enable = true;
@@ -245,8 +275,18 @@
         rpc-authentication-required = true;
         rpc-username = vars.userName;
         rpc-whitelist-enabled = false;
+        # nixarr defaults this on (threshold 10, global, no cooldown).
+        # One burst of bad Basic auth — browser saved password or *arr —
+        # 403s every RPC client until transmission.service restarts.
+        # RPC is Tailscale/LAN-only; password auth is enough.
+        anti-brute-force-enabled = false;
         ratio-limit = 1.0;
         ratio-limit-enabled = true;
+        # Overrides nixarr's cross-seed hook (disabled here). Instant
+        # import when a tagged torrent finishes; the timer covers tags
+        # applied after completion.
+        script-torrent-done-enabled = true;
+        script-torrent-done-filename = lib.getExe transmissionToAbs;
       };
     };
 
@@ -297,8 +337,8 @@
   #    hard-coupled to wg.service via BindsTo+After. They refuse to start if
   #    wg is down, are force-stopped if wg dies, and retry themselves once
   #    wg recovers. mkDefault on Restart lets nixarr's own tuning (if any) win.
-  # 3) navidrome is NOT vpnBound (host network, like Jellyfin). PrivateUsers
-  #    is forced off so the media supplementary group survives the sandbox.
+  # 3) navidrome / audiobookshelf are NOT vpnBound (host network, like
+  #    Jellyfin). PrivateUsers is forced off so the media group survives.
   systemd.services = let
     vpnBound = extra:
       lib.recursiveUpdate {
@@ -381,6 +421,40 @@
       # `media`; without the group, Navidrome cannot read those files
       # when they are not world-readable.
       serviceConfig.PrivateUsers = lib.mkForce false;
+    };
+
+    # nixarr sandboxes ABS to its stateDir (ProtectSystem=strict). Allow
+    # the library so folder watch / podcast downloads / metadata embeds
+    # can write, same as Navidrome reading library/music.
+    audiobookshelf = {
+      unitConfig.RequiresMountsFor = [absAudiobooks absPodcasts];
+      serviceConfig = {
+        ReadWritePaths = [absAudiobooks absPodcasts];
+        PrivateUsers = lib.mkForce false;
+      };
+    };
+
+    # Poll Transmission for completed torrents tagged audiobook/podcast.
+    # The torrent-done hook covers the happy path; this catches torrents
+    # tagged after they finished and retries a failed hardlink.
+    transmission-to-abs = {
+      description = "Hardlink tagged Transmission downloads into Audiobookshelf";
+      after = ["transmission.service"];
+      wants = ["transmission.service"];
+      serviceConfig = {
+        Type = "oneshot";
+        User = "transmission";
+        Group = "media";
+        ExecStart = lib.getExe transmissionToAbs;
+        LoadCredential = "transmission-rpc:${config.sops.secrets."transmission-rpc-credentials".path}";
+        Nice = 10;
+        IOSchedulingClass = "idle";
+      };
+      unitConfig.RequiresMountsFor = [
+        "/data/transmission/downloads"
+        absAudiobooks
+        absPodcasts
+      ];
     };
 
     # Declarative configuration of Radarr/Sonarr state that lives in their
@@ -564,12 +638,14 @@
     ];
   };
 
-  environment.systemPackages = with pkgs; [
-    # To enable `intel_gpu_top`
-    intel-gpu-tools
-    # because nixarr does not include it by default
-    wireguard-tools
-  ];
+  environment.systemPackages = with pkgs;
+    [
+      # To enable `intel_gpu_top`
+      intel-gpu-tools
+      # because nixarr does not include it by default
+      wireguard-tools
+    ]
+    ++ [transmissionToAbs];
 
   services.nginx = {
     virtualHosts = {
@@ -637,6 +713,21 @@
         };
       };
 
+      "listen.adnanshaikh.com" = {
+        forceSSL = true;
+        useACMEHost = "adnanshaikh.com";
+        locations."/" = {
+          recommendedProxySettings = true;
+          proxyWebsockets = true;
+          proxyPass = "http://127.0.0.1:${toString config.nixarr.audiobookshelf.port}";
+          extraConfig = ''
+            client_max_body_size 5G;
+            proxy_read_timeout 86400s;
+            proxy_send_timeout 86400s;
+          '';
+        };
+      };
+
       "transmission.adnanshaikh.com" = {
         forceSSL = true;
         useACMEHost = "adnanshaikh.com";
@@ -658,6 +749,7 @@
   users.users.transmission.extraGroups = ["media"];
   users.users.jellyfin.extraGroups = ["media"];
   users.users.navidrome.extraGroups = ["media"];
+  users.users.audiobookshelf.extraGroups = ["media"];
 
   systemd = {
     tmpfiles.rules = [
@@ -667,6 +759,18 @@
       "d /data/transmission/downloads/tv-sonarr 2775 transmission media -"
       "d /data/transmission/downloads/lidarr 2775 transmission media -"
     ];
+
+    timers.transmission-to-abs = {
+      description = "Sweep tagged Transmission downloads into Audiobookshelf";
+      wantedBy = ["timers.target"];
+      after = ["transmission.service"];
+      timerConfig = {
+        OnBootSec = "1min";
+        OnUnitActiveSec = "1min";
+        AccuracySec = "15s";
+        Persistent = true;
+      };
+    };
 
     #services = {
     #  "backup-nixarr" = {

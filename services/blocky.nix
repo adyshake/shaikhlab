@@ -146,6 +146,7 @@ in {
           "sonarr.adnanshaikh.com" = serverIP;
           "lidarr.adnanshaikh.com" = serverIP;
           "transmission.adnanshaikh.com" = serverIP;
+          "listen.adnanshaikh.com" = serverIP;
 
           # Navidrome
           "music.adnanshaikh.com" = serverIP;
