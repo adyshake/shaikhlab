@@ -272,13 +272,12 @@ in {
         speed-limit-up = 500;
         speed-limit-up-enabled = true;
         rpc-bind-address = "0.0.0.0";
-        rpc-authentication-required = true;
+        rpc-authentication-required = false;
         rpc-username = vars.userName;
         rpc-whitelist-enabled = false;
         # nixarr defaults this on (threshold 10, global, no cooldown).
         # One burst of bad Basic auth — browser saved password or *arr —
         # 403s every RPC client until transmission.service restarts.
-        # RPC is Tailscale/LAN-only; password auth is enough.
         anti-brute-force-enabled = false;
         ratio-limit = 1.0;
         ratio-limit-enabled = true;
