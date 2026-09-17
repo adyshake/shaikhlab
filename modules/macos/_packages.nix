@@ -51,7 +51,6 @@
       "librewolf"
       "flycut"
       "grandperspective"
-      "hammerspoon"
       "handbrake-app"
       "itsycal"
       "linearmouse"

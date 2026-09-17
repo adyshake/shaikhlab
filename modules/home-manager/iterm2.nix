@@ -35,6 +35,7 @@ in {
   targets.darwin.defaults = lib.mkIf pkgs.stdenv.isDarwin {
     "com.googlecode.iterm2" = {
       "Default Bookmark Guid" = profileGuid;
+      LoadPrefsFromCustomFolder = false;
     };
   };
 }
