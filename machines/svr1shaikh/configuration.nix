@@ -28,6 +28,7 @@
     ./../../services/wastebin.nix
     ./../../services/immich.nix
     ./../../services/nextcloud.nix # Requires: nextcloud-admin-password
+    ./../../services/pge-bills.nix # Requires: secrets/pge-credentials + mxroute-smtp-password
   ];
 
   home-manager = {
