@@ -503,7 +503,10 @@ in {
         RECYCLARR_CONFIG_DIR = "/var/lib/nixarr/recyclarr";
         RECYCLARR_DATA_DIR = "/var/lib/nixarr/recyclarr";
       };
-      serviceConfig.ExecStart = lib.mkForce "${lib.getExe pkgs.recyclarr} sync --config ${cfg}";
+      serviceConfig.ExecStart = lib.mkForce [
+        ""
+        "${lib.getExe pkgs.recyclarr} sync --config ${cfg}"
+      ];
     };
 
     # Poll Transmission for completed torrents tagged audiobook/podcast.
