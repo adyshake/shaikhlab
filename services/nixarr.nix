@@ -503,7 +503,7 @@ in {
         RECYCLARR_CONFIG_DIR = "/var/lib/nixarr/recyclarr";
         RECYCLARR_DATA_DIR = "/var/lib/nixarr/recyclarr";
       };
-      serviceConfig.ExecStart = lib.mkForce [
+      serviceConfig.ExecStart = lib.mkOverride 0 [
         ""
         "${lib.getExe pkgs.recyclarr} sync --config ${cfg}"
       ];
