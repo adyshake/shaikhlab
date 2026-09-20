@@ -88,7 +88,72 @@ in {
 
     recyclarr = {
       enable = true;
-      configuration = {
+      configuration = let
+        # Size limits are MB/min. 1080p WEB/Bluray stay at TRaSH defaults
+        # (unlimited) so normal encodes are not rejected. 4K is capped
+        # (~50GB for a 2.5h movie) so a fallback 4K is not an 80GB remux.
+        cap = max: preferred: {inherit max preferred;};
+        sonarrSizeCaps = [
+          ({name = "Bluray-1080p Remux";} // cap 200 160)
+          ({name = "WEBRip-2160p";} // cap 220 160)
+          ({name = "WEBDL-2160p";} // cap 220 160)
+          ({name = "Bluray-2160p";} // cap 280 200)
+          ({name = "Bluray-2160p Remux";} // cap 280 200)
+        ];
+        radarrSizeCaps = [
+          ({name = "WEBRip-2160p";} // cap 280 180)
+          ({name = "WEBDL-2160p";} // cap 280 180)
+          ({name = "Bluray-2160p";} // cap 350 220)
+          ({name = "Remux-2160p";} // cap 350 220)
+        ];
+
+        # Same-resolution sources are grouped so quality does not trump
+        # a well-seeded WEB-DL. Radarr then ranks by CF score (original
+        # language preferred, not English dubs) and seeders. Remux is
+        # omitted — that is the 80GB path.
+        resolutionLadder = [
+          {
+            name = "1080p";
+            qualities = ["Bluray-1080p" "WEBDL-1080p" "WEBRip-1080p"];
+          }
+          {
+            name = "2160p";
+            qualities = ["Bluray-2160p" "WEBDL-2160p" "WEBRip-2160p"];
+          }
+          {
+            name = "720p";
+            qualities = ["Bluray-720p" "WEBDL-720p" "WEBRip-720p"];
+          }
+          {name = "HDTV-1080p";}
+          {name = "HDTV-720p";}
+        ];
+        movieLadder = name: {
+          inherit name;
+          reset_unmatched_scores.enabled = true;
+          # Language: Not Original is -100. Must be below 0 so a
+          # dubbed release still downloads when no original exists.
+          min_format_score = -200;
+          upgrade = {
+            allowed = true;
+            until_quality = "1080p";
+            until_score = 10000;
+          };
+          qualities = resolutionLadder;
+        };
+        # Prefer the title's original audio (JA/FR/KO/…) over an English
+        # dub, without blocking the dub if original is unavailable.
+        preferOriginal = name: trashId: {
+          trash_ids = [trashId];
+          assign_scores_to = [
+            {
+              inherit name;
+              score = -100;
+            }
+          ];
+        };
+        radarrNotOriginal = "d6e9318c875905d6cfb5bee961afcea9";
+        sonarrNotOriginal = "ae575f95ab639ba5d15f663bf019e3e8";
+      in {
         sonarr = {
           anime-sonarr-v4 = {
             base_url = "https://sonarr.adnanshaikh.com";
@@ -102,6 +167,11 @@ in {
               {template = "sonarr-v4-quality-profile-anime";}
               {template = "sonarr-v4-custom-formats-anime";}
             ];
+
+            quality_definition = {
+              type = "anime";
+              qualities = sonarrSizeCaps;
+            };
           };
 
           web-1080p-v4 = {
@@ -114,7 +184,20 @@ in {
               {template = "sonarr-v4-custom-formats-web-1080p";}
             ];
 
+            quality_definition = {
+              type = "series";
+              qualities = sonarrSizeCaps;
+            };
+
+            quality_profiles = [
+              {
+                name = "WEB-1080p";
+                min_format_score = -200;
+              }
+            ];
+
             custom_formats = [
+              (preferOriginal "WEB-1080p" sonarrNotOriginal)
               # Unwanted
               {
                 trash_ids = [
@@ -153,6 +236,11 @@ in {
               {template = "radarr-custom-formats-anime";}
             ];
 
+            quality_definition = {
+              type = "movie";
+              qualities = radarrSizeCaps;
+            };
+
             delete_old_custom_formats = true;
             replace_existing_custom_formats = true;
 
@@ -183,10 +271,20 @@ in {
               {template = "radarr-custom-formats-hd-blueray-web";}
             ];
 
+            quality_definition = {
+              type = "movie";
+              qualities = radarrSizeCaps;
+            };
+
+            quality_profiles = [
+              (movieLadder "HD Blueray + WEB")
+            ];
+
             delete_old_custom_formats = true;
             replace_existing_custom_formats = true;
 
             custom_formats = [
+              (preferOriginal "HD Blueray + WEB" radarrNotOriginal)
               {
                 trash_ids = [
                   "dc98083864ea246d05a42df0d05f81cc" # x265 (HD)
@@ -202,51 +300,39 @@ in {
             ];
           };
 
-          remux-web-1080p = {
+          # 1080p first, then size-capped 4K, then 720p. Existing
+          # "Remux + WEB 1080p" movies get the same ladder so they
+          # stop grabbing 80GB remuxes.
+          uhd-then-hd = {
             base_url = "https://radarr.adnanshaikh.com";
             api_key = "!env_var RADARR_API_KEY";
 
             include = [
               {template = "radarr-quality-definition-movie";}
-              {template = "radarr-quality-profile-remux-web-1080p";}
-              {template = "radarr-custom-formats-remux-web-1080p";}
+              {template = "radarr-custom-formats-uhd-bluray-web";}
+              {template = "radarr-custom-formats-hd-blueray-web";}
+            ];
+
+            quality_definition = {
+              type = "movie";
+              qualities = radarrSizeCaps;
+            };
+
+            quality_profiles = let
+              uhd = "64fb5f9858489bdac2af690e27c8f42f";
+            in [
+              (movieLadder "1080p then 4K" // {trash_id = uhd;})
+              (movieLadder "Remux + WEB 1080p" // {trash_id = uhd;})
+              (movieLadder "UHD Bluray + WEB" // {trash_id = uhd;})
             ];
 
             delete_old_custom_formats = true;
             replace_existing_custom_formats = true;
 
             custom_formats = [
-              {
-                trash_ids = [
-                  "496f355514737f7d83bf7aa4d24f8169" # TrueHD Atmos
-                  "2f22d89048b01681dde8afe203bf2e95" # DTS X
-                  "417804f7f2c4308c1f4c5d380d4c4475" # ATMOS (undefined)
-                  "1af239278386be2919e1bcee0bde047e" # DD+ ATMOS
-                  "3cafb66171b47f226146a0770576870f" # TrueHD
-                  "dcf3ec6938fa32445f590a4da84256cd" # DTS-HD MA
-                  "a570d4a0e56a2874b64e5bfa55202a1b" # FLAC
-                  "e7c2fcae07cbada050a0af3357491d7b" # PCM
-                  "8e109e50e0a0b83a5098b056e13bf6db" # DTS-HD HRA
-                  "185f1dd7264c4562b9022d963ac37424" # DD+
-                  "f9f847ac70a0af62ea4a08280b859636" # DTS-ES
-                  "1c1a4c5e823891c75bc50380a6866f73" # DTS
-                  "240770601cc226190c367ef59aba7463" # AAC
-                  "c2998bd0d90ed5621d8df281e839436e" # DD
-                ];
-                assign_scores_to = [{name = "Remux + WEB 1080p";}];
-              }
-              {
-                trash_ids = [
-                  "dc98083864ea246d05a42df0d05f81cc" # x265 (HD)
-                  "839bea857ed2c0a8e084f3cbdbd65ecb" # x265 (no HDR/DV)
-                ];
-                assign_scores_to = [
-                  {
-                    name = "Remux + WEB 1080p";
-                    score = 0;
-                  }
-                ];
-              }
+              (preferOriginal "1080p then 4K" radarrNotOriginal)
+              (preferOriginal "Remux + WEB 1080p" radarrNotOriginal)
+              (preferOriginal "UHD Bluray + WEB" radarrNotOriginal)
             ];
           };
         };
@@ -575,6 +661,44 @@ in {
           fi
         }
 
+        # Recyclarr TRaSH profiles reset language to Original, which
+        # hard-filters instead of scoring. Set Any so "Language: Not
+        # Original" can prefer the title's original audio without
+        # blocking a dub when original is missing. Skip anime.
+        set_radarr_language_any() {
+          local port="$1" apiKey="$2"
+          local anyId
+          anyId=$(${pkgs.curl}/bin/curl -fsS -H "X-Api-Key: $apiKey" \
+            "http://127.0.0.1:$port/api/v3/language" \
+            | ${pkgs.jq}/bin/jq -r '.[] | select(.name=="Any") | .id')
+          if [ -z "$anyId" ]; then
+            echo "[radarr] language Any: id not found, skipping" >&2
+            return 0
+          fi
+
+          local profiles
+          profiles=$(${pkgs.curl}/bin/curl -fsS -H "X-Api-Key: $apiKey" \
+            "http://127.0.0.1:$port/api/v3/qualityprofile")
+
+          local -a payloads
+          mapfile -t payloads < <(echo "$profiles" | ${pkgs.jq}/bin/jq -c --argjson anyId "$anyId" '
+            .[]
+            | select(.name | test("Anime"; "i") | not)
+            | select(.language.name != "Any")
+            | .language = {id: $anyId, name: "Any"}
+          ')
+          for payload in "${payloads[@]}"; do
+            id=$(echo "$payload" | ${pkgs.jq}/bin/jq -r '.id')
+            name=$(echo "$payload" | ${pkgs.jq}/bin/jq -r '.name')
+            echo "[radarr] quality profile: $name language -> Any"
+            echo "$payload" | ${pkgs.curl}/bin/curl -fsS -X PUT \
+              -H "X-Api-Key: $apiKey" \
+              -H "Content-Type: application/json" \
+              --data-binary @- \
+              "http://127.0.0.1:$port/api/v3/qualityprofile/$id" >/dev/null
+          done
+        }
+
         # ------------------------------------------------------------------
         # Main: configure one *arr instance end-to-end.
         # ------------------------------------------------------------------
@@ -583,6 +707,9 @@ in {
           local apiKey
           apiKey=$(wait_for_api "$service" "$port" "$configFile" "$apiVer")
           upsert_download_client "$service" "$port" "$apiKey" "$appFields" "$apiVer"
+          if [ "$service" = radarr ]; then
+            set_radarr_language_any "$port" "$apiKey"
+          fi
         }
 
         RADARR_FIELDS='[
@@ -608,7 +735,7 @@ in {
       '';
     in {
       description = "Declaratively configure Radarr/Sonarr/Lidarr runtime state (Transmission download client)";
-      after = ["radarr.service" "sonarr.service" "lidarr.service"];
+      after = ["radarr.service" "sonarr.service" "lidarr.service" "recyclarr.service"];
       wants = ["radarr.service" "sonarr.service" "lidarr.service"];
       wantedBy = ["multi-user.target"];
       serviceConfig = {
