@@ -153,6 +153,12 @@ in {
         };
         radarrNotOriginal = "d6e9318c875905d6cfb5bee961afcea9";
         sonarrNotOriginal = "ae575f95ab639ba5d15f663bf019e3e8";
+        # Recyclarr v8 guide-backed profiles (include templates are gone).
+        sonarrWeb1080p = "72dae194fc92bf828f32cde7744e51a1";
+        sonarrAnime = "20e0fc959f1f1704bed501f23bdae76f";
+        radarrHd = "d1d67249d3890e49bc12e275d989a7e9";
+        radarrUhd = "64fb5f9858489bdac2af690e27c8f42f";
+        radarrAnime = "722b624f9af1e492284c4bc842153a38";
       in {
         sonarr = {
           anime-sonarr-v4 = {
@@ -160,29 +166,24 @@ in {
             api_key = "!env_var SONARR_API_KEY";
 
             delete_old_custom_formats = true;
-            replace_existing_custom_formats = true;
-
-            include = [
-              {template = "sonarr-quality-definition-anime";}
-              {template = "sonarr-v4-quality-profile-anime";}
-              {template = "sonarr-v4-custom-formats-anime";}
-            ];
 
             quality_definition = {
               type = "anime";
               qualities = sonarrSizeCaps;
             };
+
+            quality_profiles = [
+              {
+                trash_id = sonarrAnime;
+                name = "Remux-1080p - Anime";
+                reset_unmatched_scores.enabled = true;
+              }
+            ];
           };
 
           web-1080p-v4 = {
             base_url = "https://sonarr.adnanshaikh.com";
             api_key = "!env_var SONARR_API_KEY";
-
-            include = [
-              {template = "sonarr-quality-definition-series";}
-              {template = "sonarr-v4-quality-profile-web-1080p";}
-              {template = "sonarr-v4-custom-formats-web-1080p";}
-            ];
 
             quality_definition = {
               type = "series";
@@ -191,14 +192,15 @@ in {
 
             quality_profiles = [
               {
+                trash_id = sonarrWeb1080p;
                 name = "WEB-1080p";
+                reset_unmatched_scores.enabled = true;
                 min_format_score = -200;
               }
             ];
 
             custom_formats = [
               (preferOriginal "WEB-1080p" sonarrNotOriginal)
-              # Unwanted
               {
                 trash_ids = [
                   "85c61753df5da1fb2aab6f2a47426b09" # BR-DISK
@@ -231,18 +233,17 @@ in {
             base_url = "https://radarr.adnanshaikh.com";
             api_key = "!env_var RADARR_API_KEY";
 
-            include = [
-              {template = "radarr-quality-profile-anime";}
-              {template = "radarr-custom-formats-anime";}
-            ];
-
             quality_definition = {
-              type = "movie";
-              qualities = radarrSizeCaps;
+              type = "anime";
             };
 
-            delete_old_custom_formats = true;
-            replace_existing_custom_formats = true;
+            quality_profiles = [
+              {
+                trash_id = radarrAnime;
+                name = "Remux-1080p - Anime";
+                reset_unmatched_scores.enabled = true;
+              }
+            ];
 
             custom_formats = [
               {
@@ -261,15 +262,12 @@ in {
             ];
           };
 
-          hd-blueray-web = {
+          # One Radarr instance so quality defs and CFs do not fight.
+          # 1080p first, then size-capped 4K, then 720p. Existing
+          # remux/HD profile names are kept so Recyclarr adopts them.
+          movies = {
             base_url = "https://radarr.adnanshaikh.com";
             api_key = "!env_var RADARR_API_KEY";
-
-            include = [
-              {template = "radarr-quality-definition-movie";}
-              {template = "radarr-quality-profile-hd-blueray-web";}
-              {template = "radarr-custom-formats-hd-blueray-web";}
-            ];
 
             quality_definition = {
               type = "movie";
@@ -277,14 +275,19 @@ in {
             };
 
             quality_profiles = [
-              (movieLadder "HD Blueray + WEB")
+              (movieLadder "HD Blueray + WEB" // {trash_id = radarrHd;})
+              (movieLadder "1080p then 4K" // {trash_id = radarrUhd;})
+              (movieLadder "Remux + WEB 1080p" // {trash_id = radarrUhd;})
+              (movieLadder "UHD Bluray + WEB" // {trash_id = radarrUhd;})
             ];
 
             delete_old_custom_formats = true;
-            replace_existing_custom_formats = true;
 
             custom_formats = [
               (preferOriginal "HD Blueray + WEB" radarrNotOriginal)
+              (preferOriginal "1080p then 4K" radarrNotOriginal)
+              (preferOriginal "Remux + WEB 1080p" radarrNotOriginal)
+              (preferOriginal "UHD Bluray + WEB" radarrNotOriginal)
               {
                 trash_ids = [
                   "dc98083864ea246d05a42df0d05f81cc" # x265 (HD)
@@ -297,42 +300,6 @@ in {
                   }
                 ];
               }
-            ];
-          };
-
-          # 1080p first, then size-capped 4K, then 720p. Existing
-          # "Remux + WEB 1080p" movies get the same ladder so they
-          # stop grabbing 80GB remuxes.
-          uhd-then-hd = {
-            base_url = "https://radarr.adnanshaikh.com";
-            api_key = "!env_var RADARR_API_KEY";
-
-            include = [
-              {template = "radarr-quality-definition-movie";}
-              {template = "radarr-custom-formats-uhd-bluray-web";}
-              {template = "radarr-custom-formats-hd-blueray-web";}
-            ];
-
-            quality_definition = {
-              type = "movie";
-              qualities = radarrSizeCaps;
-            };
-
-            quality_profiles = let
-              uhd = "64fb5f9858489bdac2af690e27c8f42f";
-            in [
-              (movieLadder "1080p then 4K" // {trash_id = uhd;})
-              (movieLadder "Remux + WEB 1080p" // {trash_id = uhd;})
-              (movieLadder "UHD Bluray + WEB" // {trash_id = uhd;})
-            ];
-
-            delete_old_custom_formats = true;
-            replace_existing_custom_formats = true;
-
-            custom_formats = [
-              (preferOriginal "1080p then 4K" radarrNotOriginal)
-              (preferOriginal "Remux + WEB 1080p" radarrNotOriginal)
-              (preferOriginal "UHD Bluray + WEB" radarrNotOriginal)
             ];
           };
         };
@@ -517,6 +484,26 @@ in {
         ReadWritePaths = [absAudiobooks absPodcasts];
         PrivateUsers = lib.mkForce false;
       };
+    };
+
+    # nixarr still execs `recyclarr sync --app-data`, which 8.6 rejects.
+    # Keep its EnvironmentFile (API keys) and point CONFIG/DATA at the
+    # nixarr state dir that already has the cloned guides.
+    recyclarr = let
+      yaml = pkgs.formats.yaml {};
+      raw = yaml.generate "recyclarr-raw.yml" config.nixarr.recyclarr.configuration;
+      cfg =
+        pkgs.runCommand "recyclarr.yml" {
+          nativeBuildInputs = [pkgs.gnused];
+        } ''
+          sed -E "s/[\"']!env_var ([^\"']+)[\"']/!env_var \\1/g" ${raw} > "$out"
+        '';
+    in {
+      environment = {
+        RECYCLARR_CONFIG_DIR = "/var/lib/nixarr/recyclarr";
+        RECYCLARR_DATA_DIR = "/var/lib/nixarr/recyclarr";
+      };
+      serviceConfig.ExecStart = lib.mkForce "${lib.getExe pkgs.recyclarr} sync --config ${cfg}";
     };
 
     # Poll Transmission for completed torrents tagged audiobook/podcast.
