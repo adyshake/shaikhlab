@@ -687,7 +687,7 @@ in {
             | select(.language.name != "Any")
             | .language = {id: $anyId, name: "Any"}
           ')
-          for payload in "${payloads[@]}"; do
+          for payload in "''${payloads[@]}"; do
             id=$(echo "$payload" | ${pkgs.jq}/bin/jq -r '.id')
             name=$(echo "$payload" | ${pkgs.jq}/bin/jq -r '.name')
             echo "[radarr] quality profile: $name language -> Any"
