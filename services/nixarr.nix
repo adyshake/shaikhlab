@@ -884,6 +884,11 @@ in {
       "d /data/transmission/downloads/radarr 2775 transmission media -"
       "d /data/transmission/downloads/tv-sonarr 2775 transmission media -"
       "d /data/transmission/downloads/lidarr 2775 transmission media -"
+      # nixarr writes these as root:640; recyclarr-setup runs as
+      # recyclarr and has been failing nightly since mid-September.
+      "d /var/lib/nixarr/api-keys 0750 root recyclarr -"
+      "z /var/lib/nixarr/api-keys/radarr.key 0640 root recyclarr -"
+      "z /var/lib/nixarr/api-keys/sonarr.key 0640 root recyclarr -"
     ];
 
     timers.transmission-to-abs = {
