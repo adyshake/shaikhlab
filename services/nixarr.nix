@@ -160,15 +160,19 @@ in {
         radarrUhd = "64fb5f9858489bdac2af690e27c8f42f";
         radarrAnime = "722b624f9af1e492284c4bc842153a38";
       in {
+        # Recyclarr 8 errors on two YAML instances that share a
+        # base_url (Split instances) and exits without syncing.
+        # One instance per *arr; anime is another profile, not
+        # another server. Movie/series size defs win over anime.
         sonarr = {
-          anime-sonarr-v4 = {
+          series = {
             base_url = "https://sonarr.adnanshaikh.com";
             api_key = "!env_var SONARR_API_KEY";
 
             delete_old_custom_formats = true;
 
             quality_definition = {
-              type = "anime";
+              type = "series";
               qualities = sonarrSizeCaps;
             };
 
@@ -178,19 +182,6 @@ in {
                 name = "Remux-1080p - Anime";
                 reset_unmatched_scores.enabled = true;
               }
-            ];
-          };
-
-          web-1080p-v4 = {
-            base_url = "https://sonarr.adnanshaikh.com";
-            api_key = "!env_var SONARR_API_KEY";
-
-            quality_definition = {
-              type = "series";
-              qualities = sonarrSizeCaps;
-            };
-
-            quality_profiles = [
               {
                 trash_id = sonarrWeb1080p;
                 name = "WEB-1080p";
@@ -229,40 +220,6 @@ in {
           };
         };
         radarr = {
-          anime = {
-            base_url = "https://radarr.adnanshaikh.com";
-            api_key = "!env_var RADARR_API_KEY";
-
-            quality_definition = {
-              type = "anime";
-            };
-
-            quality_profiles = [
-              {
-                trash_id = radarrAnime;
-                name = "Remux-1080p - Anime";
-                reset_unmatched_scores.enabled = true;
-              }
-            ];
-
-            custom_formats = [
-              {
-                trash_ids = [
-                  "064af5f084a0a24458cc8ecd3220f93f" # Uncensored
-                  "a5d148168c4506b55cf53984107c396e" # 10bit
-                  "4a3b087eea2ce012fcc1ce319259a3be" # Dual Audio
-                ];
-                assign_scores_to = [
-                  {
-                    name = "Remux-1080p - Anime";
-                    score = 0;
-                  }
-                ];
-              }
-            ];
-          };
-
-          # One Radarr instance so quality defs and CFs do not fight.
           # 1080p first, then size-capped 4K, then 720p. Existing
           # remux/HD profile names are kept so Recyclarr adopts them.
           movies = {
@@ -279,6 +236,11 @@ in {
               (movieLadder "1080p then 4K" // {trash_id = radarrUhd;})
               (movieLadder "Remux + WEB 1080p" // {trash_id = radarrUhd;})
               (movieLadder "UHD Bluray + WEB" // {trash_id = radarrUhd;})
+              {
+                trash_id = radarrAnime;
+                name = "Remux-1080p - Anime";
+                reset_unmatched_scores.enabled = true;
+              }
             ];
 
             delete_old_custom_formats = true;
@@ -296,6 +258,19 @@ in {
                 assign_scores_to = [
                   {
                     name = "HD Blueray + WEB";
+                    score = 0;
+                  }
+                ];
+              }
+              {
+                trash_ids = [
+                  "064af5f084a0a24458cc8ecd3220f93f" # Uncensored
+                  "a5d148168c4506b55cf53984107c396e" # 10bit
+                  "4a3b087eea2ce012fcc1ce319259a3be" # Dual Audio
+                ];
+                assign_scores_to = [
+                  {
+                    name = "Remux-1080p - Anime";
                     score = 0;
                   }
                 ];
@@ -488,7 +463,8 @@ in {
 
     # nixarr still execs `recyclarr sync --app-data`, which 8.6 rejects.
     # Keep its EnvironmentFile (API keys) and point CONFIG/DATA at the
-    # nixarr state dir that already has the cloned guides.
+    # nixarr state dir that already has the cloned guides. One YAML
+    # instance per *arr — Recyclarr 8 skips a split-instance sync.
     recyclarr = let
       yaml = pkgs.formats.yaml {};
       raw = yaml.generate "recyclarr-raw.yml" config.nixarr.recyclarr.configuration;
