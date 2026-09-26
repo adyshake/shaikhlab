@@ -22,6 +22,16 @@
       ${pkgs.bash}/bin/bash ${./nixarr/transmission-to-abs.sh}
     '';
   };
+
+  # Jellyfin Played, or >=85% watched, that has sat for a week.
+  # Deletes through Radarr so the title is not grabbed again.
+  jellyfinStaleMovies = pkgs.writeShellApplication {
+    name = "jellyfin-stale-movies";
+    runtimeInputs = [pkgs.python3];
+    text = ''
+      exec ${pkgs.python3}/bin/python3 ${./nixarr/jellyfin-stale-movies.py}
+    '';
+  };
 in {
   imports = [
     ./_acme.nix
@@ -89,23 +99,43 @@ in {
     recyclarr = {
       enable = true;
       configuration = let
-        # Size limits are MB/min. 1080p WEB/Bluray stay at TRaSH defaults
-        # (unlimited) so normal encodes are not rejected. 4K is capped
-        # (~50GB for a 2.5h movie) so a fallback 4K is not an 80GB remux.
-        cap = max: preferred: {inherit max preferred;};
-        sonarrSizeCaps = [
-          ({name = "Bluray-1080p Remux";} // cap 200 160)
-          ({name = "WEBRip-2160p";} // cap 220 160)
-          ({name = "WEBDL-2160p";} // cap 220 160)
-          ({name = "Bluray-2160p";} // cap 280 200)
-          ({name = "Bluray-2160p Remux";} // cap 280 200)
+        # Size limits are MB/min (Radarr has no absolute GB floor).
+        # 720p 3, 1080p ~500MB/90min, 4K ~1GB/90min. TRaSH Bluray-1080p
+        # min (~51) was 4.7GB and rejected lean x265. 4K still has a
+        # max so a fallback is not an 80GB remux.
+        floor720 = {min = 3;};
+        floor1080 = {min = 5.6;}; # 5.6 * 90min ≈ 500MB
+        floorUhd = {min = 11.1;}; # 11.1 * 90min ≈ 1GB
+        cap = max: preferred: floorUhd // {inherit max preferred;};
+        hdFloors = [
+          ({name = "HDTV-720p";} // floor720)
+          ({name = "WEBDL-720p";} // floor720)
+          ({name = "WEBRip-720p";} // floor720)
+          ({name = "Bluray-720p";} // floor720)
+          ({name = "HDTV-1080p";} // floor1080)
+          ({name = "WEBDL-1080p";} // floor1080)
+          ({name = "WEBRip-1080p";} // floor1080)
+          ({name = "Bluray-1080p";} // floor1080)
         ];
-        radarrSizeCaps = [
-          ({name = "WEBRip-2160p";} // cap 280 180)
-          ({name = "WEBDL-2160p";} // cap 280 180)
-          ({name = "Bluray-2160p";} // cap 350 220)
-          ({name = "Remux-2160p";} // cap 350 220)
-        ];
+        sonarrSizeCaps =
+          hdFloors
+          ++ [
+            ({name = "Bluray-1080p Remux";} // floor1080 // {max = 200; preferred = 160;})
+            ({name = "WEBRip-2160p";} // cap 220 160)
+            ({name = "WEBDL-2160p";} // cap 220 160)
+            ({name = "Bluray-2160p";} // cap 280 200)
+            ({name = "Bluray-2160p Remux";} // cap 280 200)
+          ];
+        radarrSizeCaps =
+          hdFloors
+          ++ [
+            ({name = "Remux-1080p";} // floor1080)
+            ({name = "HDTV-2160p";} // floorUhd)
+            ({name = "WEBRip-2160p";} // cap 280 180)
+            ({name = "WEBDL-2160p";} // cap 280 180)
+            ({name = "Bluray-2160p";} // cap 350 220)
+            ({name = "Remux-2160p";} // cap 350 220)
+          ];
 
         # Same-resolution sources are grouped so quality does not trump
         # a well-seeded WEB-DL. Radarr then ranks by CF score (original
@@ -508,6 +538,32 @@ in {
       ];
     };
 
+    # Movies Jellyfin marked Played, or left at >=85%, that have not
+    # been touched for a week. Radarr deletes the files and adds an
+    # import exclusion so lists do not immediately re-grab them.
+    # Favorite / tag `keep` on Jellyfin or Radarr skips a title.
+    jellyfin-stale-movies = {
+      description = "Delete Jellyfin movies watched (>=85% or Played) and untouched for a week";
+      after = ["jellyfin.service" "radarr.service"];
+      wants = ["jellyfin.service" "radarr.service"];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = lib.getExe jellyfinStaleMovies;
+        Nice = 10;
+        IOSchedulingClass = "idle";
+        ProtectSystem = "strict";
+        ProtectHome = true;
+        PrivateTmp = true;
+        ReadOnlyPaths = [
+          "/var/lib/nixarr/jellyfin/data/data"
+          "/var/lib/nixarr/radarr/config.xml"
+        ];
+        # Jellyfin cannot unlink 0755 radarr/root movie folders.
+        ReadWritePaths = ["${config.nixarr.mediaDir}/library/movies"];
+      };
+      unitConfig.RequiresMountsFor = ["${config.nixarr.mediaDir}/library/movies"];
+    };
+
     # Declarative configuration of Radarr/Sonarr state that lives in their
     # SQLite DB (and therefore can't be set via NixOS options on config.xml).
     # Runs on the host (not inside the VPN namespace) and talks to the *arr
@@ -737,7 +793,7 @@ in {
       # because nixarr does not include it by default
       wireguard-tools
     ]
-    ++ [transmissionToAbs];
+    ++ [transmissionToAbs jellyfinStaleMovies];
 
   services.nginx = {
     virtualHosts = {
@@ -866,6 +922,17 @@ in {
         OnUnitActiveSec = "1min";
         AccuracySec = "15s";
         Persistent = true;
+      };
+    };
+
+    timers.jellyfin-stale-movies = {
+      description = "Delete Jellyfin movies watched (>=85% or Played) and untouched for a week";
+      wantedBy = ["timers.target"];
+      after = ["jellyfin.service"];
+      timerConfig = {
+        OnCalendar = "*-*-* 04:15:00";
+        Persistent = true;
+        RandomizedDelaySec = "15m";
       };
     };
 
