@@ -1,15 +1,8 @@
 {
-  config,
-  lib,
   pkgs,
   ...
 }: let
   domain = "start.adnanshaikh.com";
-
-  # Weekly Kagi Search API v1 refresh. Encrypt the key from
-  # https://kagi.com/api/keys as secrets/kagi-api-token (`sops -e -i`).
-  kagiTokenFile = ./../secrets/kagi-api-token;
-  hasKagiToken = builtins.pathExists kagiTokenFile;
 
   # Archived upstream; static HTML/JS only. Pin the last master commit.
   # https://github.com/jeroenpardon/sui
@@ -271,73 +264,6 @@
       border: 4px solid #6e6e6e;
       color: #f2f2f2;
     }
-
-    #good-news {
-      padding-bottom: 6vh;
-    }
-
-    #good-news h3 {
-      height: auto;
-      margin-bottom: 0.55em;
-    }
-
-    .good-news-meta {
-      color: var(--color-text-acc);
-      font-size: 0.8em;
-      margin: 0 0 0.55em 0;
-      text-transform: uppercase;
-    }
-
-    .good-news-lede {
-      color: var(--color-text-acc);
-      font-size: 0.9em;
-      line-height: 1.4;
-      margin: 0 0 2.6em 0;
-    }
-
-    #good-news-items {
-      display: grid;
-      grid-column-gap: 2.5em;
-      grid-row-gap: 1.6em;
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .good-news-item h4 {
-      font-size: 1em;
-      font-weight: 500;
-      height: auto;
-      line-height: 1.35;
-      margin: 0 0 0.35em 0;
-      text-transform: none;
-    }
-
-    .good-news-item h4 a {
-      color: var(--color-text-pri);
-    }
-
-    .good-news-item p {
-      color: var(--color-text-acc);
-      display: -webkit-box;
-      font-size: 0.9em;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 3;
-      line-height: 1.45;
-      margin: 0 0 0.45em 0;
-      overflow: hidden;
-    }
-
-    .good-news-item .good-news-source {
-      color: var(--color-text-acc);
-      font-size: 0.75em;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    @media screen and (max-width: 667px) {
-      #good-news-items {
-        grid-template-columns: 1fr;
-      }
-    }
   '';
 
   patchSui = pkgs.writeText "patch-sui.py" ''
@@ -356,23 +282,6 @@
     html = html.replace(
         '<button data-theme="blackboard"',
         '<button data-theme="black" class="theme-button theme-black">Black</button>\n                <button data-theme="blackboard"',
-    )
-    if "</main>" not in html:
-        raise SystemExit("index.html </main> not found")
-    html = html.replace(
-        "</main>",
-        """<section id="good-news">
-            <h3>Good news</h3>
-            <p class="good-news-meta" id="good-news-meta"></p>
-            <p class="good-news-lede" id="good-news-lede"></p>
-            <div id="good-news-items"></div>
-        </section>
-    </main>""",
-        1,
-    )
-    html = html.replace(
-        '<script src="./assets/js/search.js" type="text/javascript"></script>',
-        '<script src="./assets/js/search.js" type="text/javascript"></script>\n    <script src="./assets/js/good-news.js" type="text/javascript"></script>',
     )
     (root / "index.html").write_text(html)
 
@@ -435,8 +344,8 @@
     assert "https://{{url}}" in html
     assert "data-theme=\"black\"" in html
     assert "shaikhlab.css" in html
-    assert 'id="good-news"' in html
-    assert "good-news.js" in html
+    assert 'id="good-news"' not in html
+    assert "good-news.js" not in html
     assert "kagi.com/search" in search
     assert "case \"k\":" in search
     assert "document.getElementById('keywords').focus();" not in search
@@ -453,8 +362,6 @@
     cp ${linksJson} $out/links.json
     cp ${providersJson} $out/providers.json
     cp ${extraCss} $out/assets/css/shaikhlab.css
-    cp ${./sui/good-news.js} $out/assets/js/good-news.js
-    cp ${./sui/good-news.fallback.json} $out/good-news.fallback.json
 
     python3 ${patchSui} $out
   '';
@@ -471,62 +378,5 @@ in {
     locations."/".extraConfig = ''
       try_files $uri $uri/ /index.html;
     '';
-    locations."= /good-news.json" = {
-      alias = "/var/lib/sui-good-news/news.json";
-      extraConfig = ''
-        default_type application/json;
-        add_header Cache-Control "public, max-age=300";
-      '';
-    };
-  };
-
-  environment.persistence."/nix/persist".directories = [
-    "/var/lib/sui-good-news"
-  ];
-
-  sops.secrets = lib.mkIf hasKagiToken {
-    "kagi-api-token" = {
-      format = "binary";
-      sopsFile = kagiTokenFile;
-      mode = "0400";
-    };
-  };
-
-  systemd.services.sui-good-news = lib.mkIf hasKagiToken {
-    description = "Refresh startpage good-news digest via Kagi Search API v1";
-    after = ["network-online.target"];
-    wants = ["network-online.target"];
-    path = [pkgs.python3];
-
-    serviceConfig = {
-      Type = "oneshot";
-      User = "nginx";
-      Group = "nginx";
-      StateDirectory = "sui-good-news";
-      StateDirectoryMode = "0755";
-      WorkingDirectory = "/var/lib/sui-good-news";
-      LoadCredential = "kagi-api-token:${config.sops.secrets."kagi-api-token".path}";
-      ProtectSystem = "strict";
-      ProtectHome = true;
-      PrivateTmp = true;
-    };
-
-    script = ''
-      set -eu
-      python3 ${./sui/fetch-good-news.py} \
-        --token-file "$CREDENTIALS_DIRECTORY/kagi-api-token" \
-        --output /var/lib/sui-good-news/news.json
-    '';
-  };
-
-  systemd.timers.sui-good-news = lib.mkIf hasKagiToken {
-    description = "Weekly startpage good-news refresh";
-    wantedBy = ["timers.target"];
-    timerConfig = {
-      OnCalendar = "Sun *-*-* 07:00:00";
-      OnBootSec = "3min";
-      Persistent = true;
-      Unit = "sui-good-news.service";
-    };
   };
 }
