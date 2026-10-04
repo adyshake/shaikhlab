@@ -214,7 +214,13 @@
     }
 
     #container {
+      align-content: center;
+      box-sizing: border-box;
       grid-template-rows: auto;
+      margin-top: 0;
+      min-height: 100vh;
+      padding-bottom: 6vh;
+      padding-top: 6vh;
     }
 
     .theme-black {
