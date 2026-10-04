@@ -264,93 +264,15 @@
       border: 4px solid #6e6e6e;
       color: #f2f2f2;
     }
-  '';
 
-  patchSui = pkgs.writeText "patch-sui.py" ''
-    import sys
-    from pathlib import Path
-
-    root = Path(sys.argv[1])
-
-    html = (root / "index.html").read_text()
-    html = html.replace("<title>SUI</title>", "<title>shaikhlab</title>")
-    html = html.replace(
-        'href="./assets/css/styles.css"',
-        'href="./assets/css/styles.css">\n    <link type="text/css" rel="stylesheet" href="./assets/css/shaikhlab.css"',
-    )
-    html = html.replace('href="http://{{url}}"', 'href="https://{{url}}"')
-    html = html.replace(
-        '<button data-theme="blackboard"',
-        '<button data-theme="black" class="theme-button theme-black">Black</button>\n                <button data-theme="blackboard"',
-    )
-    (root / "index.html").write_text(html)
-
-    search = (root / "assets/js/search.js").read_text()
-    # New tabs keep address-bar focus; don't steal it with the in-page search box.
-    old_search_focus = "document.getElementById('keywords').focus();"
-    if old_search_focus not in search:
-        raise SystemExit("search.js keywords focus() not found")
-    search = search.replace(old_search_focus, "", 1)
-    search = search.replace(
-        'var sengine = "https://www.google.com/?q=";',
-        'var sengine = "https://kagi.com/search?q=";',
-    )
-    search = search.replace(
-        'case "am":',
-        'case "k":\n                    window.location = "https://kagi.com/search?q=" + subtext;\n                    break;\n                case "am":',
-    )
-    (root / "assets/js/search.js").write_text(search)
-
-    themer = (root / "assets/js/themer.js").read_text()
-    themer = themer.replace(
-        "case 'blackboard':",
-        """case 'black':
-            setTheme({
-                'color-background': '#000000',
-                'color-text-pri': '#f2f2f2',
-                'color-text-acc': '#6e6e6e'
-            });
-            return;
-
-        case 'blackboard':""",
-    )
-    old_theme_init = (
-        "setValueFromLocalStorage('color-background');\n"
-        "    setValueFromLocalStorage('color-text-pri');\n"
-        "    setValueFromLocalStorage('color-text-acc');"
-    )
-    new_theme_init = (
-        "if (!localStorage.getItem('color-background')) {\n"
-        "        setTheme({\n"
-        "            'color-background': '#000000',\n"
-        "            'color-text-pri': '#f2f2f2',\n"
-        "            'color-text-acc': '#6e6e6e'\n"
-        "        });\n"
-        "    } else {\n"
-        "        setValueFromLocalStorage('color-background');\n"
-        "        setValueFromLocalStorage('color-text-pri');\n"
-        "        setValueFromLocalStorage('color-text-acc');\n"
-        "    }"
-    )
-    if old_theme_init not in themer:
-        raise SystemExit("themer.js theme init block not found")
-    themer = themer.replace(old_theme_init, new_theme_init)
-    (root / "assets/js/themer.js").write_text(themer)
-
-    html = (root / "index.html").read_text()
-    search = (root / "assets/js/search.js").read_text()
-    themer = (root / "assets/js/themer.js").read_text()
-    assert "shaikhlab" in html
-    assert "https://{{url}}" in html
-    assert "data-theme=\"black\"" in html
-    assert "shaikhlab.css" in html
-    assert 'id="good-news"' not in html
-    assert "good-news.js" not in html
-    assert "kagi.com/search" in search
-    assert "case \"k\":" in search
-    assert "document.getElementById('keywords').focus();" not in search
-    assert "case 'black':" in themer
-    assert "localStorage.getItem('color-background')" in themer
+    svg.icon,
+    .modal-close svg,
+    #modal-footer svg {
+      display: inline-block;
+      height: 1em;
+      vertical-align: -0.15em;
+      width: 1em;
+    }
   '';
 
   suiRoot = pkgs.runCommand "sui-shaikhlab" {nativeBuildInputs = [pkgs.python3];} ''
@@ -358,12 +280,9 @@
     cp -r ${suiSrc}/. $out/
     chmod -R u+w $out
 
-    cp ${appsJson} $out/apps.json
-    cp ${linksJson} $out/links.json
-    cp ${providersJson} $out/providers.json
     cp ${extraCss} $out/assets/css/shaikhlab.css
 
-    python3 ${patchSui} $out
+    python3 ${./sui/patch-sui.py} $out ${appsJson} ${linksJson} ${providersJson} ${./sui/icons.json}
   '';
 in {
   imports = [
@@ -377,6 +296,11 @@ in {
     root = suiRoot;
     locations."/".extraConfig = ''
       try_files $uri $uri/ /index.html;
+      # New tabs should reuse the last response instead of revalidating.
+      add_header Cache-Control "public, max-age=3600";
+    '';
+    locations."/assets/".extraConfig = ''
+      add_header Cache-Control "public, max-age=86400";
     '';
   };
 }
