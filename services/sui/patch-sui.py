@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Bake the start page so a new tab does not wait on third parties.
 
-Apps, bookmarks, and search providers are written into index.html.
-Icons are inline SVGs (Pictogrammers MDI, Apache-2.0). Google Fonts,
-Handlebars, and Iconify are removed. The entrance fade is removed.
+Apps and bookmarks are written into index.html. Icons are inline SVGs
+(Pictogrammers MDI, Apache-2.0). Google Fonts, Handlebars, Iconify,
+the search box, and the entrance fade are removed.
 """
 
 import html
@@ -93,30 +93,6 @@ def render_links(data: dict) -> str:
     )
 
 
-def render_providers(data: dict) -> str:
-    rows = []
-    for provider in data["providers"]:
-        name = html.escape(provider["name"])
-        url = html.escape(provider["url"], quote=True)
-        prefix = html.escape(provider["prefix"])
-        rows.append(
-            "                        <tr>\n"
-            f"                            <td><a href=\"{url}\">{name}</a></td>\n"
-            f"                            <td>{prefix}</td>\n"
-            "                        </tr>"
-        )
-    body = "\n".join(rows)
-    return (
-        "                <table>\n"
-        "                    <tr>\n"
-        "                        <th>Website</th>\n"
-        "                        <th>Prefix</th>\n"
-        "                    </tr>\n"
-        f"{body}\n"
-        "                </table>"
-    )
-
-
 def replace_section(page: str, section_id: str, inner: str) -> str:
     pattern = rf'(<section id="{section_id}">).*?(</section>)'
     updated, count = re.subn(pattern, rf"\1\n{inner}\n        \2", page, count=1, flags=re.S)
@@ -148,12 +124,18 @@ def strip_fade(css: str) -> str:
     return css[:start] + css[end:]
 
 
+def remove_block(page: str, pattern: str, label: str) -> str:
+    updated, count = re.subn(pattern, "\n", page, count=1, flags=re.S)
+    if count != 1:
+        raise SystemExit(f"{label} not found")
+    return updated
+
+
 def main() -> None:
     root = Path(sys.argv[1])
     apps = json.loads(Path(sys.argv[2]).read_text())
     links = json.loads(Path(sys.argv[3]).read_text())
-    providers = json.loads(Path(sys.argv[4]).read_text())
-    icons = load_icons(Path(sys.argv[5]))
+    icons = load_icons(Path(sys.argv[4]))
 
     page = (root / "index.html").read_text()
     page = page.replace("<title>SUI</title>", "<title>shaikhlab</title>")
@@ -175,9 +157,22 @@ def main() -> None:
             raise SystemExit(f"missing snippet: {snippet.strip()}")
         page = page.replace(snippet, "")
     page = page.replace('<main id="container" class="fade">', '<main id="container">')
+    page = remove_block(
+        page,
+        r'\s*<section id="search">.*?</section>',
+        "search box",
+    )
+    page = remove_block(
+        page,
+        r'\s*<h2>Search options</h2>\s*<section id="providers">.*?</section>',
+        "search options",
+    )
+    search_script = '    <script src="./assets/js/search.js" type="text/javascript"></script>\n'
+    if search_script not in page:
+        raise SystemExit("search.js script tag not found")
+    page = page.replace(search_script, "")
     page = replace_section(page, "apps", render_apps(icons, apps))
     page = replace_section(page, "links", render_links(links))
-    page = replace_section(page, "providers", render_providers(providers))
     page = replace_icon_spans(page, icons)
     (root / "index.html").write_text(page)
 
@@ -185,25 +180,10 @@ def main() -> None:
     css = strip_fade(css)
     (root / "assets/css/styles.css").write_text(css)
 
-    data_js = root / "assets/js/data.js"
-    if data_js.exists():
-        data_js.unlink()
-
-    search = (root / "assets/js/search.js").read_text()
-    # New tabs keep address-bar focus; don't steal it with the in-page search box.
-    old_search_focus = "document.getElementById('keywords').focus();"
-    if old_search_focus not in search:
-        raise SystemExit("search.js keywords focus() not found")
-    search = search.replace(old_search_focus, "", 1)
-    search = search.replace(
-        'var sengine = "https://www.google.com/?q=";',
-        'var sengine = "https://kagi.com/search?q=";',
-    )
-    search = search.replace(
-        'case "am":',
-        'case "k":\n                    window.location = "https://kagi.com/search?q=" + subtext;\n                    break;\n                case "am":',
-    )
-    (root / "assets/js/search.js").write_text(search)
+    for unused in ("data.js", "search.js"):
+        path = root / "assets/js" / unused
+        if path.exists():
+            path.unlink()
 
     themer = (root / "assets/js/themer.js").read_text()
     themer = themer.replace(
@@ -242,7 +222,6 @@ def main() -> None:
     (root / "assets/js/themer.js").write_text(themer)
 
     page = (root / "index.html").read_text()
-    search = (root / "assets/js/search.js").read_text()
     themer = (root / "assets/js/themer.js").read_text()
     css = (root / "assets/css/styles.css").read_text()
     assert "shaikhlab" in page
@@ -250,19 +229,20 @@ def main() -> None:
     assert 'data-theme="black"' in page
     assert "https://watch.adnanshaikh.com" in page
     assert "https://assistant.kagi.com" in page
-    assert "Kagi" in page
     assert "<svg" in page
     assert "{{" not in page
     assert "fonts.googleapis.com" not in page
     assert "handlebars" not in page
     assert "iconify" not in page
     assert "data.js" not in page
+    assert "search.js" not in page
+    assert 'id="keywords"' not in page
+    assert 'id="search"' not in page
+    assert "Search options" not in page
     assert 'class="fade"' not in page
     assert 'id="good-news"' not in page
     assert "fadeseq" not in css
-    assert "kagi.com/search" in search
-    assert 'case "k":' in search
-    assert "document.getElementById('keywords').focus();" not in search
+    assert not (root / "assets/js/search.js").exists()
     assert "case 'black':" in themer
     assert "localStorage.getItem('color-background')" in themer
 

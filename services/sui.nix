@@ -191,41 +191,6 @@
     ];
   });
 
-  providersJson = pkgs.writeText "providers.json" (builtins.toJSON {
-    providers = [
-      {
-        name = "Kagi";
-        url = "https://kagi.com/search?q=";
-        prefix = "/k";
-      }
-      {
-        name = "YouTube";
-        url = "https://www.youtube.com/results?search_query=";
-        prefix = "/y";
-      }
-      {
-        name = "TheMovieDB";
-        url = "https://www.themoviedb.org/search?query=";
-        prefix = "/m";
-      }
-      {
-        name = "TheTVDB";
-        url = "https://www.thetvdb.com/search?query=";
-        prefix = "/tv";
-      }
-      {
-        name = "iMDB";
-        url = "https://www.imdb.com/find?q=";
-        prefix = "/i";
-      }
-      {
-        name = "Duck Duck Go";
-        url = "https://duckduckgo.com/?q=";
-        prefix = "/d";
-      }
-    ];
-  });
-
   extraCss = pkgs.writeText "shaikhlab.css" ''
     :root {
       --color-background: #000000;
@@ -248,15 +213,8 @@
       color: #f2f2f2;
     }
 
-    table,
-    table td,
-    table th {
-      border-color: #333333;
-      color: #f2f2f2;
-    }
-
-    table a {
-      color: #f2f2f2;
+    #container {
+      grid-template-rows: auto;
     }
 
     .theme-black {
@@ -282,7 +240,7 @@
 
     cp ${extraCss} $out/assets/css/shaikhlab.css
 
-    python3 ${./sui/patch-sui.py} $out ${appsJson} ${linksJson} ${providersJson} ${./sui/icons.json}
+    python3 ${./sui/patch-sui.py} $out ${appsJson} ${linksJson} ${./sui/icons.json}
   '';
 in {
   imports = [
