@@ -10,9 +10,17 @@
   blockedDomains = [
     "news.ycombinator.com"
     "lobste.rs"
+    "reddit.com"
+    "www.reddit.com"
+    "old.reddit.com"
+    "new.reddit.com"
+    "np.reddit.com"
+    "amp.reddit.com"
   ];
+  # 127.0.0.1, not 0.0.0.0. Firefox drops 0.0.0.0 as an unusable address and
+  # looks the name up for real. ::1 covers IPv6 the same way.
   blockedHostsBody =
-    lib.concatStringsSep "\n" (map (d: "0.0.0.0 ${d}\n::1 ${d}") blockedDomains);
+    lib.concatStringsSep "\n" (map (d: "127.0.0.1 ${d}\n::1 ${d}") blockedDomains);
   blockedHostsMarkerBegin = "# BEGIN shaikhlab blocked domains (mac1shaikh)";
   blockedHostsMarkerEnd = "# END shaikhlab blocked domains (mac1shaikh)";
   blockedHostsSnippet = pkgs.writeText "mac1shaikh-blocked-hosts-snippet" ''
@@ -64,9 +72,18 @@ in {
         $0 == e { skip = 0; next }
         skip == 0 { print }
       ' "$hosts" > "$tmp"
-      mv "$tmp" "$hosts"
+    else
+      cat "$hosts" > "$tmp"
     fi
-    cat ${blockedHostsSnippet} >> "$hosts"
+    cat ${blockedHostsSnippet} >> "$tmp"
+    # mktemp is mode 600. macOS looks up names inside the app, and it skips
+    # /etc/hosts when that file is not world-readable. LibreWolf then gets the
+    # real addresses from DNS. mv would keep the 600 mode, so fix it first.
+    chown root:wheel "$tmp"
+    chmod 644 "$tmp"
+    mv "$tmp" "$hosts"
+    dscacheutil -flushcache || true
+    killall -HUP mDNSResponder || true
     echo >&2 "shaikhlab: updated blocked domains in /etc/hosts"
   '';
 }

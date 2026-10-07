@@ -34,6 +34,7 @@
       "trash-cli"
       "imagemagick"
       "ghostscript"
+      "go"
       "jrnl"
       "zbar"
     ];
