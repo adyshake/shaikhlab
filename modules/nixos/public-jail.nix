@@ -38,7 +38,7 @@
       domain = mkOption {
         type = types.nullOr types.str;
         default = null;
-        example = "paste.adnanshaikh.com";
+        example = "ntfy.adnanshaikh.com";
         description = "nginx server_name. Also used as the Cloudflare hostname when public.";
       };
 
@@ -137,7 +137,8 @@
         description = ''
           Give the jail a default route and NAT, for HTTPS/DNS only.
           RFC1918, link-local, and Tailscale CGNAT stay blocked.
-          wastebin stays false; ntfy needs this for ntfy.sh (iOS).
+          Leave this false unless the jail must reach the public internet.
+          ntfy needs it for ntfy.sh (iOS).
         '';
       };
 
@@ -151,7 +152,7 @@
         type = types.deferredModule;
         description = ''
           NixOS module evaluated inside the jail. Enable the actual service
-          here (wastebin, ntfy, …). The jail already has a private network,
+          here (ntfy, …). The jail already has a private network,
           no host DNS, and a size-capped /var.
         '';
       };
@@ -408,7 +409,7 @@ in {
                     port = jail.proxyPort;
                   }
                 ];
-                # Only listener on this port, so Host: paste.* from cloudflared still matches.
+                # Only listener on this port, so the public Host from cloudflared still matches.
                 default = true;
                 extraConfig = jailServerExtra;
                 locations = loc;

@@ -81,11 +81,6 @@
         icon = "git";
       }
       {
-        name = "Paste";
-        url = "paste.adnanshaikh.com";
-        icon = "content-paste";
-      }
-      {
         name = "Photos";
         url = "photos.adnanshaikh.com";
         icon = "image";
@@ -172,10 +167,6 @@
           {
             name = "Git";
             url = "https://git.adnanshaikh.com";
-          }
-          {
-            name = "Paste";
-            url = "https://paste.adnanshaikh.com";
           }
         ];
       }
