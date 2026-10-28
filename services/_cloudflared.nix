@@ -28,7 +28,9 @@ in {
     description = "Public hostnames routed through the shaikhlab-01 Cloudflare tunnel.";
   };
 
-  config = {
+  # No public hostnames means the tunnel stays down. A running tunnel
+  # with an empty ingress is still a door onto the machine.
+  config = lib.mkIf (ingress != {}) {
     sops.secrets = {
       "cloudflare-tunnel" = {
         format = "binary";

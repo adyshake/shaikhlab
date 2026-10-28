@@ -151,7 +151,7 @@ in {
           # Navidrome
           "music.adnanshaikh.com" = serverIP;
 
-          # ntfy
+          # ntfy (Tailscale-only)
           "ntfy.adnanshaikh.com" = serverIP;
 
           # Home Assistant

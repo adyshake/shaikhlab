@@ -27,7 +27,8 @@ in {
     guestPort = 2586;
     proxyPort = 12586;
     domain = domain;
-    public = true;
+    # Tailscale-only. Blocky answers this name with the tailnet IP.
+    public = false;
     memoryMax = "256M";
     tmpfsSize = "16M";
     maxBodySize = "256k";
