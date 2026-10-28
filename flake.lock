@@ -240,6 +240,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-cloudflared": {
+      "locked": {
+        "lastModified": 1793042116,
+        "narHash": "sha256-qzwKQ7flGs5Fgqa8ZAtlmsqxUhsHpatto3kBmY/9QkQ=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "8eaa4bdae7a8a8c05a555a0c462ed010af2d8dbc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "8eaa4bdae7a8a8c05a555a0c462ed010af2d8dbc",
+        "type": "github"
+      }
+    },
     "nixpkgs-unstable": {
       "locked": {
         "lastModified": 1787135253,
@@ -285,6 +301,7 @@
         "nix-homebrew": "nix-homebrew",
         "nixarr": "nixarr",
         "nixpkgs": "nixpkgs_2",
+        "nixpkgs-cloudflared": "nixpkgs-cloudflared",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "sops-nix": "sops-nix"
       }

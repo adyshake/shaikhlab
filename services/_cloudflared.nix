@@ -2,12 +2,16 @@
   config,
   pkgs,
   lib,
+  inputs,
   ...
 }: let
   inherit (lib) mkOption types;
   tunnelName = "shaikhlab-01";
   ingress = config.shaikhlab.publicIngress;
   routeUnit = hostname: "cloudflared-route-${lib.head (lib.splitString "." hostname)}";
+  # See nixpkgs-cloudflared in flake.nix. Both the tunnel and the DNS
+  # route units must use this build; pkgs.cloudflared is still 2026.5.2.
+  cloudflared = inputs.nixpkgs-cloudflared.legacyPackages.${pkgs.stdenv.hostPlatform.system}.cloudflared;
 in {
   # Hostnames that must be reachable from the public internet.
   # Everything else on *.adnanshaikh.com stays LAN/Tailscale-only via blocky.
@@ -40,6 +44,7 @@ in {
 
     services.cloudflared = {
       enable = true;
+      package = cloudflared;
       tunnels = {
         ${tunnelName} = {
           credentialsFile = config.sops.secrets."cloudflare-tunnel".path;
@@ -76,7 +81,7 @@ in {
             serviceConfig = {
               Type = "oneshot";
               ExecStartPre = "${pkgs.bash}/bin/bash -c 'for i in {1..10}; do ${pkgs.iputils}/bin/ping -c1 api.cloudflare.com && exit 0 || sleep 3; done; exit 1'";
-              ExecStart = "${lib.getExe pkgs.cloudflared} tunnel route dns '${tunnelName}' '${hostname}'";
+              ExecStart = "${lib.getExe cloudflared} tunnel route dns '${tunnelName}' '${hostname}'";
             };
           }
       )

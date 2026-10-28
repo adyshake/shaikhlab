@@ -5,6 +5,11 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
+    # cloudflared before 2026.10.2 still trusts the compromised eMudhra
+    # intermediates. nixos-26.05 is on 2026.5.2, and the 26.05 backport of
+    # nixpkgs#576762 failed, so pin the merge that ships 2026.10.3.
+    nixpkgs-cloudflared.url = "github:nixos/nixpkgs/8eaa4bdae7a8a8c05a555a0c462ed010af2d8dbc";
+
     impermanence.url = "github:nix-community/impermanence";
 
     home-manager = {
