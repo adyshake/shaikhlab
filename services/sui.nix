@@ -56,11 +56,6 @@
         icon = "progress-download";
       }
       {
-        name = "ntfy";
-        url = "ntfy.adnanshaikh.com";
-        icon = "bell-ring";
-      }
-      {
         name = "Home Assistant";
         url = "hass.adnanshaikh.com";
         icon = "home-assistant";
@@ -142,10 +137,6 @@
           {
             name = "Z-Wave";
             url = "https://zwave.adnanshaikh.com";
-          }
-          {
-            name = "ntfy";
-            url = "https://ntfy.adnanshaikh.com";
           }
           {
             name = "Photos";

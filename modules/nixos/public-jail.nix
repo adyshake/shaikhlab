@@ -38,7 +38,7 @@
       domain = mkOption {
         type = types.nullOr types.str;
         default = null;
-        example = "ntfy.adnanshaikh.com";
+        example = "app.adnanshaikh.com";
         description = "nginx server_name. Also used as the Cloudflare hostname when public.";
       };
 
@@ -138,7 +138,6 @@
           Give the jail a default route and NAT, for HTTPS/DNS only.
           RFC1918, link-local, and Tailscale CGNAT stay blocked.
           Leave this false unless the jail must reach the public internet.
-          ntfy needs it for ntfy.sh (iOS).
         '';
       };
 
@@ -152,7 +151,7 @@
         type = types.deferredModule;
         description = ''
           NixOS module evaluated inside the jail. Enable the actual service
-          here (ntfy, …). The jail already has a private network,
+          here. The jail already has a private network,
           no host DNS, and a size-capped /var.
         '';
       };
@@ -199,9 +198,7 @@ in {
       Each jail has its own network namespace (no host localhost), a
       cgroup memory cap, and a size-limited tmpfs for /var. Traffic
       enters only via host nginx (rate limits, body cap), optionally
-      through the Cloudflare tunnel.
-
-      ntfy lives in shaikhlab.publicJails.ntfy (allowEgress for ntfy.sh).
+      through the Cloudflare tunnel. Nothing in this repo enables a jail.
     '';
   };
 
@@ -324,8 +321,8 @@ in {
               if jail.allowEgress
               then ["1.1.1.1" "9.9.9.9"]
               else [];
-            # No default route unless this jail is allowed HTTPS/DNS egress
-            # (ntfy → ntfy.sh). Private ranges stay firewalled on the host.
+            # No default route unless this jail is allowed HTTPS/DNS egress.
+            # Private ranges stay firewalled on the host.
             networking.defaultGateway =
               lib.mkForce (
                 if jail.allowEgress

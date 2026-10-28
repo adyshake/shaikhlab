@@ -571,8 +571,6 @@ in {
     # value, diffs, and only PUTs when something would actually change.
     #
     # What it configures:
-    #   - Ntfy Connect entry (push notifications on download/upgrade/import)
-    #     Schema: src/NzbDrone.Core/Notifications/Ntfy/NtfySettings.cs
     #   - Transmission download client, fully declared:
     #       host=localhost, port=9091, category=radarr|tv-sonarr,
     #       removeCompletedDownloads=true, removeFailedDownloads=true.

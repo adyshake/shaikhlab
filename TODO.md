@@ -41,7 +41,7 @@
 ## To do — services
 
 - [x] set up immich — Tailscale-only at `photos.adnanshaikh.com` (localhost + nginx, library + Postgres on `/data`); see [`services/immich.nix`](services/immich.nix). Not in a public jail; not on the Cloudflare tunnel.
-- [x] set up pastebin — removed. wastebin at `paste.adnanshaikh.com` is no longer deployed. The jail module remains for ntfy: [`modules/nixos/public-jail.nix`](modules/nixos/public-jail.nix)
+- [x] set up pastebin — removed. wastebin at `paste.adnanshaikh.com` is no longer deployed. The unused jail module is [`modules/nixos/public-jail.nix`](modules/nixos/public-jail.nix)
 - [x] set up google drive — Nextcloud at `drive.adnanshaikh.com` (Tailscale-only, files on `/data/nextcloud`, Postgres shared with Immich); see [`services/nextcloud.nix`](services/nextcloud.nix). No Collabora/Talk; phone camera roll stays on Immich.
 - [ ] customize home assistant interface
 - [ ] security (define scope)
