@@ -17,6 +17,7 @@
 
     ./../../services/drive-health.nix # Requires: mxroute-smtp-password (imports ./mail.nix)
     ./../../services/nixarr.nix # Requires: wg.conf, transmission-rpc-credentials
+    ./../../services/isponsorblocktv.nix # Pair TVs with: isponsorblocktv-setup
     ./../../services/tailscale.nix # Requires: tailscale-authkey
     ./../../services/homeassistant.nix
     ./../../services/zwave-js-ui.nix
