@@ -314,6 +314,8 @@
       "https://www.fidelity.com"
       "https://fidelity.com"
       "https://digital.fidelity.com"
+      "https://www.linkedin.com"
+      "https://linkedin.com"
     ];
     Behavior = "reject-tracker-and-partition-foreign";
     Locked = true;
