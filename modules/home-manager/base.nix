@@ -59,7 +59,31 @@ in {
     htop.enable = true;
     lsd.enable = true;
     nh.enable = true;
-    vim.enable = true;
+    vim = {
+      enable = true;
+      settings = {
+        # Absolute line number on the current line.
+        number = true;
+        # Relative line numbers everywhere else, so 5j jumps five lines.
+        relativenumber = true;
+        # Indent with spaces instead of a tab character.
+        expandtab = true;
+        # A literal tab displays as 2 columns.
+        tabstop = 2;
+        # Each indent or outdent moves 2 spaces.
+        shiftwidth = 2;
+        # Search ignores capitalization.
+        ignorecase = true;
+        # A capital letter in the pattern makes that search case-sensitive.
+        smartcase = true;
+      };
+      extraConfig = ''
+        " Highlight matches for the last search. Ctrl-L clears them.
+        set hlsearch
+        " Leave click-and-drag selection to the terminal.
+        set mouse=
+      '';
+    };
     yt-dlp = {
       enable = true;
       package = pkgs-unstable.yt-dlp;
