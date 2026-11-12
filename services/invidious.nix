@@ -120,8 +120,10 @@ in {
   services.nginx.virtualHosts.${domain} = {
     forceSSL = true;
     useACMEHost = "adnanshaikh.com";
-    locations."= /feed/popular".return = "302 /";
-    locations."= /feed/trending".return = "302 /";
+    # /search, not /. A saved homepage of Popular would otherwise
+    # bounce between the feed and the front page.
+    locations."= /feed/popular".return = "302 /search";
+    locations."= /feed/trending".return = "302 /search";
     locations."/" = {
       recommendedProxySettings = true;
       proxyPass = "http://127.0.0.1:3010";
