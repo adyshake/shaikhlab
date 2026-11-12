@@ -141,10 +141,10 @@ in {
         sub_filter_types text/html;
         sub_filter 'href="/feed/popular"' 'href="/" hidden';
         sub_filter 'href="/feed/trending"' 'href="/" hidden';
-        sub_filter '<option value="Popular"  selected >Popular</option>' '';
-        sub_filter '<option value="Popular" >Popular</option>' '';
-        sub_filter '<option value="Trending"  selected >Trending</option>' '';
-        sub_filter '<option value="Trending" >Trending</option>' '';
+        sub_filter '<option value="Popular"  selected >Popular</option>' ''';
+        sub_filter '<option value="Popular" >Popular</option>' ''';
+        sub_filter '<option value="Trending"  selected >Trending</option>' ''';
+        sub_filter '<option value="Trending" >Trending</option>' ''';
       '';
     };
   };
