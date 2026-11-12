@@ -46,6 +46,7 @@ in {
         {private_url = "http://127.0.0.1:8282/companion";}
       ];
       captcha_enabled = false;
+      popular_enabled = false;
       admins = [vars.userName];
       # Blank homepage is the search page. An empty feed menu leaves both
       # slots on Search; the preferences form drops blank entries.
