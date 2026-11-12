@@ -141,6 +141,7 @@ in {
 
           # Nixarr services
           "watch.adnanshaikh.com" = serverIP;
+          "yattee.adnanshaikh.com" = serverIP;
           "prowlarr.adnanshaikh.com" = serverIP;
           "radarr.adnanshaikh.com" = serverIP;
           "sonarr.adnanshaikh.com" = serverIP;
