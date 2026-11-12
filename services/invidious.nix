@@ -52,6 +52,7 @@ in {
       default_user_preferences = {
         continue_autoplay = false;
         related_videos = false;
+        search_privacy = true;
         default_home = "";
         feed_menu = [];
       };
