@@ -16,6 +16,15 @@ in {
     ./_nginx.nix
   ];
 
+  # The module turns on DynamicUser, which wants to move this directory
+  # under /var/lib/private. It is a bind mount, so that move fails.
+  users.users.invidious = {
+    isSystemUser = true;
+    group = "invidious";
+    home = stateDir;
+  };
+  users.groups.invidious = {};
+
   # The Crystal app serves the website and the API. Companion is what
   # actually fetches playable streams; the old sig helper no longer works.
   # Companion publishes no version tags, so this tracks Quay's latest.
@@ -45,8 +54,8 @@ in {
   # out of the store. Invidious generates its own hmac key beside this.
   systemd.services.invidious = {
     unitConfig.RequiresMountsFor = [stateDir];
+    serviceConfig.DynamicUser = lib.mkForce false;
     preStart = lib.mkAfter ''
-      install -d -m 0750 ${cacheDir}
       if [[ ! -e ${companionKey} ]]; then
         ${pkgs.pwgen}/bin/pwgen 16 1 | tr -d '\n' > ${companionKey}
         chmod 0600 ${companionKey}
