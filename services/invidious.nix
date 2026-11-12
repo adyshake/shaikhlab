@@ -104,7 +104,15 @@ in {
 
   # hmac key, companion key, and the companion's player cache. Root is tmpfs.
   # Postgres for this app lives with the existing cluster on /data.
-  environment.persistence."/nix/persist".directories = [stateDir];
+  # Container images live under /var/lib/containers, which is also tmpfs.
+  environment.persistence."/nix/persist".directories = [
+    stateDir
+    "/var/lib/containers"
+  ];
+
+  # Companion's outbound path is podman0. Without this, NixOS drops
+  # the YouTube requests it is here to make.
+  networking.firewall.trustedInterfaces = ["podman0"];
 
   services.nginx.virtualHosts.${domain} = {
     forceSSL = true;

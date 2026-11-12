@@ -18,7 +18,6 @@
     ./../../services/drive-health.nix # Requires: mxroute-smtp-password (imports ./mail.nix)
     ./../../services/nixarr.nix # Requires: wg.conf, transmission-rpc-credentials
     ./../../services/isponsorblocktv.nix # Pair TVs with: iSponsorBlockTV setup-cli
-    ./../../services/yattee-server.nix # Tailscale-only; first visit opens the setup wizard
     ./../../services/invidious.nix # Tailscale-only website and API
     ./../../services/tailscale.nix # Requires: tailscale-authkey
     ./../../services/homeassistant.nix
