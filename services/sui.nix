@@ -21,6 +21,11 @@
         icon = "television";
       }
       {
+        name = "Invidious";
+        url = "invidious.adnanshaikh.com";
+        icon = "youtube";
+      }
+      {
         name = "Music";
         url = "music.adnanshaikh.com";
         icon = "music";
@@ -96,6 +101,10 @@
           {
             name = "Watch";
             url = "https://watch.adnanshaikh.com";
+          }
+          {
+            name = "Invidious";
+            url = "https://invidious.adnanshaikh.com";
           }
           {
             name = "Music";
