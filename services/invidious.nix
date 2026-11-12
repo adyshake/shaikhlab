@@ -1,0 +1,104 @@
+{
+  config,
+  lib,
+  pkgs,
+  vars,
+  ...
+}: let
+  domain = "invidious.adnanshaikh.com";
+  stateDir = "/var/lib/invidious";
+  cacheDir = "${stateDir}/companion-cache";
+  companionKey = "${stateDir}/companion_key";
+  companionEnv = "${stateDir}/companion.env";
+  companionSettings = "${stateDir}/companion.json";
+in {
+  imports = [
+    ./_nginx.nix
+  ];
+
+  # The Crystal app serves the website and the API. Companion is what
+  # actually fetches playable streams; the old sig helper no longer works.
+  # Companion publishes no version tags, so this tracks Quay's latest.
+  services.invidious = {
+    enable = true;
+    address = "127.0.0.1";
+    domain = domain;
+
+    settings = {
+      https_only = true;
+      external_port = 443;
+      # stateVersion is 23.11, which would pair user "kemal" with database
+      # "invidious" and fail local provisioning.
+      db.user = "invidious";
+      db.dbname = "invidious";
+      invidious_companion = [
+        {private_url = "http://127.0.0.1:8282/companion";}
+      ];
+      captcha_enabled = false;
+      admins = [vars.userName];
+    };
+
+    extraSettingsFile = companionSettings;
+  };
+
+  # Companion key is 16 characters and must match on both sides. It stays
+  # out of the store. Invidious generates its own hmac key beside this.
+  systemd.services.invidious = {
+    unitConfig.RequiresMountsFor = [stateDir];
+    preStart = lib.mkAfter ''
+      install -d -m 0750 ${cacheDir}
+      if [[ ! -e ${companionKey} ]]; then
+        ${pkgs.pwgen}/bin/pwgen 16 1 | tr -d '\n' > ${companionKey}
+        chmod 0600 ${companionKey}
+      fi
+      key="$(tr -d '\n' < ${companionKey})"
+      printf 'SERVER_SECRET_KEY=%s\n' "$key" > ${companionEnv}
+      chmod 0600 ${companionEnv}
+      ${pkgs.jq}/bin/jq -n --arg key "$key" '{invidious_companion_key: $key}' > ${companionSettings}
+      chmod 0600 ${companionSettings}
+    '';
+  };
+
+  virtualisation.podman.enable = true;
+  virtualisation.oci-containers.backend = "podman";
+  virtualisation.oci-containers.containers.invidious-companion = {
+    image = "quay.io/invidious/invidious-companion:latest";
+    ports = ["127.0.0.1:8282:8282"];
+    environmentFiles = [companionEnv];
+    volumes = ["${cacheDir}:/var/tmp/youtubei.js:rw"];
+    extraOptions = [
+      "--read-only"
+      "--cap-drop=ALL"
+      "--security-opt=no-new-privileges"
+      "--user=10001:10001"
+    ];
+  };
+
+  systemd.services.podman-invidious-companion = {
+    after = ["invidious.service"];
+    unitConfig.RequiresMountsFor = [stateDir];
+    serviceConfig.ExecStartPre = lib.mkAfter [
+      "${pkgs.coreutils}/bin/install -d -m 0750 -o 10001 -g 10001 ${cacheDir}"
+    ];
+  };
+
+  # hmac key, companion key, and the companion's player cache. Root is tmpfs.
+  # Postgres for this app lives with the existing cluster on /data.
+  environment.persistence."/nix/persist".directories = [stateDir];
+
+  services.nginx.virtualHosts.${domain} = {
+    forceSSL = true;
+    useACMEHost = "adnanshaikh.com";
+    locations."/" = {
+      recommendedProxySettings = true;
+      proxyPass = "http://127.0.0.1:3000";
+      extraConfig = ''
+        proxy_buffering off;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+      '';
+    };
+  };
+}
