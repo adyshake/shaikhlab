@@ -1,4 +1,4 @@
-{...}: let
+{lib, pkgs, ...}: let
   domain = "yattee.adnanshaikh.com";
   stateDir = "/var/lib/yattee-server";
 in {
@@ -21,17 +21,13 @@ in {
     environment.SECURE_COOKIES = "true";
   };
 
-  systemd.tmpfiles.settings.yattee-server = {
-    "${stateDir}/data".d = {
-      user = "root";
-      group = "root";
-      mode = "0750";
-    };
-    "${stateDir}/downloads".d = {
-      user = "root";
-      group = "root";
-      mode = "0750";
-    };
+  # The bind mount and this unit come up together on first switch.
+  # Podman refuses to start if the volume paths are missing.
+  systemd.services.podman-yattee-server = {
+    unitConfig.RequiresMountsFor = [stateDir];
+    serviceConfig.ExecStartPre = lib.mkAfter [
+      "${pkgs.coreutils}/bin/install -d -m 0750 ${stateDir}/data ${stateDir}/downloads"
+    ];
   };
 
   # Account, encryption key, and the pulled image. Root is tmpfs.
