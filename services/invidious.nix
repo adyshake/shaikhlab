@@ -47,6 +47,14 @@ in {
       ];
       captcha_enabled = false;
       admins = [vars.userName];
+      # Blank homepage is the search page. An empty feed menu leaves both
+      # slots on Search; the preferences form drops blank entries.
+      default_user_preferences = {
+        continue_autoplay = false;
+        related_videos = false;
+        default_home = "";
+        feed_menu = [];
+      };
     };
 
     extraSettingsFile = companionSettings;
