@@ -50,7 +50,7 @@
       {
         Name = "@yt";
         Description = "YouTube search";
-        URLTemplate = "https://www.youtube.com/results?search_query={searchTerms}";
+        URLTemplate = "https://invidious.adnanshaikh.com/search?q={searchTerms}";
         Method = "GET";
         IconURL = "https://www.youtube.com/favicon.ico";
         Alias = "@yt";
@@ -304,6 +304,7 @@
       "https://www.google.com"
       "https://gemini.google.com"
       "https://youtube.com"
+      "https://invidious.adnanshaikh.com"
       "https://github.com"
       "https://git.adnanshaikh.com"
       "https://start.adnanshaikh.com"

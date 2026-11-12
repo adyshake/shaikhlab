@@ -135,6 +135,11 @@
             dbInChromeStorage = true;
           };
         };
+        # LibRedirect — youtube.com, youtu.be, and embeds go to the homelab.
+        "7esoorv3@alefvanoon.anonaddy.me" = {
+          force = true;
+          settings = builtins.fromJSON (builtins.readFile ./libredirect.json);
+        };
         "{2662ff67-b302-4363-95f3-b050218bd72c}" = {
           force = true;
           settings = {
