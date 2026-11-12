@@ -31,6 +31,8 @@ in {
   services.invidious = {
     enable = true;
     address = "127.0.0.1";
+    # 3000 is Grafana, 3001 is Forgejo.
+    port = 3010;
     domain = domain;
 
     settings = {
@@ -100,7 +102,7 @@ in {
     useACMEHost = "adnanshaikh.com";
     locations."/" = {
       recommendedProxySettings = true;
-      proxyPass = "http://127.0.0.1:3000";
+      proxyPass = "http://127.0.0.1:3010";
       extraConfig = ''
         proxy_buffering off;
         proxy_http_version 1.1;
