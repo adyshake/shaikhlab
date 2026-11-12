@@ -47,6 +47,9 @@ in {
       ];
       captcha_enabled = false;
       admins = [vars.userName];
+      # The Popular tab is a page of its own. Trending has no matching
+      # switch, so nginx sends both feeds back to search.
+      popular_enabled = false;
       # Blank homepage is the search page. An empty feed menu leaves both
       # slots on Search; the preferences form drops blank entries.
       default_user_preferences = {
@@ -117,6 +120,8 @@ in {
   services.nginx.virtualHosts.${domain} = {
     forceSSL = true;
     useACMEHost = "adnanshaikh.com";
+    locations."= /feed/popular".return = "302 /";
+    locations."= /feed/trending".return = "302 /";
     locations."/" = {
       recommendedProxySettings = true;
       proxyPass = "http://127.0.0.1:3010";
@@ -124,8 +129,22 @@ in {
         proxy_buffering off;
         proxy_http_version 1.1;
         proxy_set_header Connection "";
+        proxy_set_header Accept-Encoding "";
         proxy_read_timeout 3600s;
         proxy_send_timeout 3600s;
+
+        # A saved preference can still ask for these tabs. Hide the links
+        # and drop the options so they cannot be turned back on.
+        gzip on;
+        gzip_types text/html;
+        sub_filter_once off;
+        sub_filter_types text/html;
+        sub_filter 'href="/feed/popular"' 'href="/" hidden';
+        sub_filter 'href="/feed/trending"' 'href="/" hidden';
+        sub_filter '<option value="Popular"  selected >Popular</option>' '';
+        sub_filter '<option value="Popular" >Popular</option>' '';
+        sub_filter '<option value="Trending"  selected >Trending</option>' '';
+        sub_filter '<option value="Trending" >Trending</option>' '';
       '';
     };
   };
