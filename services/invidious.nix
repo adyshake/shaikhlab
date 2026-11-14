@@ -118,16 +118,6 @@ in {
   services.nginx.virtualHosts.${domain} = {
     forceSSL = true;
     useACMEHost = "adnanshaikh.com";
-    # Trending has no config switch. A 403 stays on this URL, so a
-    # client does not follow a redirect into search or the homepage.
-    locations."= /feed/trending".extraConfig = ''
-      default_type text/plain;
-      return 403 "Trending is disabled";
-    '';
-    locations."= /api/v1/trending".extraConfig = ''
-      default_type application/json;
-      return 403 '{"error":"Trending is disabled"}';
-    '';
     locations."/" = {
       recommendedProxySettings = true;
       proxyPass = "http://127.0.0.1:3010";
@@ -135,22 +125,8 @@ in {
         proxy_buffering off;
         proxy_http_version 1.1;
         proxy_set_header Connection "";
-        proxy_set_header Accept-Encoding "";
         proxy_read_timeout 3600s;
         proxy_send_timeout 3600s;
-
-        # Saved preferences can still emit these tabs. Hide the links and
-        # remove the options. text/html only, so the video API is untouched.
-        gzip on;
-        gzip_types text/html;
-        sub_filter_once off;
-        sub_filter_types text/html;
-        sub_filter 'href="/feed/popular"' 'href="/" hidden';
-        sub_filter 'href="/feed/trending"' 'href="/" hidden';
-        sub_filter '<option value="Popular"  selected >Popular</option>' ''';
-        sub_filter '<option value="Popular" >Popular</option>' ''';
-        sub_filter '<option value="Trending"  selected >Trending</option>' ''';
-        sub_filter '<option value="Trending" >Trending</option>' ''';
       '';
     };
   };
