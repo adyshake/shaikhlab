@@ -135,8 +135,22 @@ in {
         proxy_buffering off;
         proxy_http_version 1.1;
         proxy_set_header Connection "";
+        proxy_set_header Accept-Encoding "";
         proxy_read_timeout 3600s;
         proxy_send_timeout 3600s;
+
+        # Saved preferences can still emit these tabs. Hide the links and
+        # remove the options. text/html only, so the video API is untouched.
+        gzip on;
+        gzip_types text/html;
+        sub_filter_once off;
+        sub_filter_types text/html;
+        sub_filter 'href="/feed/popular"' 'href="/" hidden';
+        sub_filter 'href="/feed/trending"' 'href="/" hidden';
+        sub_filter '<option value="Popular"  selected >Popular</option>' ''';
+        sub_filter '<option value="Popular" >Popular</option>' ''';
+        sub_filter '<option value="Trending"  selected >Trending</option>' ''';
+        sub_filter '<option value="Trending" >Trending</option>' ''';
       '';
     };
   };
