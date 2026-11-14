@@ -118,6 +118,16 @@ in {
   services.nginx.virtualHosts.${domain} = {
     forceSSL = true;
     useACMEHost = "adnanshaikh.com";
+    # Trending has no config switch. A 403 stays on this URL, so a
+    # client does not follow a redirect into search or the homepage.
+    locations."= /feed/trending".extraConfig = ''
+      default_type text/plain;
+      return 403 "Trending is disabled";
+    '';
+    locations."= /api/v1/trending".extraConfig = ''
+      default_type application/json;
+      return 403 '{"error":"Trending is disabled"}';
+    '';
     locations."/" = {
       recommendedProxySettings = true;
       proxyPass = "http://127.0.0.1:3010";
