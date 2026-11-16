@@ -11,6 +11,42 @@
   companionKey = "${stateDir}/companion_key";
   companionEnv = "${stateDir}/companion.env";
   companionSettings = "${stateDir}/companion.json";
+  # iv-org/smart-ipv6-rotator @ b9cf1f56. One address, Google ranges only.
+  rotatorSrc = pkgs.fetchzip {
+    url = "https://github.com/iv-org/smart-ipv6-rotator/archive/b9cf1f56c86dc8c8269d1f881c34ff88e43611ff.tar.gz";
+    hash = "sha256-iUT9tpScggM+N8aafB+V4/vnEr7UHWp+Ub64QRimA8Q=";
+  };
+  rotatorPy = pkgs.python3.withPackages (ps: [ps.requests ps.pyroute2]);
+  # Picks the on-link /64 on the IPv6 default route. --not-preferred keeps
+  # that address off the host's default source selection; the script still
+  # installs prefsrc routes for Google's ranges.
+  rotateGoogleV6 = pkgs.writeShellScript "invidious-rotate-ipv6" ''
+    set -eu
+    dev=$(${pkgs.iproute2}/bin/ip -6 route show default | ${pkgs.gawk}/bin/awk '/^default/ {print $5; exit}')
+    if [ -z "$dev" ]; then
+      echo "invidious ipv6 rotator: no IPv6 default route" >&2
+      exit 1
+    fi
+    prefix=$(${pkgs.python3}/bin/python3 -c '
+import ipaddress, subprocess, sys
+dev = sys.argv[1]
+out = subprocess.check_output(["${pkgs.iproute2}/bin/ip", "-6", "-o", "addr", "show", "dev", dev, "scope", "global"], text=True)
+nets = []
+for line in out.splitlines():
+    iface = ipaddress.IPv6Interface(line.split()[3])
+    if iface.network.prefixlen == 64 and str(iface.network) not in nets:
+        nets.append(str(iface.network))
+if not nets:
+    raise SystemExit("no global /64 on %s" % dev)
+print(nets[0])
+' "$dev")
+    echo "invidious ipv6 rotator: using $prefix on $dev" >&2
+    export PYTHONPATH=${rotatorSrc}
+    exec ${rotatorPy}/bin/python ${rotatorSrc}/smart-ipv6-rotator.py run \
+      --ipv6range="$prefix" \
+      --not-preferred \
+      --log-level INFO
+  '';
 in {
   imports = [
     ./_nginx.nix
@@ -38,6 +74,9 @@ in {
     settings = {
       https_only = true;
       external_port = 443;
+      # Companion rotates YouTube onto a fresh IPv6. Keep this app on v6
+      # too, or playback URLs are minted for an address the proxy is not using.
+      force_resolve = "ipv6";
       # stateVersion is 23.11, which would pair user "kemal" with database
       # "invidious" and fail local provisioning.
       db.user = "invidious";
@@ -84,7 +123,12 @@ in {
   virtualisation.oci-containers.backend = "podman";
   virtualisation.oci-containers.containers.invidious-companion = {
     image = "quay.io/invidious/invidious-companion:latest";
-    ports = ["127.0.0.1:8282:8282"];
+    # Host network, not podman0. The rotator installs routes on the host;
+    # the bridge would still NAT YouTube out as the house IPv4.
+    networks = ["host"];
+    environment = {
+      HOST = "127.0.0.1";
+    };
     environmentFiles = [companionEnv];
     volumes = ["${cacheDir}:/var/tmp/youtubei.js:rw"];
     extraOptions = [
@@ -95,8 +139,30 @@ in {
     ];
   };
 
+  systemd.services.smart-ipv6-rotator = {
+    description = "Rotate the IPv6 source used for YouTube";
+    wantedBy = ["multi-user.target"];
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = rotateGoogleV6;
+    };
+  };
+
+  systemd.timers.smart-ipv6-rotator = {
+    description = "Rotate the YouTube IPv6 source twice a day";
+    wantedBy = ["timers.target"];
+    timerConfig = {
+      OnUnitActiveSec = "12h";
+      AccuracySec = "15min";
+      Persistent = true;
+    };
+  };
+
   systemd.services.podman-invidious-companion = {
-    after = ["invidious.service"];
+    after = ["invidious.service" "smart-ipv6-rotator.service"];
+    wants = ["smart-ipv6-rotator.service"];
     unitConfig.RequiresMountsFor = [stateDir];
     serviceConfig.ExecStartPre = lib.mkAfter [
       "${pkgs.coreutils}/bin/install -d -m 0750 -o 10001 -g 10001 ${cacheDir}"
@@ -110,10 +176,6 @@ in {
     stateDir
     "/var/lib/containers"
   ];
-
-  # Companion's outbound path is podman0. Without this, NixOS drops
-  # the YouTube requests it is here to make.
-  networking.firewall.trustedInterfaces = ["podman0"];
 
   services.nginx.virtualHosts.${domain} = {
     forceSSL = true;
